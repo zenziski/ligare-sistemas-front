@@ -1,5 +1,5 @@
 import { CheckIcon, CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
-import { Box, Flex, Button, useDisclosure, Divider, Icon, IconButton, Slide } from "@chakra-ui/react";
+import { Box, Flex, useDisclosure, Divider, Icon, IconButton, Text } from "@chakra-ui/react";
 import { useRef, useState } from "react";
 
 interface SidebarProps {
@@ -30,8 +30,8 @@ const Item = ({ children, icon }: ItemProps) => {
                     onOpen();
                 }
             }}
-            bg={isHover ? "primary-700" : "primary-400"}
-            color="white"
+            bg={isHover ? "#fff" : "#f9f9f9"}
+            color="black"
             p={4}
             cursor="pointer"
             _focus={{
@@ -54,16 +54,16 @@ const Item = ({ children, icon }: ItemProps) => {
                 w={6}
                 h={6}
                 borderRadius={'md'}
-                bg={isActive ? 'primary-700' : 'primary-400'}
-                color={isActive ? '#F7FAFC' : 'primary-700'}
+                bg="primary-500"
+                color='primary-400'
                 transition={'all 0.2s ease-in-out'}
             >
                 {icon}
             </Box>
             <Box
                 fontSize={'md'}
-                fontWeight={'bold'}
-                color={isActive ? '#F7FAFC' : '#E2E8F0'}
+                color="#555"
+                fontFamily="Poppins-Medium"
             >
                 {children}
             </Box>
@@ -77,7 +77,7 @@ const Sidebar = ({ children }: SidebarProps) => {
     return (
         <Flex>
             <Box
-                bg="primary-400"
+                bg="#f5f7f7"
                 w="64"
                 p="6"
                 color="white"
@@ -90,7 +90,7 @@ const Sidebar = ({ children }: SidebarProps) => {
                     fontSize={'2xl'}
                     fontWeight={'bold'}
                 >
-                    Ligare
+                    <Text fontFamily="Poppins-Light" fontSize="36px" color="black">Ligare</Text>
                 </Box>
                 <Divider />
                 <Box
@@ -120,7 +120,6 @@ const Sidebar = ({ children }: SidebarProps) => {
             >
                 <Box
                     p={4}
-                    bg={'primary-400'}
                     color={'white'}
                     h={'64px'}
                     display={'flex'}
