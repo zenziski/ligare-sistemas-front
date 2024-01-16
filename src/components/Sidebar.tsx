@@ -1,159 +1,78 @@
-import { CheckIcon, CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
-import { Box, Flex, useDisclosure, Divider, Icon, IconButton, Text } from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { CheckIcon } from "@chakra-ui/icons";
+import { Box, Flex, Divider, Text } from "@chakra-ui/react";
 
 interface SidebarProps {
     children: React.ReactNode
 }
 
 interface ItemProps {
-    children: React.ReactNode
+    label: string
     icon: React.ReactNode
+    isActive?: boolean
 }
 
-const Item = ({ children, icon }: ItemProps) => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const [isHover, setIsHover] = useState(false);
-    const [isActive, setIsActive] = useState(false)
-    const ref = useRef<HTMLDivElement>(null);
+const Item = ({ label, icon, isActive }: ItemProps) => {
 
     return (
-        <Box
-            ref={ref}
-            onMouseEnter={() => setIsHover(true)}
-            onMouseLeave={() => setIsHover(false)}
-            onClick={() => {
-                setIsActive(!isActive);
-                if (ref.current?.contains(document.activeElement)) {
-                    onClose();
-                } else {
-                    onOpen();
-                }
-            }}
-            bg={isHover ? "#fff" : "#f9f9f9"}
+        <Flex
+            bg={isActive ? 'primary-100' : 'transparent'}
             color="black"
             p={4}
             cursor="pointer"
-            _focus={{
-                outline: "none",
-            }}
-            display={'flex'}
-            alignItems={'center'}
-            borderRadius={'md'}
+            alignItems='center'
+            borderRadius='md'
             mb={2}
-            _active={{
-                bg: 'primary-700'
-            }}
-            transition={'all 0.2s ease-in-out'}
+            transition='all 0.2s ease-in-out'
         >
-            <Box
+            <Flex
                 mr={2}
-                display={'flex'}
-                alignItems={'center'}
-                justifyContent={'center'}
+                alignItems='center'
+                justifyContent='center'
                 w={6}
                 h={6}
-                borderRadius={'md'}
+                borderRadius='md'
                 bg="primary-500"
                 color='primary-400'
-                transition={'all 0.2s ease-in-out'}
+                transition='all 0.2s ease-in-out'
             >
                 {icon}
-            </Box>
+            </Flex>
             <Box
-                fontSize={'md'}
+                fontSize='md'
                 color="#555"
                 fontFamily="Poppins-Medium"
             >
-                {children}
+                {label}
             </Box>
-        </Box>
+        </Flex>
     );
 }
 
 const Sidebar = ({ children }: SidebarProps) => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
-
     return (
         <Flex>
-            <Box
-                bg="#f5f7f7"
-                w="64"
-                p="6"
-                color="white"
-                display={{ base: isOpen ? "block" : "none", md: "block" }}
-                h={'100vh'}
-            >
-                <Box
+            <Box bg="#f5f7f7" w="64" p="6" color="white" h='100vh'>
+                <Flex
                     p={4}
-                    textAlign={'center'}
-                    fontSize={'2xl'}
-                    fontWeight={'bold'}
+                    textAlign='center'
+                    fontSize='2xl'
+                    fontWeight='bold'
+                    justifyContent="center"
+                    alignItems="center"
                 >
                     <Text fontFamily="Poppins-Light" fontSize="36px" color="black">Ligare</Text>
-                </Box>
+                </Flex>
                 <Divider />
-                <Box
-                    mt={4}
-                    display={'flex'}
-                    flexDirection={'column'}
-                >
-                    <Item
-                        icon={<CheckIcon />}
-                    >
-                        Item 1
-                    </Item>
-                    <Item
-                        icon={<Icon />}
-                    >
-                        Item 2
-                    </Item>
-                    <Item
-                        icon={<Icon />}
-                    >
-                        Item 3
-                    </Item>
-                </Box>
-            </Box>
-            <Box
-                flex="1"
-            >
-                <Box
-                    p={4}
-                    color={'white'}
-                    h={'64px'}
-                    display={'flex'}
-                    alignItems={'center'}
-                    justifyContent={'flex-end'}
-                >
-                    {
-                        isOpen ? (
-                            <IconButton
-                                aria-label="Close Menu"
-                                size="lg"
-                                mr={2}
-                                icon={<CloseIcon />}
-                                onClick={onClose}
-                                display={{ base: "block", md: "none" }}
-                            />) : (
-                            <IconButton
-                                aria-label="Open Menu"
-                                size="lg"
-                                mr={2}
-                                icon={<HamburgerIcon />}
-                                onClick={onOpen}
-                                display={{ base: "block", md: "none" }}
-                            />
-                        )
-                    }
-                </Box>
-                <Box
-                    p={4}
-                >
-                    {children}
-                </Box>
-            </Box>
-        </Flex>
+                <Flex direction="column">
+                    <Item label="Menu item" icon={<CheckIcon />} />
+                    <Item label="Menu item" icon={<CheckIcon />} />
+                    <Item label="Menu item" icon={<CheckIcon />} />
+                </Flex>
+            </Box >
+            <Flex p={4} w="100%" h="100%">
+                {children}
+            </Flex>
+        </Flex >
     );
 }
 
