@@ -4,6 +4,7 @@ import { Route, Routes } from "react-router"
 import Home from "./routes/home"
 import Clientes from "./routes/clientes"
 import Obras from "./routes/obras"
+import Obra from "./routes/obra"
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
         <Route path="home" element={<Home />} />
         <Route path="clientes" element={<Clientes />} />
         <Route path="obras" element={<Obras />} />
+        <Route path="obra/:id" element={<Obra />} />
       </Route>
     </Routes>
   )
