@@ -1,5 +1,6 @@
 import { CheckIcon } from "@chakra-ui/icons";
 import { Box, Flex, Divider, Text } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 interface SidebarProps {
     children: React.ReactNode
@@ -7,44 +8,48 @@ interface SidebarProps {
 
 interface ItemProps {
     label: string
-    icon: React.ReactNode
+    icon: React.ReactNode,
+    to: string
     isActive?: boolean
 }
 
-const Item = ({ label, icon, isActive }: ItemProps) => {
+const Item = ({ label, icon, to, isActive }: ItemProps) => {
 
     return (
-        <Flex
-            bg={isActive ? 'primary-100' : 'transparent'}
-            color="black"
-            p={4}
-            cursor="pointer"
-            alignItems='center'
-            borderRadius='md'
-            mb={2}
-            transition='all 0.2s ease-in-out'
-        >
+        <Link to={`/${to}`}>
             <Flex
-                mr={2}
+                bg={isActive ? 'primary-100' : 'transparent'}
+                color="black"
+                p={4}
+                cursor="pointer"
                 alignItems='center'
-                justifyContent='center'
-                w={6}
-                h={6}
                 borderRadius='md'
-                bg="primary-500"
-                color='primary-400'
+                mb={2}
                 transition='all 0.2s ease-in-out'
             >
-                {icon}
+                <Flex
+                    mr={2}
+                    alignItems='center'
+                    justifyContent='center'
+                    w={6}
+                    h={6}
+                    borderRadius='md'
+                    bg="primary-500"
+                    color='primary-400'
+                    transition='all 0.2s ease-in-out'
+                >
+                    {icon}
+                </Flex>
+                <Box
+                    fontSize='md'
+                    color="#555"
+                    fontFamily="Poppins-Medium"
+                >
+                    {label}
+                </Box>
             </Flex>
-            <Box
-                fontSize='md'
-                color="#555"
-                fontFamily="Poppins-Medium"
-            >
-                {label}
-            </Box>
-        </Flex>
+        </Link>
+
     );
 }
 
@@ -64,16 +69,16 @@ const Sidebar = ({ children }: SidebarProps) => {
                 </Flex>
                 <Divider />
                 <Flex direction="column">
-                    <Item label="Menu item" icon={<CheckIcon />} />
-                    <Item label="Menu item" icon={<CheckIcon />} />
-                    <Item label="Menu item" icon={<CheckIcon />} />
+                    <Item to="home" label="Home" icon={<CheckIcon />} />
+                    <Item to="obras" label="Obras" icon={<CheckIcon />} />
+                    <Item to="clientes" label="Clientes" icon={<CheckIcon />} />
                 </Flex>
             </Box >
             <Flex
                 p={4}
                 w="100%"
                 h="100%"
-                
+
             >
                 {children}
             </Flex>
