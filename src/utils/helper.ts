@@ -2,9 +2,6 @@ import moment from 'moment'
 import { TOKEN_KEY, USER_KEY } from './constants'
 
 export default class Helpers {
-    static get user(): IAuth | null {
-        return toAppUser(this.getUserLocalstorage())
-    }
 
     static setTokenLocalStorage(token: string): void {
         localStorage.setItem(TOKEN_KEY, token)
