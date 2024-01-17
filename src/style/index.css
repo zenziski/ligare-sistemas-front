@@ -131,20 +131,3 @@ code {
 html {
     scroll-behavior: smooth;
 }
-
-body::-webkit-scrollbar-track {
-    background-color: #f2f0f4;
-}
-
-body::-webkit-scrollbar {
-    width: 8px;
-}
-
-body::-webkit-scrollbar-thumb {
-
-    background-color: #0263FF;
-}
-
-body::-webkit-scrollbar-thumb:hover {
-    background: #004CC6;
-}

@@ -69,7 +69,12 @@ const Sidebar = ({ children }: SidebarProps) => {
                     <Item label="Menu item" icon={<CheckIcon />} />
                 </Flex>
             </Box >
-            <Flex p={4} w="100%" h="100%">
+            <Flex
+                p={4}
+                w="100%"
+                h="100%"
+                
+            >
                 {children}
             </Flex>
         </Flex >
