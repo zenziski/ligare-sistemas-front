@@ -5,6 +5,7 @@ import Home from "./routes/home"
 import Clientes from "./routes/clientes"
 import Obras from "./routes/obras"
 import Obra from "./routes/obra"
+import Usuarios from "./routes/usuarios"
 
 function App() {
 
@@ -16,6 +17,7 @@ function App() {
         <Route path="clientes" element={<Clientes />} />
         <Route path="obras" element={<Obras />} />
         <Route path="obra/:id" element={<Obra />} />
+        <Route path="usuarios" element={<Usuarios />} />
       </Route>
     </Routes>
   )

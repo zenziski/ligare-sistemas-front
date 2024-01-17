@@ -1,7 +1,7 @@
 import { AbsoluteCenter, Box, Button, Divider, Flex, FormControl, FormLabel, Grid, Input, InputGroup, InputLeftElement, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react"
 import Sidebar from "../../components/Sidebar"
 import DrawerComponent from "../../components/Drawer"
-import { AddIcon, EditIcon, SearchIcon } from "@chakra-ui/icons"
+import { AddIcon, SearchIcon } from "@chakra-ui/icons"
 import { useEffect, useState } from "react"
 import MoneyInput from "../../components/MoneyInput"
 import { Link } from "react-router-dom"
