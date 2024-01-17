@@ -2,31 +2,17 @@ import { AbsoluteCenter, Box, Button, Divider, Flex, FormControl, FormLabel, Gri
 import Sidebar from "../../components/Sidebar"
 import DrawerComponent from "../../components/Drawer"
 import { AddIcon, EditIcon, SearchIcon } from "@chakra-ui/icons"
-import InputMask from "react-input-mask"
+import { useEffect, useState } from "react"
+import MoneyInput from "../../components/MoneyInput"
+import { Link } from "react-router-dom"
 
 const Obras = () => {
 
-    const EditButton = (props: any) => {
-        //TODO: TIPAR ESSA PORRA
-        return (
-            <DrawerComponent
-                buttonIcon={<EditIcon />}
-                headerText="Editar Obra"
-                buttonColorScheme="blue"
-                size="md"
-            >
-                oi
-            </DrawerComponent>
-        )
-    }
+    const [inputValue, setInputValue] = useState('')
 
-    const renderInput = (): any => {
-        return () => {
-            return (
-                <Input placeholder="Digite..." />
-            );
-        }
-    }
+    useEffect(() => {
+        console.log(inputValue)
+    }, [inputValue])
 
     return (
         <Sidebar>
@@ -67,9 +53,10 @@ const Obras = () => {
                             <FormControl gridColumn="span 2">
                                 <FormLabel>Contrato</FormLabel>
                                 <InputGroup>
-                                    <InputMask mask="R$ 999.999.999,99" maskChar={null}>
-                                        {renderInput()}
-                                    </InputMask>
+                                    <MoneyInput
+                                        value={inputValue}
+                                        setValue={setInputValue}
+                                    />
                                 </InputGroup>
                             </FormControl>
                             <FormControl>
@@ -78,7 +65,7 @@ const Obras = () => {
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Valor Mensal</FormLabel>
-                                <Input placeholder="Digite..." />
+                                <Input placeholder="R$" readOnly={true} />
                             </FormControl>
                             <Box position='relative' gridColumn="span 2" >
                                 <Divider
@@ -90,7 +77,10 @@ const Obras = () => {
                             </Box>
                             <FormControl gridColumn="span 2">
                                 <FormLabel>Contrato</FormLabel>
-                                <Input placeholder="Digite..." />
+                                <MoneyInput
+                                    value={inputValue}
+                                    setValue={setInputValue}
+                                />
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Parcelas</FormLabel>
@@ -98,7 +88,7 @@ const Obras = () => {
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Valor Mensal</FormLabel>
-                                <Input placeholder="Digite..." />
+                                <Input placeholder="R$" readOnly />
                             </FormControl>
                             <Divider gridColumn="span 2" borderColor={'gray.500'} />
                             <FormControl>
@@ -140,7 +130,6 @@ const Obras = () => {
                                 <Th>Parcelas</Th>
                                 <Th>Valor Mensal</Th>
                                 <Th>{' '}</Th>
-                                <Th>{' '}</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
@@ -151,11 +140,18 @@ const Obras = () => {
                                 <Td> </Td>
                                 <Td> </Td>
                                 <Td> </Td>
-                                <Td><EditButton /></Td>
                                 <Td>
-                                    <Button>
-                                        Detalhes
-                                    </Button>
+                                    <Link
+                                        to={'/obra/1'}
+                                        style={{
+                                            textDecoration: 'none'
+                                        }}
+                                    >
+                                        <Button>
+                                            Detalhes
+                                        </Button>
+                                    </Link>
+
                                 </Td>
                             </Tr>
                         </Tbody>
