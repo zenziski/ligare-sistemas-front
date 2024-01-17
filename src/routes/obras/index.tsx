@@ -20,9 +20,13 @@ const Obras = () => {
         )
     }
 
-    const renderInput = (inputProps: any): React.ReactNode => (
-        <Input {...inputProps} placeholder="Digite..." />
-    );
+    const renderInput = (): any => {
+        return () => {
+            return (
+                <Input placeholder="Digite..." />
+            );
+        }
+    }
 
     return (
         <Sidebar>
@@ -64,7 +68,7 @@ const Obras = () => {
                                 <FormLabel>Contrato</FormLabel>
                                 <InputGroup>
                                     <InputMask mask="R$ 999.999.999,99" maskChar={null}>
-                                        {renderInput}
+                                        {renderInput()}
                                     </InputMask>
                                 </InputGroup>
                             </FormControl>
