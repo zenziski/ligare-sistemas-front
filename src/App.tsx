@@ -8,7 +8,6 @@ import Obra from "./routes/obra"
 import Usuarios from "./routes/usuarios"
 
 function App() {
-
   return (
     <Routes>
       <Route path="/">
@@ -16,11 +15,11 @@ function App() {
         <Route path="home" element={<Home />} />
         <Route path="clientes" element={<Clientes />} />
         <Route path="obras" element={<Obras />} />
-        <Route path="obra/:id" element={<Obra />} />
+        <Route path="obras/:id" element={<Obra />} />
         <Route path="usuarios" element={<Usuarios />} />
       </Route>
     </Routes>
   )
 }
 
-export default App
+export default App;

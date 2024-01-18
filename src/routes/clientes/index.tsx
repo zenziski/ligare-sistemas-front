@@ -3,18 +3,55 @@ import Sidebar from "../../components/Sidebar";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import DrawerComponent from "../../components/Drawer";
 
+interface IUserTable {
+    nome: string;
+    cpf: string;
+    rg: string;
+    email: string;
+    dataNascimento: string;
+    enderecoCobranca: string;
+};
+
 const Clientes = () => {
-    //TODO: TIPAR ESSA PORRA
-    const EditButton = (props: any) => {
+
+    const clientes = Array<IUserTable>(10).fill({
+        nome: 'Matheus Zenziski',
+        cpf: '141.973.309-52',
+        rg: '13.401.592-6',
+        email: 'matheus.zenziski@gmail.com',
+        dataNascimento: '05/06/2001',
+        enderecoCobranca: 'Rua das Flores, 123'
+    })
+
+
+    const GridForm = ({ cliente }: { cliente?: IUserTable }) => {
         return (
-            <DrawerComponent
-                buttonIcon={<EditIcon />}
-                headerText="Editar cliente"
-                buttonColorScheme="blue"
-                size="md"
-            >
-                oi
-            </DrawerComponent>
+            <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+                <FormControl gridColumn="span 2">
+                    <FormLabel>Nome completo</FormLabel>
+                    <Input value={cliente?.nome || ''} placeholder="Digite..." />
+                </FormControl>
+                <FormControl>
+                    <FormLabel>CPF</FormLabel>
+                    <Input value={cliente?.cpf || ''} placeholder="Digite..." />
+                </FormControl>
+                <FormControl>
+                    <FormLabel>RG</FormLabel>
+                    <Input value={cliente?.rg || ''} placeholder="Digite..." />
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Email</FormLabel>
+                    <Input value={cliente?.email || ''} placeholder="Digite..." />
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Data de nascimento</FormLabel>
+                    <Input value={cliente?.dataNascimento || ''} placeholder="Digite..." />
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Endereço de cobrança</FormLabel>
+                    <Input value={cliente?.enderecoCobranca || ''} placeholder="Digite..." />
+                </FormControl>
+            </Grid>
         )
     }
 
@@ -33,36 +70,7 @@ const Clientes = () => {
                         size="md"
                         isButton
                     >
-                        <Grid templateColumns="repeat(2, 1fr)" gap={6}>
-                            <FormControl gridColumn="span 2">
-                                <FormLabel>Nome completo</FormLabel>
-                                <Input placeholder="Digite..." />
-                            </FormControl>
-                            <FormControl>
-                                <FormLabel>CPF</FormLabel>
-                                <Input placeholder="Digite..." />
-                            </FormControl>
-                            <FormControl>
-                                <FormLabel>RG</FormLabel>
-                                <Input placeholder="Digite..." />
-                            </FormControl>
-                            <FormControl>
-                                <FormLabel>Email</FormLabel>
-                                <Input placeholder="Digite..." />
-                            </FormControl>
-                            <FormControl>
-                                <FormLabel>Data de nascimento</FormLabel>
-                                <Input placeholder="Digite..." />
-                            </FormControl>
-                            <FormControl>
-                                <FormLabel>Endereço da Obra</FormLabel>
-                                <Input placeholder="Digite..." />
-                            </FormControl>
-                            <FormControl>
-                                <FormLabel>Endereço de cobrança</FormLabel>
-                                <Input placeholder="Digite..." />
-                            </FormControl>
-                        </Grid>
+                        <GridForm />
                     </DrawerComponent>
                 </Flex>
                 <TableContainer>
@@ -77,69 +85,27 @@ const Clientes = () => {
                                 <Th>{' '}</Th>
                             </Tr>
                         </Thead>
+
                         <Tbody>
-                            <Tr>
-                                <Td>Matheus</Td>
-                                <Td>141.973.309-52</Td>
-                                <Td>13.401.592-6</Td>
-                                <Td>matheus.zenziski@gmail.com</Td>
-                                <Td>05/06/2001</Td>
-                                <Td><EditButton /></Td>
-                            </Tr>
-                            <Tr>
-                                <Td>Matheus</Td>
-                                <Td>141.973.309-52</Td>
-                                <Td>13.401.592-6</Td>
-                                <Td>matheus.zenziski@gmail.com</Td>
-                                <Td>05/06/2001</Td>
-                                <Td><EditButton /></Td>
-
-                            </Tr>
-                            <Tr>
-                                <Td>Matheus</Td>
-                                <Td>141.973.309-52</Td>
-                                <Td>13.401.592-6</Td>
-                                <Td>matheus.zenziski@gmail.com</Td>
-                                <Td>05/06/2001</Td>
-                                <Td><EditButton /></Td>
-
-                            </Tr>
-                            <Tr>
-                                <Td>Matheus</Td>
-                                <Td>141.973.309-52</Td>
-                                <Td>13.401.592-6</Td>
-                                <Td>matheus.zenziski@gmail.com</Td>
-                                <Td>05/06/2001</Td>
-                                <Td><EditButton /></Td>
-
-                            </Tr>
-                            <Tr>
-                                <Td>Matheus</Td>
-                                <Td>141.973.309-52</Td>
-                                <Td>13.401.592-6</Td>
-                                <Td>matheus.zenziski@gmail.com</Td>
-                                <Td>05/06/2001</Td>
-                                <Td><EditButton /></Td>
-
-                            </Tr>
-                            <Tr>
-                                <Td>Matheus</Td>
-                                <Td>141.973.309-52</Td>
-                                <Td>13.401.592-6</Td>
-                                <Td>matheus.zenziski@gmail.com</Td>
-                                <Td>05/06/2001</Td>
-                                <Td><EditButton /></Td>
-
-                            </Tr>
-                            <Tr>
-                                <Td>Matheus</Td>
-                                <Td>141.973.309-52</Td>
-                                <Td>13.401.592-6</Td>
-                                <Td>matheus.zenziski@gmail.com</Td>
-                                <Td>05/06/2001</Td>
-                                <Td><EditButton /></Td>
-
-                            </Tr>
+                            {clientes.map((cliente, index) => (
+                                <Tr key={index}>
+                                    <Td>{cliente.nome}</Td>
+                                    <Td>{cliente.cpf}</Td>
+                                    <Td>{cliente.rg}</Td>
+                                    <Td>{cliente.email}</Td>
+                                    <Td>{cliente.dataNascimento}</Td>
+                                    <Td>
+                                        <DrawerComponent
+                                            buttonIcon={<EditIcon />}
+                                            headerText="Editar cliente"
+                                            buttonColorScheme="blue"
+                                            size="md"
+                                        >
+                                            <GridForm cliente={cliente} />
+                                        </DrawerComponent>
+                                    </Td>
+                                </Tr>
+                            ))}
                         </Tbody>
                     </Table>
                 </TableContainer>
