@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import MaskedInput from 'react-text-mask';
 import createNumberMask from 'text-mask-addons/dist/createNumberMask';
-import { InputGroup, Input, } from '@chakra-ui/react';
+import { Input, } from '@chakra-ui/react';
 
 const defaultMaskOptions = {
     prefix: 'R$ ',
