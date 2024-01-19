@@ -2,7 +2,7 @@ import { AbsoluteCenter, Box, Divider, Flex, FormControl, FormLabel, Grid, Input
 import Sidebar from "../../components/Sidebar"
 import DrawerComponent from "../../components/Drawer"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { AddIcon, ArrowForwardIcon, DeleteIcon, EditIcon, SearchIcon } from "@chakra-ui/icons"
 
 import MoneyInput from "../../components/MoneyInput"

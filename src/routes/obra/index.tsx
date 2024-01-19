@@ -1,11 +1,9 @@
-import { EditIcon } from "@chakra-ui/icons"
 import Sidebar from "../../components/Sidebar"
-import { Flex, Text, Grid, FormControl, FormLabel, Input, Table, Thead, Tbody, Tr, Th, Td, TableContainer, InputGroup, InputLeftElement, Checkbox, Avatar, IconButton, Badge, Card, CardBody, Stat, StatHelpText, StatLabel, StatNumber, StatArrow, StatGroup, GridItem } from "@chakra-ui/react"
+import { Flex, Text, Grid, Table, Thead, Tbody, Tr, Th, Td, TableContainer, GridItem } from "@chakra-ui/react"
 import { useParams } from "react-router-dom"
 import Helpers from "../../utils/helper";
 import Chart from "react-apexcharts";
 import StatComponent from "../../components/Stats";
-
 
 interface IDiarioItem {
     createdAt: string;
