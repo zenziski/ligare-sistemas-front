@@ -3,53 +3,41 @@ import Sidebar from "../../components/Sidebar";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import DrawerComponent from "../../components/Drawer";
 
-interface IUserTable {
+interface IFornecedorTable {
     nome: string;
-    cpf: string;
-    rg: string;
+    cpfCnpj: string;
     email: string;
-    dataNascimento: string;
-    enderecoCobranca: string;
+    contato: string;
 };
 
-const Clientes = () => {
+const Fornecedores = () => {
 
-    const clientes = Array<IUserTable>(10).fill({
+    const clientes = Array<IFornecedorTable>(10).fill({
         nome: 'Matheus Zenziski',
-        cpf: '141.973.309-52',
-        rg: '13.401.592-6',
+        cpfCnpj: '141.973.309-52',
         email: 'matheus.zenziski@gmail.com',
-        dataNascimento: '05/06/2001',
-        enderecoCobranca: 'Rua das Flores, 123'
+        contato: '(41) 9 9999-9999'
     })
 
 
-    const GridForm = ({ cliente }: { cliente?: IUserTable }) => {
+    const GridForm = ({ cliente }: { cliente?: IFornecedorTable }) => {
         return (
             <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
                 <FormControl gridColumn="span 2">
-                    <FormLabel>Nome completo</FormLabel>
-                    <Input value={cliente?.nome || ''} placeholder="Exemplo da Silva" />
-                </FormControl>
-                <FormControl>
-                    <FormLabel>CPF</FormLabel>
-                    <Input value={cliente?.cpf || ''} placeholder="999.999.999-99" />
-                </FormControl>
-                <FormControl>
-                    <FormLabel>RG</FormLabel>
-                    <Input value={cliente?.rg || ''} placeholder="99.999.999-9" />
-                </FormControl>
-                <FormControl>
-                    <FormLabel>Email</FormLabel>
-                    <Input value={cliente?.email || ''} placeholder="exemplo@mail.com" />
-                </FormControl>
-                <FormControl>
-                    <FormLabel>Data de nascimento</FormLabel>
-                    <Input value={cliente?.dataNascimento || ''} placeholder="01/01/2000" />
+                    <FormLabel>Nome/Razão Social</FormLabel>
+                    <Input value={cliente?.nome || ''} placeholder="Exemplo da Silva LTDA" />
                 </FormControl>
                 <FormControl gridColumn="span 2">
-                    <FormLabel>Endereço de cobrança</FormLabel>
-                    <Input value={cliente?.enderecoCobranca || ''} placeholder="Rua do Exemplo, 123" />
+                    <FormLabel>Email</FormLabel>
+                    <Input value={cliente?.email || ''} placeholder="exemplo@mail.com.br" />
+                </FormControl>
+                <FormControl>
+                    <FormLabel>CPF/CNPJ</FormLabel>
+                    <Input value={cliente?.cpfCnpj || ''} placeholder="99.999.999/9999-99" />
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Contato</FormLabel>
+                    <Input value={cliente?.contato || ''} placeholder="(99) 9 9999-9999" />
                 </FormControl>
             </Grid>
         )
@@ -60,12 +48,12 @@ const Clientes = () => {
             <Flex w="100%" h="100%" p={10} direction="column" fontFamily="Poppins-Regular">
                 <Flex direction="row" mb="15px" justifyContent="space-between">
                     <Text fontSize="4xl">
-                        Clientes
+                        Fornecedores
                     </Text>
                     <DrawerComponent
                         buttonIcon={<AddIcon />}
                         buttonText="Adicionar"
-                        headerText="Adicionar cliente"
+                        headerText="Adicionar fornecedor"
                         buttonColorScheme="green"
                         size="md"
                         isButton
@@ -77,31 +65,29 @@ const Clientes = () => {
                     <Table variant="striped" >
                         <Thead>
                             <Tr>
-                                <Th>Nome</Th>
-                                <Th>CPF</Th>
-                                <Th>RG</Th>
+                                <Th>Nome/Razão Social</Th>
+                                <Th>CPF/CNPJ</Th>
                                 <Th>Email</Th>
-                                <Th>Data de nascimento</Th>
+                                <Th>Contato</Th>
                                 <Th>{' '}</Th>
                             </Tr>
                         </Thead>
 
                         <Tbody>
-                            {clientes.map((cliente, index) => (
+                            {clientes.map((fornecedor, index) => (
                                 <Tr key={index}>
-                                    <Td>{cliente.nome}</Td>
-                                    <Td>{cliente.cpf}</Td>
-                                    <Td>{cliente.rg}</Td>
-                                    <Td>{cliente.email}</Td>
-                                    <Td>{cliente.dataNascimento}</Td>
+                                    <Td>{fornecedor.nome}</Td>
+                                    <Td>{fornecedor.cpfCnpj}</Td>
+                                    <Td>{fornecedor.email}</Td>
+                                    <Td>{fornecedor.contato}</Td>
                                     <Td>
                                         <DrawerComponent
                                             buttonIcon={<EditIcon />}
-                                            headerText="Editar cliente"
+                                            headerText="Editar fornecedor"
                                             buttonColorScheme="blue"
                                             size="md"
                                         >
-                                            <GridForm cliente={cliente} />
+                                            <GridForm cliente={fornecedor} />
                                         </DrawerComponent>
                                     </Td>
                                 </Tr>
@@ -114,4 +100,4 @@ const Clientes = () => {
     )
 }
 
-export default Clientes;
+export default Fornecedores;

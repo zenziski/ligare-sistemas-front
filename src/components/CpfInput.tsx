@@ -37,7 +37,7 @@ const CpfInput = ({
             render={(ref: any, props: any) => (
                 <Input ref={ref} {...props} />
             )}
-            placeholder='000.000.000-00'
+            placeholder='999.999.999-99'
             value={value}
             onChange={onChange}
         />

@@ -18,7 +18,7 @@ const PhoneInput = ({ value, setValue }: PhoneInputProps) => {
             render={(ref: any, props: any) => (
                 <Input ref={ref} {...props} />
             )}
-            placeholder='(00) 00000-0000'
+            placeholder='(99) 99999-9999'
         />
     );
 }

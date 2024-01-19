@@ -33,9 +33,9 @@ const DrawerComponent: React.FC<DrawerProps> = ({ buttonIcon, buttonText, header
                 <DrawerOverlay />
                 <DrawerContent>
                     <DrawerCloseButton />
-                    <DrawerHeader>{headerText}</DrawerHeader>
+                    <DrawerHeader fontFamily="Poppins-Medium">{headerText}</DrawerHeader>
 
-                    <DrawerBody>
+                    <DrawerBody fontFamily="Poppins-Regular">
                         {children}
                     </DrawerBody>
 

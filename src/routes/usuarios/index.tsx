@@ -29,11 +29,11 @@ const Usuarios = () => {
                         <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
                             <FormControl gridColumn="span 2">
                                 <FormLabel>Nome completo</FormLabel>
-                                <Input placeholder="Digite..." />
+                                <Input placeholder="Exemplo da Silva" />
                             </FormControl>
                             <FormControl gridColumn={'span 2'}>
                                 <FormLabel>Email</FormLabel>
-                                <Input placeholder="Digite..." type="email" />
+                                <Input placeholder="exemplo@mail.com.br" type="email" />
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Telefone</FormLabel>

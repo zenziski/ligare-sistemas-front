@@ -55,8 +55,8 @@ const Item = ({ label, icon, to, isActive }: ItemProps) => {
 
 const Sidebar = ({ children }: SidebarProps) => {
     return (
-        <Flex>
-            <Box bg="#f5f7f7" w="64" p="6" color="white" h='100vh'>
+        <>
+            <Box position="fixed" top="0" left="0" h="100vh" w="64" p="6" bg="blackAlpha.50" color="white">
                 <Flex
                     p={4}
                     textAlign='center'
@@ -72,17 +72,14 @@ const Sidebar = ({ children }: SidebarProps) => {
                     <Item to="home" label="Home" icon={<CheckIcon />} />
                     <Item to="obras" label="Obras" icon={<CheckIcon />} />
                     <Item to="clientes" label="Clientes" icon={<CheckIcon />} />
+                    <Item to="fornecedores" label="Fornecedores" icon={<CheckIcon />} />
+                    <Item to="usuarios" label="Usuários" icon={<CheckIcon />} />
                 </Flex>
-            </Box >
-            <Flex
-                p={4}
-                w="100%"
-                h="100%"
-
-            >
+            </Box>
+            <Box pl="64" w="100%" overflowY="auto">
                 {children}
-            </Flex>
-        </Flex >
+            </Box>
+        </>
     );
 }
 

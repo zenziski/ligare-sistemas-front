@@ -10,6 +10,7 @@ import { Link } from "react-router-dom"
 import Helpers from "../../utils/helper"
 
 interface IObraTable {
+    slug?: string;
     nomeObra: string;
     enderecoObra: string;
     formaContrato: string;
@@ -28,7 +29,8 @@ const Obras = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const obras: IObraTable[] = [
-        {
+        {   
+            slug: 'obra-1',
             nomeObra: 'Obra 1',
             enderecoObra: 'Endereço 1',
             formaContrato: 'Contrato',
@@ -36,6 +38,7 @@ const Obras = () => {
             valorMensal: 10000.0,
         },
         {
+            slug: 'obra-2',
             nomeObra: 'Obra 2',
             enderecoObra: 'Endereço 2',
             formaContrato: 'Contrato',
@@ -43,6 +46,7 @@ const Obras = () => {
             valorMensal: 10210.0,
         },
         {
+            slug: 'obra-3',
             nomeObra: 'Obra 3',
             enderecoObra: 'Endereço 3',
             formaContrato: 'Contrato',
@@ -50,6 +54,7 @@ const Obras = () => {
             valorMensal: 2041.20,
         },
         {
+            slug: 'obra-4',
             nomeObra: 'Obra 4',
             enderecoObra: 'Endereço 4',
             formaContrato: 'Contrato',
@@ -57,6 +62,7 @@ const Obras = () => {
             valorMensal: 18549.02,
         },
         {
+            slug: 'obra-5',
             nomeObra: 'Obra 5',
             enderecoObra: 'Endereço 5',
             formaContrato: 'Contrato',
@@ -64,6 +70,7 @@ const Obras = () => {
             valorMensal: 12774.24,
         },
         {
+            slug: 'obra-6',
             nomeObra: 'Obra 6',
             enderecoObra: 'Endereço 6',
             formaContrato: 'Contrato',
@@ -213,7 +220,7 @@ const Obras = () => {
                                                 <Td>{obra.parcelas}</Td>
                                                 <Td>{Helpers.toBrazilianCurrency(obra.valorMensal)}</Td>
                                                 <Td>
-                                                    <Link to={`/obras/${index}`}>
+                                                    <Link to={`/obras/${obra.slug}`}>
                                                         <ArrowForwardIcon w="20px" h="20px" />
                                                     </Link>
                                                 </Td>
