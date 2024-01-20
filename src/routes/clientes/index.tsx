@@ -6,8 +6,10 @@ import { IUserTable, schema } from "../../stores/clientes/interface";
 import { useEffect, useState } from "react";
 import Helpers from "../../utils/helper";
 import { createCustomer, getAll, updateCustomer } from "../../stores/clientes/service";
-import { useForm } from "react-hook-form";
+import { Controller, FieldValues, UseFormRegister, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import InputMask from "react-text-mask";
+import CpfInput from "../../components/CpfInput";
 
 const Clientes = () => {
     const {
@@ -15,7 +17,9 @@ const Clientes = () => {
         handleSubmit,
         setValue,
         formState: { errors, isSubmitting },
-        reset
+        reset,
+        control,
+        watch
     } = useForm<IUserTable>({
         resolver: zodResolver(schema),
     });
@@ -85,6 +89,7 @@ const Clientes = () => {
         setValue("_id", cliente._id)
     }, [setValue, cliente]);
 
+    const cpfValue = watch('cpf');
     return (
         <Sidebar>
             {loading ? (
@@ -169,7 +174,7 @@ const Clientes = () => {
                                                 headerText="Editar cliente"
                                                 buttonColorScheme="blue"
                                                 size="md"
-                                                onOpenHook={() => {setCliente(cliente); reset()}}
+                                                onOpenHook={() => { setCliente(cliente); reset() }}
                                                 onAction={() => handleSubmit(handleEditCustomer)()}
                                                 isLoading={isSubmitting}
                                                 isDisabled={!!errors.name || !!errors.cpf || !!errors.rg || !!errors.email || !!errors.birthDate || !!errors.billingAdress}
@@ -182,7 +187,7 @@ const Clientes = () => {
                                                     </FormControl>
                                                     <FormControl>
                                                         <FormLabel>CPF</FormLabel>
-                                                        <Input {...register("cpf")} placeholder="999.999.999-99" />
+                                                        <CpfInput control={control} defaultValue={cpfValue} />
                                                         {errors.cpf && <Text color="red.500" fontSize="sm">{errors.cpf.message}</Text>}
                                                     </FormControl>
                                                     <FormControl>
