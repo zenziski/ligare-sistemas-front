@@ -44,7 +44,7 @@ export const createConstructionItem = async (data: IObrasItem) => {
 };
 
 export const updateConstructionItem = async (data: IObrasItem) => {
-    const response = await Api.patch<IObrasItem>(`/construction-item/${data._id}`, data);
+    const response = await Api.put<IObrasItem>(`/construction-item/${data._id}`, data);
     return response.data;
 };
 
