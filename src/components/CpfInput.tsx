@@ -4,15 +4,16 @@ import MaskedInput from "react-text-mask";
 interface CpfInputProps {
     value: string;
     setValue: (value: string) => void;
+    formProps: any;
 }
 
 const CpfInput = ({
     value,
-    setValue
+    setValue,
+    formProps
 }: CpfInputProps) => {
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(event.target.value);
         setValue(event.target.value);
     };
 
@@ -35,7 +36,7 @@ const CpfInput = ({
                 /\d/,
             ]}
             render={(ref: any, props: any) => (
-                <Input ref={ref} {...props} />
+                <Input ref={ref} {...props} {...formProps} />
             )}
             placeholder='999.999.999-99'
             value={value}
