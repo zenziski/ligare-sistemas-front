@@ -6,9 +6,8 @@ import { IUserTable, schema } from "../../stores/clientes/interface";
 import { useEffect, useState } from "react";
 import Helpers from "../../utils/helper";
 import { createCustomer, getAll, updateCustomer } from "../../stores/clientes/service";
-import { Controller, FieldValues, UseFormRegister, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import InputMask from "react-text-mask";
 import CpfInput from "../../components/CpfInput";
 
 const Clientes = () => {

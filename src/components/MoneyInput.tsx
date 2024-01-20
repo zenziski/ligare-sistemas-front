@@ -1,7 +1,7 @@
-import React from 'react';
 import MaskedInput from 'react-text-mask';
 import createNumberMask from 'text-mask-addons/dist/createNumberMask';
 import { Input, } from '@chakra-ui/react';
+import { Controller } from "react-hook-form";
 
 const defaultMaskOptions = {
     prefix: 'R$ ',
@@ -15,30 +15,35 @@ const defaultMaskOptions = {
     allowNegative: false,
     allowLeadingZeroes: false,
 };
-
+interface MoneyInputProps {
+    control: any;
+    defaultValue: any;
+    name: string;
+}
 const currencyMask = createNumberMask(defaultMaskOptions);
 
-interface MoneyInputProps {
-    value: string;
-    setValue: (value: string) => void;
-}
+const MoneyInput = ({ control, defaultValue, name }: MoneyInputProps) => {
 
-const MoneyInput = ({ value, setValue }: MoneyInputProps) => {
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-        setValue(value.replace('R$ ', ''))
-    };
     return (
-        <MaskedInput
-            mask={currencyMask}
-            value={value}
-            onChange={handleChange}
-            render={(ref: any, props: any) => (
-                <Input ref={ref} {...props} />
+        <Controller
+            control={control}
+            name={name}
+            defaultValue={defaultValue}
+            render={({ field }) => (
+                <MaskedInput
+                    {...field}
+                    mask={currencyMask}
+                    render={(ref: any, props: any) => (
+                        <Input ref={ref} {...props} />
+                    )}
+                    placeholder='R$ 0,00'
+                />
             )}
-            placeholder='R$ 0,00'
         />
     )
 }
 
 export default MoneyInput;
+
+
+
