@@ -1,4 +1,4 @@
-import { Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerHeader, DrawerOverlay, IconButton, useDisclosure } from "@chakra-ui/react";
+import { Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerHeader, DrawerOverlay, IconButton, Spinner, useDisclosure } from "@chakra-ui/react";
 import React from "react";
 
 interface DrawerProps {
@@ -8,10 +8,12 @@ interface DrawerProps {
     buttonColorScheme?: string;
     headerText: string;
     children: React.ReactNode;
+    onAction?: () => void;
+    isLoading?: boolean;
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
 }
 
-const DrawerComponent: React.FC<DrawerProps> = ({ buttonIcon, buttonText, headerText, buttonColorScheme, size, isButton, children }) => {
+const DrawerComponent: React.FC<DrawerProps> = ({ buttonIcon, buttonText, headerText, buttonColorScheme, size, isButton, onAction, isLoading, children }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     return (
@@ -43,7 +45,7 @@ const DrawerComponent: React.FC<DrawerProps> = ({ buttonIcon, buttonText, header
                         <Button variant='outline' mr={3} onClick={onClose}>
                             Cancelar
                         </Button>
-                        <Button colorScheme='teal'>Salvar</Button>
+                        <Button colorScheme='teal' onClick={onAction} isDisabled={isLoading}>{isLoading && <Spinner />}Salvar</Button>
                     </DrawerFooter>
                 </DrawerContent>
             </Drawer>

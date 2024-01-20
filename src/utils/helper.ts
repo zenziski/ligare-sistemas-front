@@ -31,7 +31,7 @@ export default class Helpers {
     static toViewDate(date: string): string {
         if (date == null) return ''
 
-        const viewDate = moment(date).format('DD/MM/YYYY')
+        const viewDate = moment(date).add(3, 'hours').format('DD/MM/YYYY')
         return viewDate
     }
 
