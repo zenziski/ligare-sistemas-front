@@ -11,7 +11,7 @@ interface IStat {
 
 const StatComponent: React.FC<IStat> = ({ label, value, arrowType, hasArrow, helpText }) => {
     return (
-        <Box w="300px" h="200px">
+        <Box minW="300px" width={'100%'}  h="150px">
             <Stat bg="blackAlpha.50" p={4} borderRadius="15px" w="100%" h="100%">
                 <StatLabel fontSize="24px">{label}</StatLabel>
                 <StatNumber>{value}</StatNumber>

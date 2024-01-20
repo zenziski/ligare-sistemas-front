@@ -1,15 +1,14 @@
 import { AddIcon, CloseIcon, EditIcon, SearchIcon } from "@chakra-ui/icons"
 import DrawerComponent from "../../components/Drawer"
 import Sidebar from "../../components/Sidebar"
-import { Flex, Text, Grid, FormControl, FormLabel, Input, Table, Thead, Tbody, Tr, Th, Td, TableContainer, InputGroup, InputLeftElement, Checkbox, Avatar, IconButton, Badge, useToast, InputRightElement } from "@chakra-ui/react"
-import PhoneInput from "../../components/PhoneInput"
+import { Flex, Text, Grid, FormControl, FormLabel, Input, Table, Thead, Tbody, Tr, Th, Td, TableContainer, InputGroup, InputLeftElement, Checkbox, Avatar, IconButton, Badge, useToast, InputRightElement, Progress } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { IUser, schema } from "../../stores/usuarios/interface"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { getAll, createUser, updateUser } from "../../stores/usuarios/service"
 import moment from "moment"
-import MaskedInput from "react-text-mask"
+import PhoneInput from "../../components/PhoneInput"
 
 const Usuarios = () => {
 
@@ -18,12 +17,12 @@ const Usuarios = () => {
         handleSubmit,
         formState: { errors, isSubmitting },
         setValue,
-        reset
+        reset,
+        watch,
+        control
     } = useForm<IUser>({
         resolver: zodResolver(schema)
     })
-
-    // const [value, setValue] = useState<string>('')
     const [users, setUsers] = useState<IUser[]>([])
     const [filteredUsers, setFilteredUsers] = useState<IUser[]>([])
     const [user, setUser] = useState<IUser>({} as IUser)
@@ -126,13 +125,15 @@ const Usuarios = () => {
         setValue('name', user.name)
         setValue('email', user.email)
         setValue('phoneNumber', user.phoneNumber)
-        setValue('birthDate', user.admissionDate && moment(user.birthDate).format("YYYY-MM-DD"))
-        setValue('admissionDate', user.admissionDate && moment(user.admissionDate).format("YYYY-MM-DD"))
+        setValue('birthDate', user.admissionDate ? moment(user.birthDate).format("YYYY-MM-DD") : '')
+        setValue('admissionDate', user.admissionDate ? moment(user.admissionDate).format("YYYY-MM-DD") : '')
         setValue('roles', user.roles)
         setValue('password', user.password)
         setValue('confirmPassword', user.confirmPassword)
         setValue('_id', user._id)
     }, [user, setValue])
+
+    const phoneValue = watch('phoneNumber')
 
     return (
         <Sidebar>
@@ -179,19 +180,10 @@ const Usuarios = () => {
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Telefone</FormLabel>
-                                <Input {...register("phoneNumber")} placeholder="(99) 99999-9999" />
-                                {/* <PhoneInput
-                                    control={register("phoneNumber")}
-                                    name="phoneNumber"
-                                /> */}
-                                {/* <MaskedInput
-                                    mask={['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                    {...register("phoneNumber")}
-                                    render={(ref: any, props: any) => (
-                                        <Input ref={ref} {...props} />
-                                    )}
-                                    placeholder='(99) 99999-9999'
-                                /> */}
+                                <PhoneInput
+                                    control={control}
+                                    defaultValue={phoneValue}
+                                />
                                 {errors.phoneNumber && <Text color="red.500" fontSize="sm">{errors.phoneNumber.message}</Text>}
                             </FormControl>
                             <FormControl>
@@ -249,81 +241,80 @@ const Usuarios = () => {
                         </Thead>
                         <Tbody>
                             {
-                                filteredUsers.map((user, index) => (
-                                    <Tr key={index}>
-                                        <Td>
-                                            <Avatar size="sm" name={user.name} src={user.name} />
-                                        </Td>
-                                        <Td>
-                                            <Text>{user.name}{user?.roles?.admin && <Badge ml={1} mb={1} colorScheme="green">Admin</Badge>}</Text>
-                                            <Text fontSize="sm" color="gray.500">{user.email}</Text>
-                                        </Td>
-                                        <Td>{user.phoneNumber}</Td>
-                                        <Td>{user.admissionDate && moment(user.admissionDate).format('DD/MM/YYYY')}</Td>
-                                        <Td>{user.birthDate && moment(user.birthDate).format('DD/MM/YYYY')}</Td>
-                                        <Td>
-                                            <DrawerComponent
-                                                buttonIcon={<EditIcon />}
-                                                buttonText="Editar"
-                                                headerText="Editar Usuario"
-                                                buttonColorScheme="blue"
-                                                size="md"
-                                                onOpenHook={() => {
-                                                    setUser(user);
-                                                }}
-                                                onAction={handleSubmit(handleEditUser)}
-                                                isLoading={isSubmitting}
-                                            >
-                                                <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
-                                                    <FormControl gridColumn="span 2">
-                                                        <FormLabel>Nome completo</FormLabel>
-                                                        <Input placeholder="Nome" {...register("name")} />                                                        {errors.name && <Text color="red.500" fontSize="sm">{errors.name.message}</Text>}
-                                                    </FormControl>
-                                                    <FormControl gridColumn={'span 2'}>
-                                                        <FormLabel>Email</FormLabel>
-                                                        <Input {...register("email")} placeholder="exemplo@gmail.com" type="email" />
-                                                        {errors.email && <Text color="red.500" fontSize="sm">{errors.email.message}</Text>}
-                                                    </FormControl>
-                                                    <FormControl>
-                                                        <FormLabel>Telefone</FormLabel>
-                                                        <Input {...register("phoneNumber")} placeholder="(99) 99999-9999" />
-                                                        {/* <PhoneInput
-                                                        control={register("phoneNumber")}
-                                                        name="phoneNumber"
-                                                    /> */}
-                                                        {/* <MaskedInput
-                                                        mask={['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-                                                        {...register("phoneNumber")}
-                                                        render={(ref: any, props: any) => (
-                                                            <Input ref={ref} {...props} />
-                                                        )}
-                                                        placeholder='(99) 99999-9999'
-                                                    /> */}
-                                                        {errors.phoneNumber && <Text color="red.500" fontSize="sm">{errors.phoneNumber.message}</Text>}
-                                                    </FormControl>
-                                                    <FormControl>
-                                                        <FormLabel>Data Nascimento</FormLabel>
-                                                        <Input type="date" {...register("birthDate")} />
-                                                        {errors.birthDate && <Text color="red.500" fontSize="sm">{errors.birthDate.message}</Text>}
-                                                    </FormControl>
-                                                    <FormControl>
-                                                        <FormLabel>Data Admissão</FormLabel>
-                                                        <Input type="date" {...register("admissionDate")} />
-                                                        {errors.admissionDate && <Text color="red.500" fontSize="sm">{errors.admissionDate.message}</Text>}
-                                                    </FormControl>
-                                                    <FormControl>
-                                                        <FormLabel>Permissões</FormLabel>
-                                                        <Checkbox
-                                                            {...register("roles.admin")}
-                                                        >
-                                                            Administrador
-                                                        </Checkbox>
-                                                    </FormControl>
-                                                </Grid>
-                                            </DrawerComponent>
-                                        </Td>
-                                    </Tr>
-                                ))
+                                loading ? (
+                                    <Progress size="xs" isIndeterminate />
+                                ) : filteredUsers.length === 0 ? (
+                                    <Text p={4} fontSize="18px">
+                                        Nenhum resultado encontrado :(
+                                    </Text>
+                                ) : (
+                                    filteredUsers.map((user, index) => (
+                                        <Tr key={index}>
+                                            <Td>
+                                                <Avatar size="sm" name={user.name} src={user.name} />
+                                            </Td>
+                                            <Td>
+                                                <Text>{user.name}{user?.roles?.admin && <Badge ml={1} mb={1} colorScheme="green">Admin</Badge>}</Text>
+                                                <Text fontSize="sm" color="gray.500">{user.email}</Text>
+                                            </Td>
+                                            <Td>{user.phoneNumber}</Td>
+                                            <Td>{user.admissionDate && moment(user.admissionDate).format('DD/MM/YYYY')}</Td>
+                                            <Td>{user.birthDate && moment(user.birthDate).format('DD/MM/YYYY')}</Td>
+                                            <Td>
+                                                <DrawerComponent
+                                                    buttonIcon={<EditIcon />}
+                                                    buttonText="Editar"
+                                                    headerText="Editar Usuario"
+                                                    buttonColorScheme="blue"
+                                                    size="md"
+                                                    onOpenHook={() => {
+                                                        setUser(user);
+                                                    }}
+                                                    onAction={handleSubmit(handleEditUser)}
+                                                    isLoading={isSubmitting}
+                                                >
+                                                    <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
+                                                        <FormControl gridColumn="span 2">
+                                                            <FormLabel>Nome completo</FormLabel>
+                                                            <Input placeholder="Nome" {...register("name")} />                                                        {errors.name && <Text color="red.500" fontSize="sm">{errors.name.message}</Text>}
+                                                        </FormControl>
+                                                        <FormControl gridColumn={'span 2'}>
+                                                            <FormLabel>Email</FormLabel>
+                                                            <Input {...register("email")} placeholder="exemplo@gmail.com" type="email" />
+                                                            {errors.email && <Text color="red.500" fontSize="sm">{errors.email.message}</Text>}
+                                                        </FormControl>
+                                                        <FormControl>
+                                                            <FormLabel>Telefone</FormLabel>
+                                                            <PhoneInput
+                                                                control={control}
+                                                                defaultValue={phoneValue}
+                                                            />
+                                                            {errors.phoneNumber && <Text color="red.500" fontSize="sm">{errors.phoneNumber.message}</Text>}
+                                                        </FormControl>
+                                                        <FormControl>
+                                                            <FormLabel>Data Nascimento</FormLabel>
+                                                            <Input type="date" {...register("birthDate")} />
+                                                            {errors.birthDate && <Text color="red.500" fontSize="sm">{errors.birthDate.message}</Text>}
+                                                        </FormControl>
+                                                        <FormControl>
+                                                            <FormLabel>Data Admissão</FormLabel>
+                                                            <Input type="date" {...register("admissionDate")} />
+                                                            {errors.admissionDate && <Text color="red.500" fontSize="sm">{errors.admissionDate.message}</Text>}
+                                                        </FormControl>
+                                                        <FormControl>
+                                                            <FormLabel>Permissões</FormLabel>
+                                                            <Checkbox
+                                                                {...register("roles.admin")}
+                                                            >
+                                                                Administrador
+                                                            </Checkbox>
+                                                        </FormControl>
+                                                    </Grid>
+                                                </DrawerComponent>
+                                            </Td>
+                                        </Tr>
+                                    ))
+                                )
                             }
                         </Tbody>
                     </Table>

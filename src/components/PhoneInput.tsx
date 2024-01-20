@@ -1,24 +1,43 @@
 import { Input } from "@chakra-ui/react";
+import { Controller } from "react-hook-form";
 import MaskedInput from "react-text-mask";
 
 interface PhoneInputProps {
-    value: string;
-    setValue: (value: string) => void;
+    control: any;
+    defaultValue: any;
 }
 
-const PhoneInput = ({ value, setValue }: PhoneInputProps) => {
-    const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(event.target.value);
-    };
+const PhoneInput = ({ control, defaultValue }: PhoneInputProps) => {
     return (
-        <MaskedInput
-            mask={['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-            value={value}
-            onChange={onChange}
-            render={(ref: any, props: any) => (
-                <Input ref={ref} {...props} />
+        <Controller
+            control={control}
+            name="phoneNumber"
+            defaultValue={defaultValue}
+            render={({ field }) => (
+                <MaskedInput
+                    {...field}
+                    mask={[
+                        '(',
+                        /\d/,
+                        /\d/,
+                        ')',
+                        ' ',
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        '-',
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                    ]}
+                    render={(ref: any, props: any) => (
+                        <Input ref={ref} {...props} />
+                    )}
+                />
             )}
-            placeholder='(99) 99999-9999'
         />
     );
 }
