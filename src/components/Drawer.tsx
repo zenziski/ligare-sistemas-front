@@ -9,22 +9,30 @@ interface DrawerProps {
     headerText: string;
     children: React.ReactNode;
     onAction?: () => void;
+    onOpenHook?: () => void;
     isLoading?: boolean;
+    isDisabled?: boolean;
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
 }
 
-const DrawerComponent: React.FC<DrawerProps> = ({ buttonIcon, buttonText, headerText, buttonColorScheme, size, isButton, onAction, isLoading, children }) => {
+const DrawerComponent: React.FC<DrawerProps> = ({ buttonIcon, buttonText, headerText, buttonColorScheme, size, isButton, onAction, onOpenHook, isDisabled, isLoading, children }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     return (
         <>
             {isButton ?
                 (
-                    <Button leftIcon={buttonIcon} colorScheme={buttonColorScheme || 'teal'} onClick={onOpen}>
+                    <Button leftIcon={buttonIcon} colorScheme={buttonColorScheme || 'teal'} onClick={() => {
+                        onOpen();
+                        onOpenHook && onOpenHook();
+                    }}>
                         {buttonText || ''}
                     </Button>
                 ) : (
-                    <IconButton bg="transparent" aria-label="Abrir" icon={buttonIcon} onClick={onOpen} />
+                    <IconButton bg="transparent" aria-label="Abrir" icon={buttonIcon} onClick={() => {
+                        onOpen();
+                        onOpenHook && onOpenHook();
+                    }} />
                 )}
             <Drawer
                 isOpen={isOpen}
@@ -45,7 +53,13 @@ const DrawerComponent: React.FC<DrawerProps> = ({ buttonIcon, buttonText, header
                         <Button variant='outline' mr={3} onClick={onClose}>
                             Cancelar
                         </Button>
-                        <Button colorScheme='teal' onClick={onAction} isDisabled={isLoading}>{isLoading && <Spinner />}Salvar</Button>
+                        <Button colorScheme='teal' onClick={() => {
+                            if (onAction) {
+                                try {
+                                    onAction();
+                                } catch (error) { }
+                            }
+                        }} isDisabled={isLoading || isDisabled}>{isLoading && <Spinner />}Salvar</Button>
                     </DrawerFooter>
                 </DrawerContent>
             </Drawer>

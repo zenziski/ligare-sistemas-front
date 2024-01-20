@@ -2,34 +2,32 @@ import { Table, Thead, Tr, Th, Tbody, Td, Flex, TableContainer, Text, FormContro
 import Sidebar from "../../components/Sidebar";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import DrawerComponent from "../../components/Drawer";
-import { IUserTable } from "../../stores/clientes/interface";
+import { IUserTable, schema } from "../../stores/clientes/interface";
 import { useEffect, useState } from "react";
 import Helpers from "../../utils/helper";
-import { createCustomer, getAll } from "../../stores/clientes/service";
+import { createCustomer, getAll, updateCustomer } from "../../stores/clientes/service";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const Clientes = () => {
-    const toast = useToast()
-    const [clienteState, setCliente] = useState<IUserTable>({
-        _id: '',
-        name: '',
-        cpf: '',
-        rg: '',
-        email: '',
-        birthDate: '',
-        billingAdress: ''
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        formState: { errors, isSubmitting },
+        reset
+    } = useForm<IUserTable>({
+        resolver: zodResolver(schema),
     });
+    const toast = useToast()
     const [clientes, setClientes] = useState<IUserTable[]>([]);
+    const [cliente, setCliente] = useState<IUserTable>({} as IUserTable);
     const [loading, setLoading] = useState(false);
 
 
-    const handleChange = (key: string, value: string) => {
-        setCliente({ ...clienteState, [key]: value })
-    }
-
-    const handleCreateCustomer = async () => {
-        setLoading(true);
+    const handleCreateCustomer = async (data: IUserTable) => {
         try {
-            const response = await createCustomer(clienteState);
+            const response = await createCustomer(data);
             setClientes([...clientes, response]);
             toast({
                 title: "Cliente criado com sucesso!",
@@ -37,15 +35,34 @@ const Clientes = () => {
                 duration: 5000,
                 isClosable: true,
             })
-        } catch (error) {
+        } catch (error: any) {
             toast({
-                title: "Erro ao criar cliente!",
+                title: (error?.response?.data?.message) || "Erro ao criar cliente!",
                 status: "error",
                 duration: 5000,
                 isClosable: true,
             })
         }
-        setLoading(false);
+    }
+
+    const handleEditCustomer = async (data: IUserTable) => {
+        try {
+            await updateCustomer(data);
+            await getAll();
+            toast({
+                title: "Cliente editado com sucesso!",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+            })
+        } catch (error: any) {
+            toast({
+                title: (error?.response?.data?.message) || "Erro ao editar cliente!",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            })
+        }
     }
 
     useEffect(() => {
@@ -59,8 +76,14 @@ const Clientes = () => {
     }, [])
 
     useEffect(() => {
-        console.log(clienteState);
-    }, [clienteState])
+        setValue("name", cliente.name);
+        setValue("cpf", cliente.cpf);
+        setValue("rg", cliente.rg);
+        setValue("email", cliente.email);
+        setValue("birthDate", Helpers.toViewDate(cliente.birthDate));
+        setValue("billingAdress", cliente.billingAdress);
+        setValue("_id", cliente._id)
+    }, [setValue, cliente]);
 
     return (
         <Sidebar>
@@ -81,33 +104,40 @@ const Clientes = () => {
                             buttonColorScheme="green"
                             size="md"
                             isButton
-                            onAction={() => handleCreateCustomer()}
-                            isLoading={loading}
+                            onAction={() => handleSubmit(handleCreateCustomer)()}
+                            onOpenHook={() => setCliente({} as IUserTable)}
+                            isLoading={isSubmitting}
                         >
                             <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
                                 <FormControl gridColumn="span 2">
                                     <FormLabel>Nome completo</FormLabel>
-                                    <Input value={clienteState?.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="Exemplo da Silva" />
+                                    <Input {...register("name")} placeholder="Exemplo da Silva" />
+                                    {errors.name && <Text color="red.500" fontSize="sm">{errors.name.message}</Text>}
                                 </FormControl>
                                 <FormControl>
                                     <FormLabel>CPF</FormLabel>
-                                    <Input value={clienteState?.cpf} onChange={(e) => handleChange('cpf', e.target.value)} placeholder="999.999.999-99" />
+                                    <Input {...register("cpf")} placeholder="999.999.999-99" />
+                                    {errors.cpf && <Text color="red.500" fontSize="sm">{errors.cpf.message}</Text>}
                                 </FormControl>
                                 <FormControl>
                                     <FormLabel>RG</FormLabel>
-                                    <Input value={clienteState?.rg || ''} onChange={(e) => handleChange('rg', e.target.value)} placeholder="99.999.999-9" />
+                                    <Input {...register("rg")} placeholder="99.999.999-9" />
+                                    {errors.rg && <Text color="red.500" fontSize="sm">{errors.rg.message}</Text>}
                                 </FormControl>
                                 <FormControl>
                                     <FormLabel>Email</FormLabel>
-                                    <Input value={clienteState?.email || ''} onChange={(e) => handleChange('email', e.target.value)} placeholder="exemplo@mail.com" />
+                                    <Input {...register("email")} placeholder="exemplo@mail.com" />
+                                    {errors.email && <Text color="red.500" fontSize="sm">{errors.email.message}</Text>}
                                 </FormControl>
                                 <FormControl>
                                     <FormLabel>Data de nascimento</FormLabel>
-                                    <Input value={clienteState?.birthDate || ''} onChange={(e) => handleChange('birthDate', e.target.value)} placeholder="01/01/2000" />
+                                    <Input {...register("birthDate")} type="date" placeholder="01/01/2000" />
+                                    {errors.birthDate && <Text color="red.500" fontSize="sm">{errors.birthDate.message}</Text>}
                                 </FormControl>
                                 <FormControl gridColumn="span 2">
                                     <FormLabel>Endereço de cobrança</FormLabel>
-                                    <Input value={clienteState?.billingAdress || ''} onChange={(e) => handleChange('billingAdress', e.target.value)} placeholder="Rua do Exemplo, 123" />
+                                    <Input {...register("billingAdress")} placeholder="Rua do Exemplo, 123" />
+                                    {errors.billingAdress && <Text color="red.500" fontSize="sm">{errors.billingAdress.message}</Text>}
                                 </FormControl>
                             </Grid>
                         </DrawerComponent>
@@ -126,8 +156,8 @@ const Clientes = () => {
                             </Thead>
 
                             <Tbody>
-                                {clientes.map((cliente, index) => (
-                                    <Tr key={index}>
+                                {clientes.map((cliente) => (
+                                    <Tr key={cliente._id}>
                                         <Td>{cliente.name}</Td>
                                         <Td>{cliente.cpf}</Td>
                                         <Td>{cliente.rg}</Td>
@@ -139,31 +169,41 @@ const Clientes = () => {
                                                 headerText="Editar cliente"
                                                 buttonColorScheme="blue"
                                                 size="md"
+                                                onOpenHook={() => {setCliente(cliente); reset()}}
+                                                onAction={() => handleSubmit(handleEditCustomer)()}
+                                                isLoading={isSubmitting}
+                                                isDisabled={!!errors.name || !!errors.cpf || !!errors.rg || !!errors.email || !!errors.birthDate || !!errors.billingAdress}
                                             >
                                                 <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
                                                     <FormControl gridColumn="span 2">
                                                         <FormLabel>Nome completo</FormLabel>
-                                                        <Input value={cliente?.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="Exemplo da Silva" />
+                                                        <Input {...register("name")} placeholder="Exemplo da Silva" />
+                                                        {errors.name && <Text color="red.500" fontSize="sm">{errors.name.message}</Text>}
                                                     </FormControl>
                                                     <FormControl>
                                                         <FormLabel>CPF</FormLabel>
-                                                        <Input value={cliente?.cpf} onChange={(e) => handleChange('cpf', e.target.value)} placeholder="999.999.999-99" />
+                                                        <Input {...register("cpf")} placeholder="999.999.999-99" />
+                                                        {errors.cpf && <Text color="red.500" fontSize="sm">{errors.cpf.message}</Text>}
                                                     </FormControl>
                                                     <FormControl>
                                                         <FormLabel>RG</FormLabel>
-                                                        <Input value={cliente?.rg || ''} onChange={(e) => handleChange('rg', e.target.value)} placeholder="99.999.999-9" />
+                                                        <Input {...register("rg")} placeholder="99.999.999-9" />
+                                                        {errors.rg && <Text color="red.500" fontSize="sm">{errors.rg.message}</Text>}
                                                     </FormControl>
                                                     <FormControl>
                                                         <FormLabel>Email</FormLabel>
-                                                        <Input value={cliente?.email || ''} onChange={(e) => handleChange('email', e.target.value)} placeholder="exemplo@mail.com" />
+                                                        <Input {...register("email")} placeholder="exemplo@mail.com" />
+                                                        {errors.email && <Text color="red.500" fontSize="sm">{errors.email.message}</Text>}
                                                     </FormControl>
                                                     <FormControl>
                                                         <FormLabel>Data de nascimento</FormLabel>
-                                                        <Input value={cliente?.birthDate || ''} onChange={(e) => handleChange('birthDate', e.target.value)} placeholder="01/01/2000" />
+                                                        <Input {...register("birthDate")} placeholder="01/01/2000" />
+                                                        {errors.birthDate && <Text color="red.500" fontSize="sm">{errors.birthDate.message}</Text>}
                                                     </FormControl>
                                                     <FormControl gridColumn="span 2">
                                                         <FormLabel>Endereço de cobrança</FormLabel>
-                                                        <Input value={cliente?.billingAdress || ''} onChange={(e) => handleChange('billingAdress', e.target.value)} placeholder="Rua do Exemplo, 123" />
+                                                        <Input {...register("billingAdress")} placeholder="Rua do Exemplo, 123" />
+                                                        {errors.billingAdress && <Text color="red.500" fontSize="sm">{errors.billingAdress.message}</Text>}
                                                     </FormControl>
                                                 </Grid>
                                             </DrawerComponent>

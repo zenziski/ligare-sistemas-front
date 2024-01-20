@@ -17,8 +17,8 @@ export const createCustomer = async (data: IUserTable) => {
     return response.data;
 };
 
-export const updateCustomer = async (id: string, data: IUserTable) => {
-    const response = await Api.put<IUserTable>(`/customer/${id}`, data);
+export const updateCustomer = async (data: IUserTable) => {
+    const response = await Api.patch<IUserTable>(`/customer/${data._id}`, data);
     return response.data;
 };
 
