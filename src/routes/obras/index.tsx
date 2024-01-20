@@ -1,4 +1,4 @@
-import { AbsoluteCenter, Box, Divider, Flex, FormControl, FormLabel, Grid, Input, InputGroup, InputLeftElement, Select, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Th, Thead, Tr, useToast } from "@chakra-ui/react"
+import { AbsoluteCenter, Box, Divider, Flex, FormControl, FormLabel, Grid, IconButton, Input, InputGroup, InputLeftElement, Select, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Th, Thead, Tr, useToast } from "@chakra-ui/react"
 import Sidebar from "../../components/Sidebar"
 import DrawerComponent from "../../components/Drawer"
 
@@ -11,7 +11,7 @@ import Helpers from "../../utils/helper"
 import { IObrasTable, IObrasItem, obraSchema, obraItemSchema } from "../../stores/obras/interface"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createConstruction, getAllConstruction, getAllConstructionItems } from "../../stores/obras/service"
+import { createConstruction, createConstructionItem, getAllConstruction, getAllConstructionItems, removeConstructionItem, updateConstructionItem } from "../../stores/obras/service"
 import { IUserTable } from "../../stores/clientes/interface"
 import { getAll } from "../../stores/clientes/service"
 
@@ -23,6 +23,7 @@ const Obras = () => {
     const [loading, setLoading] = useState(false);
     const [obras, setObras] = useState<IObrasTable[]>([]);
     const [configs, setConfigs] = useState<IObrasItem[]>([]);
+    const [config, setConfig] = useState<IObrasItem>({} as IObrasItem);
     const [clientes, setClientes] = useState<IUserTable[]>([]);
 
     const {
@@ -44,6 +45,7 @@ const Obras = () => {
         reset: resetObrasItem,
         control: controlObrasItem,
         watch: watchObrasItem,
+        setValue: setValueObrasItem
     } = useForm<IObrasItem>({
         resolver: zodResolver(obraItemSchema),
         shouldFocusError: false
@@ -63,6 +65,48 @@ const Obras = () => {
         } catch (error) {
             toast({
                 title: "Erro ao criar obra!",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            })
+        }
+    }
+
+    const handleCreateConstructionItem = async (data: IObrasItem) => {
+        try {
+            const construction = await createConstructionItem(data);
+            const newConfigs = [...configs, construction];
+            setConfigs(newConfigs);
+            toast({
+                title: "Item criado com sucesso!",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+            })
+        } catch (error: any) {
+            toast({
+                title: error?.response?.data?.message || "Erro ao criar item",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            })
+        }
+    }
+
+    const handleEditConstructionItem = async (data: IObrasItem) => {
+        try {
+            await updateConstructionItem(data);
+            const newConfig = await getAllConstructionItems();
+            setConfigs(newConfig);
+            toast({
+                title: "Item editado com sucesso!",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+            })
+        } catch (error: any) {
+            toast({
+                title: error?.response?.data?.message || "Erro ao editar item",
                 status: "error",
                 duration: 3000,
                 isClosable: true,
@@ -97,6 +141,11 @@ const Obras = () => {
     useEffect(() => {
         console.log(errorsObras);
     }, [errorsObras])
+
+    useEffect(() => {
+        setValueObrasItem('name', config.name);
+        setValueObrasItem('_id', config._id);
+    }, [config, setValueObrasItem])
 
     const contractValue = parseFloat(watchObras('contract.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0");
     const contractInstallments = parseFloat(watchObras('contract.installments')?.toString()?.replace("R$ ", "").replace(/\./g, "")?.replace(",", ".") || "0");
@@ -299,11 +348,18 @@ const Obras = () => {
                                         buttonColorScheme="green"
                                         size="md"
                                         isButton
+                                        onOpenHook={() => resetObrasItem()}
+                                        onAction={() => handleSubmitObrasItem(handleCreateConstructionItem)()}
+                                        isLoading={isSubmittingObrasItem}
                                     >
                                         <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
                                             <FormControl gridColumn="span 2">
                                                 <FormLabel>Nome da categoria</FormLabel>
-                                                <Input placeholder="Digite..." />
+                                                <Input
+                                                    placeholder="Digite..."
+                                                    {...registerObrasItem("name")}
+                                                />
+                                                {errorsObrasItem.name && <Text color="red">{errorsObrasItem.name.message}</Text>}
                                             </FormControl>
                                         </Grid>
                                     </DrawerComponent>
@@ -346,15 +402,44 @@ const Obras = () => {
                                                                 headerText="Editar item"
                                                                 buttonColorScheme="yellow"
                                                                 size="md"
+                                                                onOpenHook={() => setConfig(config)}
+                                                                onAction={() => handleSubmitObrasItem(handleEditConstructionItem)()}
+                                                                isLoading={isSubmittingObrasItem}
                                                             >
                                                                 <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
                                                                     <FormControl gridColumn="span 2">
                                                                         <FormLabel>Nome da categoria</FormLabel>
-                                                                        <Input {...registerObrasItem("name")} value={config.name} placeholder="Digite..." />
+                                                                        <Input {...registerObrasItem("name")} placeholder="Digite..." />
                                                                     </FormControl>
                                                                 </Grid>
                                                             </DrawerComponent>
-                                                            <DeleteIcon color="red" />
+                                                            <IconButton
+                                                                aria-label="Delete"
+                                                                icon={<DeleteIcon />}
+                                                                colorScheme="red"
+                                                                onClick={async () => {
+                                                                    try {
+                                                                        await removeConstructionItem(config._id ?? '');
+                                                                        const newConfigs = await getAllConstructionItems();
+                                                                        setConfigs(newConfigs);
+                                                                        toast({
+                                                                            title: "Item deletado com sucesso!",
+                                                                            status: "success",
+                                                                            duration: 3000,
+                                                                            isClosable: true,
+                                                                        })
+                                                                    } catch (error: any) {
+                                                                        toast({
+                                                                            title: error?.response?.data?.message || "Erro ao deletar item",
+                                                                            status: "error",
+                                                                            duration: 3000,
+                                                                            isClosable: true,
+                                                                        })
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <DeleteIcon color="red" />
+                                                            </IconButton>
                                                         </Flex>
                                                     </Td>
                                                 </Tr>
@@ -365,7 +450,6 @@ const Obras = () => {
                             </TabPanel>
                         </TabPanels>
                     </Tabs>
-
                 </Flex>
             )}
 
