@@ -1,46 +1,43 @@
 import { Input } from "@chakra-ui/react";
+import { Controller } from "react-hook-form";
 import MaskedInput from "react-text-mask";
 
 interface CpfInputProps {
-    value: string;
-    setValue: (value: string) => void;
-    formProps: any;
+    control: any;
+    defaultValue: any;
 }
 
-const CpfInput = ({
-    value,
-    setValue,
-    formProps
-}: CpfInputProps) => {
-
-    const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(event.target.value);
-    };
+const CpfInput = ({ control, defaultValue }: CpfInputProps) => {
 
     return (
-        <MaskedInput
-            mask={[
-                /\d/,
-                /\d/,
-                /\d/,
-                '.',
-                /\d/,
-                /\d/,
-                /\d/,
-                '.',
-                /\d/,
-                /\d/,
-                /\d/,
-                '-',
-                /\d/,
-                /\d/,
-            ]}
-            render={(ref: any, props: any) => (
-                <Input ref={ref} {...props} {...formProps} />
+        <Controller
+            control={control}
+            name="cpf"
+            defaultValue={defaultValue}
+            render={({ field }) => (
+                <MaskedInput
+                    {...field}
+                    mask={[
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        '.',
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        '.',
+                        /\d/,
+                        /\d/,
+                        /\d/,
+                        '-',
+                        /\d/,
+                        /\d/,
+                    ]}
+                    render={(ref: any, props: any) => (
+                        <Input ref={ref} {...props} />
+                    )}
+                />
             )}
-            placeholder='999.999.999-99'
-            value={value}
-            onChange={onChange}
         />
     )
 }
