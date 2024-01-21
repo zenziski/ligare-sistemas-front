@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { getOneConstruction } from "../../stores/obras/service";
 import { IConstructionDiary, IObrasTable } from "../../stores/obras/interface";
 import AddNewDiaryItem from "./fragments/AddNewDiaryItem";
+import ConfigurarObra from "./fragments/configurarObra";
 
 const Obra = () => {
 
@@ -194,17 +195,10 @@ const Obra = () => {
                         mb={4}
                         gap={4}
                     >
-                        <AddNewDiaryItem id={id!} flushHook={setRefresh}/>
-                        <DrawerComponent
-                            isButton
-                            buttonIcon={<SettingsIcon />}
-                            buttonText="Configurar"
-                            headerText="Configurar Obra"
-                            buttonColorScheme="blue"
-                            size="md"
-                        >
-                            Oi
-                        </DrawerComponent>
+                        <AddNewDiaryItem id={id!} flushHook={setRefresh} />
+                        <ConfigurarObra
+                            data={data}
+                        />
                     </Flex>
                     <TableContainer>
                         <Table
