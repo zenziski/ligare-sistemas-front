@@ -184,7 +184,7 @@ const TiposDeLancamento = () => {
                 </InputGroup>
             </Flex>
             <TableContainer>
-                <Table>
+                <Table variant={'striped'}>
                     <Thead>
                         <Tr>
                             <Th>Tipo Lançamento</Th>

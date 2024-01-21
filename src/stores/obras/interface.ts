@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const ConstructionDiarySchema = z.object({
+    _id: z.string().optional(),
     item: z.string(),
     description: z.string(),
     supplier: z.object({
@@ -18,7 +19,7 @@ export const ConstructionDiarySchema = z.object({
     paymentMethod: z.string(),
     paymentDate: z.string().optional(),
     observation: z.string().optional(),
-    createdAt: z.date().optional(),
+    createdAt: z.date().optional().or(z.string().optional().transform(() => new Date())).or(z.null().transform(() => new Date())),
 });
 
 export type IConstructionDiary = z.infer<typeof ConstructionDiarySchema>

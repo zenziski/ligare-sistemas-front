@@ -157,7 +157,6 @@ const Obras = () => {
         setValueObras('administration.installments', administrationInstallments)
         setValueObras('contract.value', contractValue)
         setValueObras('contract.installments', contractInstallments)
-        console.log(watchObras());
     }, [watchObras('contract.value'), watchObras('contract.installments'), watchObras('administration.value'), watchObras('administration.installments')])
 
     useEffect(() => {
@@ -403,7 +402,7 @@ const Obras = () => {
                                     </InputGroup>
                                 </Flex>
                                 <TableContainer>
-                                    <Table variant={'striped'} width="40%">
+                                    <Table variant={'striped'}>
                                         <Thead>
                                             <Tr>
                                                 <Th>Item</Th>

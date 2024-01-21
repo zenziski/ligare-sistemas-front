@@ -29,7 +29,7 @@ export default class Helpers {
     }
 
     static toViewDate(date: string): string {
-        if (date == null) return ''
+        if (!date) return '-'
         const viewDate = moment(date).format('DD/MM/YYYY')
         return viewDate
     }

@@ -18,7 +18,6 @@ export const createSupplier = async (data: IFornecedorTable) => {
 };
 
 export const updateSupplier = async (data: IFornecedorTable) => {
-    console.log(data);
     const response = await Api.patch<IFornecedorTable>(`/supplier/${data._id}`, data);
     return response.data;
 };
