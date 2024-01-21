@@ -1,4 +1,4 @@
-import { AbsoluteCenter, Box, Button, Divider, Flex, FormControl, FormLabel, Grid, IconButton, Input, InputGroup, InputLeftElement, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Th, Thead, Tr, useDisclosure, useToast } from "@chakra-ui/react"
+import { AbsoluteCenter, Box, Divider, Flex, FormControl, FormLabel, Grid, Input, InputGroup, InputLeftElement, Select, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Th, Thead, Tr, useToast } from "@chakra-ui/react"
 import Sidebar from "../../components/Sidebar"
 import DrawerComponent from "../../components/Drawer"
 
@@ -15,11 +15,11 @@ import { createConstruction, createConstructionItem, getAllConstruction, getAllC
 import { IUserTable } from "../../stores/clientes/interface"
 import { getAll } from "../../stores/clientes/service"
 import ModalDelete from "../../components/ModalDelete"
+import TiposDeLancamento from "./fragments/TiposDeLancamento"
 
 
 const Obras = () => {
     const toast = useToast()
-    const [inputValue, setInputValue] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(false);
     const [obras, setObras] = useState<IObrasTable[]>([]);
@@ -169,6 +169,7 @@ const Obras = () => {
                         <TabList>
                             <Tab>Obras</Tab>
                             <Tab>Configurações</Tab>
+                            <Tab>Tipos De Lançamento</Tab>
                         </TabList>
                         <TabPanels>
                             <TabPanel>
@@ -392,8 +393,6 @@ const Obras = () => {
                                         </Thead>
                                         <Tbody>
                                             {configs.map((config, index) => {
-                                                var isOpen = false;
-
                                                 return (
                                                     < Tr key={index} >
                                                         <Td>{config.name}</Td>
@@ -456,6 +455,9 @@ const Obras = () => {
                                         </Tbody>
                                     </Table>
                                 </TableContainer>
+                            </TabPanel>
+                            <TabPanel>
+                                <TiposDeLancamento />
                             </TabPanel>
                         </TabPanels>
                     </Tabs>
