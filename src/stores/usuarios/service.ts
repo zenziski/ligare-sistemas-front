@@ -15,3 +15,8 @@ export const updateUser = async (data: IUser) => {
     const response = await Api.put<IUser>(`/users`, data);
     return response.data;
 }
+
+export const removeUser = async (id: string) => {
+    const response = await Api.delete<IUser>(`/users/${id}`);
+    return response.data;
+}
