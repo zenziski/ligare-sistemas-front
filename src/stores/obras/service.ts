@@ -1,5 +1,5 @@
 import { Api } from '../../utils/api';
-import { IObrasItem, IObrasTable } from './interface';
+import { IObrasItem, IObrasTable, ITiposLancamento } from './interface';
 
 
 export const getAllConstruction = async () => {
@@ -57,3 +57,28 @@ export const addConstructionDiary = async (id: string, data: any) => {
     const response = await Api.patch<IObrasTable>(`/construction/${id}/diary`, data);
     return response.data;
 }
+
+export const createTipoLancamento = async (data: any) => {
+    const response = await Api.post<ITiposLancamento>('/entry-type', data);
+    return response.data;
+}
+
+export const getAllTipoLancamento = async () => {
+    const response = await Api.get<ITiposLancamento[]>('/entry-type');
+    return response.data;
+};
+
+export const getOneTipoLancamento = async (id: string) => {
+    const response = await Api.get<ITiposLancamento>(`/entry-type/${id}`);
+    return response.data;
+};
+
+export const updateTipoLancamento = async (data: ITiposLancamento) => {
+    const response = await Api.put<ITiposLancamento>(`/entry-type/${data._id}`, data);
+    return response.data;
+};
+
+export const removeTipoLancamento = async (id: string) => {
+    const response = await Api.delete<ITiposLancamento>(`/entry-type/${id}`);
+    return response.data;
+};
