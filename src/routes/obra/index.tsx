@@ -1,14 +1,12 @@
 import Sidebar from "../../components/Sidebar"
-import { Flex, Text, Grid, Table, Thead, Tbody, Tr, Th, Td, TableContainer, GridItem, Box, Button } from "@chakra-ui/react"
+import { Flex, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, GridItem, Box } from "@chakra-ui/react"
 import { useParams } from "react-router-dom"
 import Helpers from "../../utils/helper";
 import Chart from "react-apexcharts";
 import StatComponent from "../../components/Stats";
-import DrawerComponent from "../../components/Drawer";
-import { AddIcon, EditIcon, SettingsIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 import { getAllConstructionItems, getAllTipoLancamento, getOneConstruction } from "../../stores/obras/service";
-import { IConstructionDiary, IObrasItem, IObrasTable, ITiposLancamento } from "../../stores/obras/interface";
+import { ConstructionDiaryPaymentMethod, ConstructionDiaryStatus, IConstructionDiary, IObrasItem, IObrasTable, ITiposLancamento } from "../../stores/obras/interface";
 import AddNewDiaryItem from "./fragments/AddNewDiaryItem";
 import ConfigurarObra from "./fragments/configurarObra";
 import EditDiaryItem from "./fragments/EditDiaryItem";
@@ -25,6 +23,10 @@ const Obra = () => {
     const [fornecedores, setFornecedores] = useState<IFornecedorTable[]>([]);
     const [constructionItems, setConstructionItems] = useState<IObrasItem[]>([]);
     const [entryType, setEntryType] = useState<ITiposLancamento[]>([]);
+    const [costByType, setCostByType] = useState<any>({})
+    const [costByItem, setCostByItem] = useState<any>({})
+    const [totalCost, setTotalCost] = useState<number>(0)
+    const [growthPercentage, setGrowthPercentage] = useState<any>({})
     const [loading, setLoading] = useState<boolean>(true)
     const [refresh, setRefresh] = useState<boolean>(false)
 
@@ -41,9 +43,80 @@ const Obra = () => {
             setDiarioItems(response.diary)
             setData(response)
             setLoading(false)
+
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const sixtyDaysAgo = new Date();
+            sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+
+            const last30Days = response.diary.filter((item: IConstructionDiary) => new Date(item.createdAt || "") >= thirtyDaysAgo);
+            const previous30Days = response.diary.filter((item: IConstructionDiary) => new Date(item.createdAt || "") < thirtyDaysAgo && new Date(item.createdAt || "") >= sixtyDaysAgo);
+            const costLast30Days = last30Days.reduce((acc, item) => {
+                if (!acc[item.type]) {
+                    acc[item.type] = 0;
+                }
+                acc[item.type] += item.value;
+                return acc;
+            }, {} as any);
+
+            const costPrevious30Days = previous30Days.reduce((acc, item) => {
+                if (!acc[item.type]) {
+                    acc[item.type] = 0;
+                }
+                acc[item.type] += item.value;
+                return acc;
+            }, {} as any);
+
+            const allKeys = Array.from(new Set([...Object.keys(costLast30Days), ...Object.keys(costPrevious30Days)]));
+
+            const _growthPercentage: any = {};
+            for (const item of allKeys) {
+                const costNow = costLast30Days[item] || 0;
+                const costBefore = costPrevious30Days[item] || 0;
+                if (costBefore === 0 && costNow === 0) {
+                    _growthPercentage[item] = { growth: 0, value: costNow };
+                } else if (costBefore === 0) {
+                    _growthPercentage[item] = { growth: 100, value: costNow };
+                } else {
+                    _growthPercentage[item] = { growth: ((costNow - costBefore) / costBefore) * 100, value: costNow };
+                }
+            }
+            console.log(Object.entries(_growthPercentage));
+            setGrowthPercentage(_growthPercentage);
+            let _costByItem = response.diary.reduce((acc, item) => {
+                if (!acc[item.item]) {
+                    acc[item.item] = 0;
+                }
+                acc[item.item] += item.value;
+                return acc;
+            }, {} as any);
+
+            let _costByType = response.diary.reduce((acc, item) => {
+                if (!acc[item.type]) {
+                    acc[item.type] = 0;
+                }
+                acc[item.type] += item.value;
+                return acc;
+            }, {} as any);
+
+            let _totalCost = response.diary.reduce((acc, item) => {
+                acc += item.value;
+                return acc;
+            }, 0);
+
+            setTotalCost(_totalCost);
+
+            let costArrayItem = Object.entries(_costByItem);
+            let costArrayType = Object.entries(_costByType);
+            costArrayType.sort((a: any, b: any) => b[1] - a[1]);
+            costArrayItem.sort((a: any, b: any) => b[1] - a[1]);
+            setCostByItem({ labels: costArrayItem.map((item: any) => item[0]), series: costArrayItem.map((item: any) => item[1]) });
+            setCostByType({ labels: costArrayType.map((item: any) => item[0]), series: costArrayType.map((item: any) => item[1]) });
         }
         if (id) fetch(id)
     }, [id, refresh])
+
+
 
     return (
         <Sidebar>
@@ -58,62 +131,32 @@ const Obra = () => {
                             {data.name}
                         </Text>
                     </Flex>
+                    <Text p={2} color="gray">Dados dos últimos 30 dias</Text>
                     <Flex
                         justifyContent={["center", "center", "center", "center", "center", "space-between"]}
                         mb="15px"
                         flexWrap="wrap"
                         width={'100%'}
                     >
-                        <GridItem
-                            mb={2}
-                            mr={2}
-                            width={['100%', '100%', '100%', 'auto']}
-                        >
-                            <StatComponent
-                                label="Material"
-                                value={Helpers.toBrazilianCurrency(1000.25)}
-                                hasArrow
-                                arrowType="increase"
-                                helpText="10,5% nos últimos 30 dias"
-                            />
-                        </GridItem>
-                        <GridItem
-                            mb={2}
-                            mr={2}
-                            width={['100%', '100%', '100%', 'auto']}
-                        >
-                            <StatComponent
-                                label="Mão de obra"
-                                value={Helpers.toBrazilianCurrency(1000.25)}
-                                hasArrow
-                                arrowType="decrease"
-                                helpText="5,4% nos últimos 30 dias"
-                            />
-                        </GridItem>
-                        <GridItem
-                            mb={2}
-                            mr={2}
-                            width={['100%', '100%', '100%', 'auto']}
-                        >
-                            <StatComponent
-                                label="Mat/Mo Terceiros"
-                                value={Helpers.toBrazilianCurrency(1000.25)}
-                                hasArrow
-                                arrowType="increase"
-                                helpText="92% nos últimos 30 dias"
-                            />
-                        </GridItem>
-                        <GridItem
-                            mb={2}
-                            mr={2}
-                            width={['100%', '100%', '100%', 'auto']}
-                        >
-                            <StatComponent
-                                label="Administração"
-                                value={Helpers.toBrazilianCurrency(1000.25)}
-                                helpText="Valor total da obra"
-                            />
-                        </GridItem>
+                        {growthPercentage && Object.entries(growthPercentage)
+                        .sort((a: any, b: any) => a[0].localeCompare(b[0]))
+                        .map((item: any, index: number) => (
+                            <GridItem
+                                mb={2}
+                                mr={2}
+                                width={['100%', '100%', '100%', 'auto']}
+                                key={index}
+                            >
+                                <StatComponent
+                                    label={item[0]}
+                                    value={Helpers.toBrazilianCurrency(item[1].value)}
+                                    hasArrow
+                                    arrowType={item[1].growth > 0 ? "increase" : "decrease"}
+                                    helpText={`${item[1].growth.toFixed(2)}% nos últimos 30 dias`}
+                                />
+                            </GridItem>
+                        ))}
+
                         <GridItem
                             mb={2}
                             mr={2}
@@ -121,7 +164,7 @@ const Obra = () => {
                         >
                             <StatComponent
                                 label="Total da Obra"
-                                value={Helpers.toBrazilianCurrency(1000.25)}
+                                value={Helpers.toBrazilianCurrency(totalCost)}
                                 helpText="Valor total da obra"
                             />
                         </GridItem>
@@ -130,24 +173,42 @@ const Obra = () => {
                         mb="15px"
                         flexWrap={['wrap', 'wrap', 'wrap', 'nowrap', 'nowrap', 'nowrap']}
                         width={'100%'}
+                        gap="5%"
                     >
                         <Box width={"100%"} h="70vh" mb={8} >
                             <Chart
                                 options={{
+                                    states: {
+                                        hover: {
+                                            filter: {
+                                                type: "none",
+                                                value: 0,
+                                            }
+                                        },
+                                    },
+                                    colors: [
+                                        "#ffcb1a",
+                                    ],
+                                    title: {
+                                        text: 'Gastos por item (total)',
+                                        align: 'center',
+                                        style: {
+                                            fontSize: '20px',
+                                            fontWeight: 'bold',
+                                            fontFamily: "Poppins-Regular",
+                                            color: '#263238'
+                                        },
+                                    },
                                     chart: {
                                         id: "basic-bar"
                                     },
                                     xaxis: {
-                                        categories: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set'],
+                                        categories: [...costByItem.labels],
                                     }
                                 }}
                                 series={[{
-                                    name: "series-1",
-                                    data: [30, 40, 45, 50, 49, 60, 70, 91, 125]
-                                },
-                                {
-                                    name: "series-2",
-                                    data: [30, 40, 45, 50, 49, 60, 70, 91, 125]
+                                    name: "Gastos por item",
+                                    data: [...costByItem.series]
                                 }]}
                                 type="bar"
                                 width="100%"
@@ -157,43 +218,37 @@ const Obra = () => {
                         <Box width={"100%"} h="70vh" mb={8} >
                             <Chart
                                 options={{
+                                    states: {
+                                        hover: {
+                                            filter: {
+                                                type: "none",
+                                                value: 0,
+                                            }
+                                        },
+                                    },
+                                    colors: [
+                                        "#ffcb1a",
+                                    ],
+                                    title: {
+                                        text: 'Gastos por tipo (total)',
+                                        align: 'center',
+                                        style: {
+                                            fontSize: '20px',
+                                            fontWeight: 'bold',
+                                            fontFamily: "Poppins-Regular",
+                                            color: '#263238'
+                                        },
+                                    },
                                     chart: {
                                         id: "basic-bar"
                                     },
                                     xaxis: {
-                                        categories: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set'],
+                                        categories: [...costByType.labels],
                                     }
                                 }}
                                 series={[{
-                                    name: "series-1",
-                                    data: [30, 40, 45, 50, 49, 60, 70, 91, 125]
-                                },
-                                {
-                                    name: "series-2",
-                                    data: [30, 40, 45, 50, 49, 60, 70, 91, 125]
-                                }]}
-                                type="bar"
-                                width="100%"
-                                height="100%"
-                            />
-                        </Box>
-                        <Box width={"100%"} h="70vh" mb={8} >
-                            <Chart
-                                options={{
-                                    chart: {
-                                        id: "basic-bar"
-                                    },
-                                    xaxis: {
-                                        categories: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set'],
-                                    }
-                                }}
-                                series={[{
-                                    name: "series-1",
-                                    data: [30, 40, 45, 50, 49, 60, 70, 91, 125]
-                                },
-                                {
-                                    name: "series-2",
-                                    data: [30, 40, 45, 50, 49, 60, 70, 91, 125]
+                                    name: "Gastos por tipo",
+                                    data: [...costByType.series]
                                 }]}
                                 type="bar"
                                 width="100%"
@@ -249,16 +304,16 @@ const Obra = () => {
                                         <Td maxW={'350px'} whiteSpace="normal">{item.description}</Td>
                                         <Td>{item.supplier.name}</Td>
                                         <Td>{Helpers.toBrazilianCurrency(item.value)}</Td>
-                                        <Td>{item.nfNumber}</Td>
+                                        <Td>{item.nfNumber || "-"}</Td>
                                         <Td>
                                             <Text>
-                                                {item.status}
+                                                {ConstructionDiaryStatus[item.status as keyof typeof ConstructionDiaryStatus]}
                                             </Text>
                                             <Text
                                                 color={'gray'}
                                                 fontSize={'sm'}
                                             >
-                                                {item.paymentMethod}
+                                                {ConstructionDiaryPaymentMethod[item.paymentMethod as keyof typeof ConstructionDiaryPaymentMethod]}
                                             </Text>
                                         </Td>
                                         <Td>{Helpers.toViewDate(item.paymentDate ? String(item.paymentDate) : '') || '-'}</Td>

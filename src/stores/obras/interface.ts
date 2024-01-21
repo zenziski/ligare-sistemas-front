@@ -63,4 +63,16 @@ export const tiposLancamentoSchema = z.object({
 
 export type ITiposLancamento = z.infer<typeof obraItemSchema>
 
+export enum ConstructionDiaryStatus {
+    toPay = "À Pagar",
+    paid = "Pago",
+}
+
+export enum ConstructionDiaryPaymentMethod {
+    pix = "Pix",
+    boleto = "Boleto",
+    cartao = "Cartão",
+    transferencia = "Transferência",
+}
+
 

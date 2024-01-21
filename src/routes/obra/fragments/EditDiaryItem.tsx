@@ -26,7 +26,6 @@ const EditDiaryItem = ({
         formState: { errors, isSubmitting },
         reset,
         control,
-        watch,
     } = useForm<IConstructionDiary>({
         resolver: zodResolver(ConstructionDiarySchema),
         shouldFocusError: false

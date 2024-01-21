@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { Grid, FormControl, FormLabel, Input, Text, InputGroup, Select, useToast } from "@chakra-ui/react";
 import MoneyInput from "../../../components/MoneyInput";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { IFornecedorTable } from "../../../stores/fornecedores/interface";
 import { addConstructionDiary } from "../../../stores/obras/service";
 
@@ -65,6 +65,7 @@ const AddNewDiaryItem = ({ id, flushHook, refresh, fornecedores, entryType, cons
             buttonColorScheme="green"
             size="lg"
             onAction={() => handleSubmit(handleCreateItem)()}
+            isLoading={isSubmitting}
         >
             <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
                 <FormControl gridColumn="span 2">

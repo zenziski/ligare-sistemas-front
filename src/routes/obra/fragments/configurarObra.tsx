@@ -125,8 +125,8 @@ const ConfigurarObra = ({
             <DrawerComponent
                 isButton
                 buttonIcon={<SettingsIcon />}
-                buttonText="Configurar"
-                headerText="Configurar Obra"
+                buttonText="Editar"
+                headerText="Editar dados gerais da obra"
                 buttonColorScheme="blue"
                 size="md"
                 onAction={() => handleSubmit(onSubmit)()}
