@@ -45,8 +45,6 @@ const Obras = () => {
         handleSubmit: handleSubmitObrasItem,
         formState: { errors: errorsObrasItem, isSubmitting: isSubmittingObrasItem },
         reset: resetObrasItem,
-        control: controlObrasItem,
-        watch: watchObrasItem,
         setValue: setValueObrasItem
     } = useForm<IObrasItem>({
         resolver: zodResolver(obraItemSchema),

@@ -8,17 +8,19 @@ import { IUserTable } from "../../../stores/clientes/interface"
 import { useEffect, useState } from "react"
 import { getAll } from "../../../stores/clientes/service"
 import MoneyInput from "../../../components/MoneyInput"
+import { updateConstruction } from "../../../stores/obras/service"
 
 interface ConfigurarObraProps {
-    data: any
+    data: any,
+    refresh: boolean,
+    setRefresh: any
 }
 
 const ConfigurarObra = ({
-    data
+    data,
+    refresh,
+    setRefresh
 }: ConfigurarObraProps) => {
-
-    console.log(data);
-
     const {
         register,
         handleSubmit,
@@ -44,6 +46,40 @@ const ConfigurarObra = ({
     const contractMonthlyValue = (contractValue / contractInstallments).toFixed(2)
     const administrationMonthlyValue = (administrationValue / administrationInstallments).toFixed(2)
 
+    const onSubmit = async (data: IObrasTable) => {
+        try {
+            await updateConstruction({
+                ...data,
+                administration: {
+                    value: Number(data?.administration?.value),
+                    installments: Number(data?.administration?.installments),
+                    monthlyValue: Number(data?.administration?.value) / Number(data?.administration?.installments)
+                },
+                contract: {
+                    value: Number(data?.contract?.value),
+                    installments: Number(data?.contract?.installments),
+                    monthlyValue: Number(data?.contract?.value) / Number(data?.contract?.installments)
+                }
+            })
+            setRefresh(!refresh)
+            toast({
+                title: "Obra configurada com sucesso",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right"
+            })
+        } catch (error) {
+            toast({
+                title: "Erro ao configurar obra",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right"
+            })
+        }
+    }
+
     useEffect(() => {
         const fetch = async () => {
             const clientes = await getAll()
@@ -51,6 +87,38 @@ const ConfigurarObra = ({
         }
         fetch()
     }, [])
+
+    useEffect(() => {
+        setValue('administration.value', administrationValue)
+        setValue('administration.installments', String(administrationInstallments))
+        setValue('administration.monthlyValue', administrationMonthlyValue)
+        setValue('contract.value', contractValue)
+        setValue('contract.installments', String(contractInstallments))
+        setValue('contract.monthlyValue', contractMonthlyValue)
+    }, [watch('contract.value'), watch('contract.installments'), watch('administration.value'), watch('administration.installments')])
+
+    useEffect(() => {
+        if (data) {
+            reset({
+                ...data,
+                customerId: data.customerId._id,
+                administration: {
+                    value: data.administration.value,
+                    installments: String(data.administration.installments),
+                    monthlyValue: administrationMonthlyValue
+                },
+                contract: {
+                    value: data.contract.value,
+                    installments: String(data.contract.installments),
+                    monthlyValue: contractMonthlyValue
+                }
+            })
+        }
+    }, [data])
+
+    useEffect(() => {
+        console.log(errors);
+    }, [errors])
 
     return (
         <>
@@ -61,6 +129,9 @@ const ConfigurarObra = ({
                 headerText="Configurar Obra"
                 buttonColorScheme="blue"
                 size="md"
+                onAction={() => handleSubmit(onSubmit)()}
+                onOpenHook={() => reset()}
+                isLoading={isSubmitting}
             >
                 <Grid
                     templateColumns="repeat(2, 1fr)"
@@ -102,8 +173,8 @@ const ConfigurarObra = ({
                             defaultValue=""
                             render={({ field }) => (
                                 <Select {...field}>
-                                    {clientes.map((cliente, index) => (
-                                        <option key={index} value={cliente._id}>{cliente.name}</option>
+                                    {clientes.map((cliente) => (
+                                        <option key={cliente._id} value={cliente._id}>{cliente.name}</option>
                                     ))}
                                 </Select>
                             )}
@@ -142,8 +213,8 @@ const ConfigurarObra = ({
                         <FormLabel>Valor Mensal</FormLabel>
                         <Input value={`R$ ${administrationMonthlyValue}`} placeholder="R$" readOnly={true} />
                         {
-                            errors.administration?.installments && <Text color="red">{
-                                errors.administration?.installments.message}</Text>}
+                            errors.administration?.monthlyValue && <Text color="red">{
+                                errors.administration?.monthlyValue.message}</Text>}
                     </FormControl>
                     <Box position='relative' gridColumn="span 2" >
                         <Divider
@@ -175,8 +246,8 @@ const ConfigurarObra = ({
                         <FormLabel>Valor Mensal</FormLabel>
                         <Input value={`R$ ${contractMonthlyValue}`} placeholder="R$" readOnly />
                         {
-                            errors.contract?.installments && <Text color="red">{
-                                errors.contract?.installments.message}</Text>}
+                            errors.contract?.monthlyValue && <Text color="red">{
+                                errors.contract?.monthlyValue.message}</Text>}
                     </FormControl>
                     <Divider gridColumn="span 2" borderColor={'gray.500'} />
                     <FormControl>

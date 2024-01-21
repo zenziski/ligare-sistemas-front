@@ -209,6 +209,8 @@ const Obra = () => {
                     >
                         <ConfigurarObra
                             data={data}
+                            refresh={refresh}
+                            setRefresh={setRefresh}
                         />
                         <AddNewDiaryItem
                             id={id!}
