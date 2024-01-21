@@ -13,9 +13,10 @@ interface DrawerProps {
     isLoading?: boolean;
     isDisabled?: boolean;
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+    hideFooter?: boolean;
 }
 
-const DrawerComponent: React.FC<DrawerProps> = ({ buttonIcon, buttonText, headerText, buttonColorScheme, size, isButton, onAction, onOpenHook, isDisabled, isLoading, children }) => {
+const DrawerComponent: React.FC<DrawerProps> = ({ buttonIcon, buttonText, headerText, buttonColorScheme, size, isButton, onAction, onOpenHook, isDisabled, isLoading, children, hideFooter }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     return (
@@ -49,18 +50,20 @@ const DrawerComponent: React.FC<DrawerProps> = ({ buttonIcon, buttonText, header
                         {children}
                     </DrawerBody>
 
-                    <DrawerFooter>
-                        <Button variant='outline' mr={3} onClick={onClose}>
-                            Cancelar
-                        </Button>
-                        <Button colorScheme='teal' onClick={() => {
-                            if (onAction) {
-                                try {
-                                    onAction();
-                                } catch (error) { }
-                            }
-                        }} isDisabled={isLoading || isDisabled}>{isLoading && <Spinner />}Salvar</Button>
-                    </DrawerFooter>
+                    {!hideFooter &&
+                        <DrawerFooter>
+                            <Button variant='outline' mr={3} onClick={onClose}>
+                                Cancelar
+                            </Button>
+                            <Button colorScheme='teal' onClick={() => {
+                                if (onAction) {
+                                    try {
+                                        onAction();
+                                    } catch (error) { }
+                                }
+                            }} isDisabled={isLoading || isDisabled}>{isLoading && <Spinner />}Salvar</Button>
+                        </DrawerFooter>
+                    }
                 </DrawerContent>
             </Drawer>
         </>
