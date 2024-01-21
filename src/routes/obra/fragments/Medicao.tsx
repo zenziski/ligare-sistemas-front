@@ -1,4 +1,4 @@
-import { Button, Divider, Flex, FormControl, FormLabel, Input, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, useToast } from "@chakra-ui/react"
+import { Button, Divider, Flex, FormControl, FormLabel, Input, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useToast } from "@chakra-ui/react"
 import DrawerComponent from "../../../components/Drawer"
 import { useEffect, useState } from "react"
 import { createMedicao, getAllTipoLancamento } from "../../../stores/obras/service"
