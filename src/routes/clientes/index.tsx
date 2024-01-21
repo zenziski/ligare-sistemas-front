@@ -29,7 +29,6 @@ const Clientes = () => {
 
 
     const handleCreateCustomer = async (data: IUserTable) => {
-        console.log(data);
         try {
             const response = await createCustomer(data);
             setClientes([...clientes, response]);

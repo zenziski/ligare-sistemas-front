@@ -13,7 +13,7 @@ const defaultMaskOptions = {
     decimalLimit: 2,
     integerLimit: 9,
     allowNegative: false,
-    allowLeadingZeroes: false,
+    allowLeadingZeroes: true,
 };
 interface MoneyInputProps {
     control: any;

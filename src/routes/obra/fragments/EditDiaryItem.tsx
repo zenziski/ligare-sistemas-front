@@ -1,15 +1,24 @@
-import { AddIcon } from "@chakra-ui/icons"
+import { EditIcon } from "@chakra-ui/icons"
 import DrawerComponent from "../../../components/Drawer"
 import { ConstructionDiarySchema, IConstructionDiary, IObrasItem, ITiposLancamento } from "../../../stores/obras/interface";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { Grid, FormControl, FormLabel, Input, Text, InputGroup, Select, useToast } from "@chakra-ui/react";
 import MoneyInput from "../../../components/MoneyInput";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { IFornecedorTable } from "../../../stores/fornecedores/interface";
-import { addConstructionDiary } from "../../../stores/obras/service";
+import { editConstructionDiary } from "../../../stores/obras/service";
+import moment from "moment";
 
-const AddNewDiaryItem = ({ id, flushHook, refresh, fornecedores, entryType, constructionItems  }: { id: string, flushHook: any, refresh: boolean, fornecedores: IFornecedorTable[], entryType: ITiposLancamento[], constructionItems: IObrasItem[] }) => {
+const EditDiaryItem = ({
+    id,
+    flushHook,
+    refresh,
+    item,
+    fornecedores,
+    entryType,
+    constructionItems
+}: { id: string, flushHook: any, refresh: boolean, item: IConstructionDiary, fornecedores: IFornecedorTable[], entryType: ITiposLancamento[], constructionItems: IObrasItem[] }) => {
     const toast = useToast()
     const {
         register,
@@ -17,7 +26,6 @@ const AddNewDiaryItem = ({ id, flushHook, refresh, fornecedores, entryType, cons
         formState: { errors, isSubmitting },
         reset,
         control,
-        setValue,
         watch,
     } = useForm<IConstructionDiary>({
         resolver: zodResolver(ConstructionDiarySchema),
@@ -25,12 +33,18 @@ const AddNewDiaryItem = ({ id, flushHook, refresh, fornecedores, entryType, cons
     });
 
     useEffect(() => {
-        setValue('value', parseFloat(watch('value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0"))
-    }, [watch('value')])
+        if (item) {
+            reset({
+                ...item,
+                sendDate: item.sendDate ? moment(item.sendDate).format("YYYY-MM-DD") : "",
+                paymentDate: item.paymentDate ? moment(item.paymentDate).format("YYYY-MM-DD") : "",
+            });
+        }
+    }, [item])
 
     const handleCreateItem = async (data: IConstructionDiary) => {
         try {
-            await addConstructionDiary(id, {
+            await editConstructionDiary(id, item._id!, {
                 ...data,
                 supplier: data.supplier._id,
             });
@@ -58,13 +72,12 @@ const AddNewDiaryItem = ({ id, flushHook, refresh, fornecedores, entryType, cons
 
     return (
         <DrawerComponent
-            isButton
-            buttonIcon={<AddIcon />}
-            buttonText="Adicionar"
-            headerText="Adicionar item ao diário de obra"
-            buttonColorScheme="green"
+            buttonIcon={<EditIcon />}
+            buttonText="Editar"
+            headerText="Editar item do diário de obra"
             size="lg"
             onAction={() => handleSubmit(handleCreateItem)()}
+            isLoading={isSubmitting}
         >
             <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
                 <FormControl gridColumn="span 2">
@@ -200,4 +213,4 @@ const AddNewDiaryItem = ({ id, flushHook, refresh, fornecedores, entryType, cons
     )
 }
 
-export default AddNewDiaryItem
+export default EditDiaryItem

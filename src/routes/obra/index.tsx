@@ -5,12 +5,16 @@ import Helpers from "../../utils/helper";
 import Chart from "react-apexcharts";
 import StatComponent from "../../components/Stats";
 import DrawerComponent from "../../components/Drawer";
-import { AddIcon, SettingsIcon } from "@chakra-ui/icons";
+import { AddIcon, EditIcon, SettingsIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
-import { getOneConstruction } from "../../stores/obras/service";
-import { IConstructionDiary, IObrasTable } from "../../stores/obras/interface";
+import { getAllConstructionItems, getAllTipoLancamento, getOneConstruction } from "../../stores/obras/service";
+import { IConstructionDiary, IObrasItem, IObrasTable, ITiposLancamento } from "../../stores/obras/interface";
 import AddNewDiaryItem from "./fragments/AddNewDiaryItem";
 import ConfigurarObra from "./fragments/configurarObra";
+import EditDiaryItem from "./fragments/EditDiaryItem";
+import { getAll } from "../../stores/fornecedores/service";
+import { IFornecedorTable } from "../../stores/fornecedores/interface";
+
 
 const Obra = () => {
 
@@ -18,6 +22,9 @@ const Obra = () => {
 
     const [diarioItems, setDiarioItems] = useState<IConstructionDiary[]>([])
     const [data, setData] = useState<IObrasTable>({} as IObrasTable)
+    const [fornecedores, setFornecedores] = useState<IFornecedorTable[]>([]);
+    const [constructionItems, setConstructionItems] = useState<IObrasItem[]>([]);
+    const [entryType, setEntryType] = useState<ITiposLancamento[]>([]);
     const [loading, setLoading] = useState<boolean>(true)
     const [refresh, setRefresh] = useState<boolean>(false)
 
@@ -25,7 +32,12 @@ const Obra = () => {
         const fetch = async (idConstruction: string) => {
             setLoading(true)
             const response = await getOneConstruction(idConstruction)
-            console.log(response.diary);
+            const items = await getAllConstructionItems();
+            const fornecedor = await getAll();
+            const types = await getAllTipoLancamento();
+            setEntryType(types);
+            setFornecedores(fornecedor);
+            setConstructionItems(items);
             setDiarioItems(response.diary)
             setData(response)
             setLoading(false)
@@ -195,9 +207,16 @@ const Obra = () => {
                         mb={4}
                         gap={4}
                     >
-                        <AddNewDiaryItem id={id!} flushHook={setRefresh} />
                         <ConfigurarObra
                             data={data}
+                        />
+                        <AddNewDiaryItem
+                            id={id!}
+                            flushHook={setRefresh}
+                            refresh={refresh}
+                            fornecedores={fornecedores}
+                            constructionItems={constructionItems}
+                            entryType={entryType}
                         />
                     </Flex>
                     <TableContainer>
@@ -218,6 +237,7 @@ const Obra = () => {
                                     <Th>Item</Th>
                                     <Th>Data de envio</Th>
                                     <Th>Observação</Th>
+                                    <Th>{' '}</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
@@ -250,7 +270,20 @@ const Obra = () => {
                                             </Text>
                                         </Td>
                                         <Td>{Helpers.toViewDate(String(item.sendDate))}</Td>
-                                        <Td>{item.observation}</Td>
+                                        <Td>
+                                            {item.observation}
+                                        </Td>
+                                        <Td>
+                                            <EditDiaryItem
+                                                entryType={entryType}
+                                                fornecedores={fornecedores}
+                                                constructionItems={constructionItems}
+                                                id={id!}
+                                                item={item}
+                                                flushHook={setRefresh}
+                                                refresh={refresh}
+                                            />
+                                        </Td>
                                     </Tr>
                                 ))}
                             </Tbody>

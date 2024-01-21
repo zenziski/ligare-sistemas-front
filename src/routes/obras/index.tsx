@@ -33,6 +33,7 @@ const Obras = () => {
         formState: { errors: errorsObras, isSubmitting: isSubmittingObras },
         reset: resetObras,
         control: controlObras,
+        setValue: setValueObras,
         watch: watchObras,
     } = useForm<IObrasTable>({
         resolver: zodResolver(obraSchema),
@@ -54,7 +55,19 @@ const Obras = () => {
 
     const handleCreateConstruction = async (data: IObrasTable) => {
         try {
-            const construction = await createConstruction(data);
+            const construction = await createConstruction({
+                ...data,
+                administration: {
+                    value: Number(data?.administration?.value),
+                    installments: Number(data?.administration?.installments),
+                    monthlyValue: Number(data?.administration?.value) / Number(data?.administration?.installments)
+                },
+                contract: {
+                    value: Number(data?.contract?.value),
+                    installments: Number(data?.contract?.installments),
+                    monthlyValue: Number(data?.contract?.value) / Number(data?.contract?.installments)
+                }
+            });
             const newObras = [...obras, construction];
             setObras(newObras);
             toast({
@@ -130,32 +143,36 @@ const Obras = () => {
     }, [])
 
     const getContractType = (obra: IObrasTable) => {
-        if (obra.contract && obra.administration) {
+        if (obra?.contract?.value && obra?.administration?.value) {
             return 'Administração/Empreitada'
-        } else if (obra.contract) {
-            return 'Administração'
-        } else {
+        } else if (obra?.contract?.value) {
             return 'Empreitada'
+        } else if (obra?.administration?.value) {
+            return 'Administração'
         }
     }
 
     useEffect(() => {
-        console.log(errorsObras);
-    }, [errorsObras])
+        setValueObras('administration.value', administrationValue)
+        setValueObras('administration.installments', administrationInstallments)
+        setValueObras('contract.value', contractValue)
+        setValueObras('contract.installments', contractInstallments)
+    }, [watchObras('contract.value'), watchObras('contract.installments'), watchObras('administration.value'), watchObras('administration.installments')])
 
     useEffect(() => {
         setValueObrasItem('name', config.name);
         setValueObrasItem('_id', config._id);
     }, [config, setValueObrasItem])
 
+
     const contractValue = parseFloat(watchObras('contract.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0");
-    const contractInstallments = parseFloat(watchObras('contract.installments')?.toString()?.replace("R$ ", "").replace(/\./g, "")?.replace(",", ".") || "0");
+    const contractInstallments = watchObras('contract.installments')
 
     const administrationValue = parseFloat(watchObras('administration.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0");
-    const administrationInstallments = parseFloat(watchObras('administration.installments')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0");
+    const administrationInstallments = watchObras('administration.installments')
 
-    const contractMonthlyValue = contractValue && contractInstallments ? (contractValue / contractInstallments).toFixed(2) : '0';
-    const administrationMonthlyValue = administrationValue && administrationInstallments ? (administrationValue / administrationInstallments).toFixed(2) : '0';
+    const contractMonthlyValue = contractValue && contractInstallments ? (contractValue / Number(contractInstallments)).toFixed(2) : '0';
+    const administrationMonthlyValue = administrationValue && administrationInstallments ? (administrationValue / Number(administrationInstallments)).toFixed(2) : '0';
 
     return (
         <Sidebar>
@@ -206,7 +223,8 @@ const Obras = () => {
                                                     control={controlObras}
                                                     defaultValue=""
                                                     render={({ field }) => (
-                                                        <Select {...field}>
+                                                        <Select defaultValue="" {...field} gridColumn="span 2">
+                                                            <option key={10000} disabled value="">Escolha um cliente</option>
                                                             {clientes.map((cliente, index) => (
                                                                 <option key={index} value={cliente._id}>{cliente.name}</option>
                                                             ))}
@@ -384,7 +402,7 @@ const Obras = () => {
                                     </InputGroup>
                                 </Flex>
                                 <TableContainer>
-                                    <Table variant={'striped'} width="40%">
+                                    <Table variant={'striped'}>
                                         <Thead>
                                             <Tr>
                                                 <Th>Item</Th>

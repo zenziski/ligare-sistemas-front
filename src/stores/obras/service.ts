@@ -18,7 +18,6 @@ export const createConstruction = async (data: IObrasTable) => {
 };
 
 export const updateConstruction = async (data: IObrasTable) => {
-    console.log(data);
     const response = await Api.patch<IObrasTable>(`/construction/${data._id}`, data);
     return response.data;
 };
@@ -55,6 +54,11 @@ export const removeConstructionItem = async (id: string) => {
 
 export const addConstructionDiary = async (id: string, data: any) => {
     const response = await Api.patch<IObrasTable>(`/construction/${id}/diary`, data);
+    return response.data;
+}
+
+export const editConstructionDiary = async (idObra: string, idDiary: string, data: any) => {
+    const response = await Api.patch<IObrasTable>(`/construction/${idObra}/diary/${idDiary}`, data);
     return response.data;
 }
 
