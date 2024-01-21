@@ -13,12 +13,14 @@ interface ItemProps {
     isActive?: boolean
 }
 
-const Item = ({ label, icon, to, isActive }: ItemProps) => {
+const Item = ({ label, icon, to }: ItemProps) => {
+
+    const isActive = window.location.pathname.includes(to)
 
     return (
         <Link to={`/${to}`}>
             <Flex
-                bg={isActive ? 'primary-100' : 'transparent'}
+                bg={isActive ? 'gray.200' : 'transparent'}
                 color="black"
                 p={4}
                 cursor="pointer"
@@ -26,6 +28,10 @@ const Item = ({ label, icon, to, isActive }: ItemProps) => {
                 borderRadius='md'
                 mb={2}
                 transition='all 0.2s ease-in-out'
+                _hover={{
+                    bg: isActive ? 'primary-500' : 'gray.100',
+                    color: 'primary-400'
+                }}
             >
                 <Flex
                     mr={2}
@@ -44,6 +50,7 @@ const Item = ({ label, icon, to, isActive }: ItemProps) => {
                     fontSize='md'
                     color="#555"
                     fontFamily="Poppins-Medium"
+                    fontWeight={isActive ? 'bold' : 'medium'}
                 >
                     {label}
                 </Box>
