@@ -1,4 +1,4 @@
-import { AbsoluteCenter, Box, Divider, Flex, FormControl, FormLabel, Grid, IconButton, Input, InputGroup, InputLeftElement, Select, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Th, Thead, Tr, useToast } from "@chakra-ui/react"
+import { AbsoluteCenter, Box, Divider, Flex, FormControl, FormLabel, Grid, Input, InputGroup, InputLeftElement, Select, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Th, Thead, Tr, useToast } from "@chakra-ui/react"
 import Sidebar from "../../components/Sidebar"
 import DrawerComponent from "../../components/Drawer"
 
@@ -14,11 +14,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createConstruction, createConstructionItem, getAllConstruction, getAllConstructionItems, removeConstructionItem, updateConstructionItem } from "../../stores/obras/service"
 import { IUserTable } from "../../stores/clientes/interface"
 import { getAll } from "../../stores/clientes/service"
+import ModalDelete from "../../components/ModalDelete"
+import TiposDeLancamento from "./fragments/TiposDeLancamento"
 
 
 const Obras = () => {
     const toast = useToast()
-    const [inputValue, setInputValue] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(false);
     const [obras, setObras] = useState<IObrasTable[]>([]);
@@ -174,6 +175,7 @@ const Obras = () => {
                         <TabList>
                             <Tab>Obras</Tab>
                             <Tab>Configurações</Tab>
+                            <Tab>Tipos De Lançamento</Tab>
                         </TabList>
                         <TabPanels>
                             <TabPanel>
@@ -393,73 +395,82 @@ const Obras = () => {
                                             <Tr>
                                                 <Th>Item</Th>
                                                 <Th>Data de cadastro</Th>
-                                                <Th>{' '}</Th>
                                             </Tr>
                                         </Thead>
                                         <Tbody>
-                                            {configs.map((config, index) => (
-                                                <Tr key={index}>
-                                                    <Td>{config.name}</Td>
-                                                    <Td>
-                                                        <Flex direction="row" alignItems="center" justifyContent="center" gap={1}>
-                                                            <DrawerComponent
-                                                                buttonIcon={<EditIcon />}
-                                                                buttonText="Editar"
-                                                                headerText="Editar item"
-                                                                buttonColorScheme="yellow"
-                                                                size="md"
-                                                                onOpenHook={() => setConfig(config)}
-                                                                onAction={() => handleSubmitObrasItem(handleEditConstructionItem)()}
-                                                                isLoading={isSubmittingObrasItem}
-                                                            >
-                                                                <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
-                                                                    <FormControl gridColumn="span 2">
-                                                                        <FormLabel>Nome da categoria</FormLabel>
-                                                                        <Input {...registerObrasItem("name")} placeholder="Digite..." />
-                                                                    </FormControl>
-                                                                </Grid>
-                                                            </DrawerComponent>
-                                                            <IconButton
-                                                                aria-label="Delete"
-                                                                icon={<DeleteIcon />}
-                                                                colorScheme="red"
-                                                                onClick={async () => {
-                                                                    try {
-                                                                        await removeConstructionItem(config._id ?? '');
-                                                                        const newConfigs = await getAllConstructionItems();
-                                                                        setConfigs(newConfigs);
-                                                                        toast({
-                                                                            title: "Item deletado com sucesso!",
-                                                                            status: "success",
-                                                                            duration: 3000,
-                                                                            isClosable: true,
-                                                                        })
-                                                                    } catch (error: any) {
-                                                                        toast({
-                                                                            title: error?.response?.data?.message || "Erro ao deletar item",
-                                                                            status: "error",
-                                                                            duration: 3000,
-                                                                            isClosable: true,
-                                                                        })
-                                                                    }
-                                                                }}
-                                                            >
-                                                                <DeleteIcon color="red" />
-                                                            </IconButton>
-                                                        </Flex>
-                                                    </Td>
-                                                </Tr>
-                                            ))}
+                                            {configs.map((config, index) => {
+                                                return (
+                                                    < Tr key={index} >
+                                                        <Td>{config.name}</Td>
+                                                        <Td>
+                                                            <Flex direction="row" alignItems="center" justifyContent="space-between" gap={1}>
+                                                                {Helpers.toViewDate(config.createdAt ?? '')}
+                                                                <Box>
+                                                                    <DrawerComponent
+                                                                        buttonIcon={<EditIcon />}
+                                                                        buttonText="Editar"
+                                                                        headerText="Editar item"
+                                                                        buttonColorScheme="yellow"
+                                                                        size="md"
+                                                                        onOpenHook={() => setConfig(config)}
+                                                                        onAction={() => handleSubmitObrasItem(handleEditConstructionItem)()}
+                                                                        isLoading={isSubmittingObrasItem}
+                                                                    >
+                                                                        <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
+                                                                            <FormControl gridColumn="span 2">
+                                                                                <FormLabel>Nome da categoria</FormLabel>
+                                                                                <Input {...registerObrasItem("name")} placeholder="Digite..." />
+                                                                            </FormControl>
+                                                                        </Grid>
+                                                                    </DrawerComponent>
+                                                                    <ModalDelete
+                                                                        headerText="Deletar item"
+                                                                        buttonIcon={<DeleteIcon color={'red'} />}
+                                                                        buttonColorScheme="red"
+                                                                        onDelete={async () => {
+                                                                            try {
+                                                                                await removeConstructionItem(config._id ?? '');
+                                                                                const newConfigs = await getAllConstructionItems();
+                                                                                setConfigs(newConfigs);
+                                                                                toast({
+                                                                                    title: "Item deletado com sucesso!",
+                                                                                    status: "success",
+                                                                                    duration: 3000,
+                                                                                    isClosable: true,
+                                                                                })
+                                                                            } catch (error: any) {
+                                                                                toast({
+                                                                                    title: error?.response?.data?.message || "Erro ao deletar item",
+                                                                                    status: "error",
+                                                                                    duration: 3000,
+                                                                                    isClosable: true,
+                                                                                })
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        <Text>
+                                                                            Tem certeza que deseja deletar o item <strong>{config.name}</strong>?
+                                                                        </Text>
+                                                                    </ModalDelete>
+                                                                </Box>
+                                                            </Flex>
+                                                        </Td>
+                                                    </Tr>
+                                                )
+                                            })}
                                         </Tbody>
                                     </Table>
                                 </TableContainer>
                             </TabPanel>
+                            <TabPanel>
+                                <TiposDeLancamento />
+                            </TabPanel>
                         </TabPanels>
                     </Tabs>
                 </Flex>
-            )}
-
-        </Sidebar>
+            )
+            }
+        </Sidebar >
     )
 }
 
