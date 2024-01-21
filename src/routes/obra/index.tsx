@@ -12,6 +12,7 @@ import ConfigurarObra from "./fragments/configurarObra";
 import EditDiaryItem from "./fragments/EditDiaryItem";
 import { getAll } from "../../stores/fornecedores/service";
 import { IFornecedorTable } from "../../stores/fornecedores/interface";
+import Medicao from "./fragments/Medicao";
 
 
 const Obra = () => {
@@ -262,6 +263,9 @@ const Obra = () => {
                         mb={4}
                         gap={4}
                     >
+                        <Medicao
+                            data={data}
+                        />
                         <ConfigurarObra
                             data={data}
                             refresh={refresh}

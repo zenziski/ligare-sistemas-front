@@ -86,3 +86,18 @@ export const removeTipoLancamento = async (id: string) => {
     const response = await Api.delete<ITiposLancamento>(`/entry-type/${id}`);
     return response.data;
 };
+
+export const createMedicao = async (id: string, dates: any) => {
+    const response = await Api.patch<any>(`/construction/${id}/measurements`, dates);
+    return response.data;
+}
+
+export const getAllMedicao = async (id: string) => {
+    const response = await Api.get<any[]>(`/construction/${id}/measurements`);
+    return response.data;
+}
+
+export const deleteMedicao = async (idObra: string, idMedicao: string) => {
+    const response = await Api.delete<any>(`/construction/${idObra}/measurements/${idMedicao}`);
+    return response.data;
+}
