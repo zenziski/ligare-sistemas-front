@@ -52,3 +52,8 @@ export const removeConstructionItem = async (id: string) => {
     const response = await Api.delete<IObrasItem>(`/construction-item/${id}`);
     return response.data;
 };
+
+export const addConstructionDiary = async (id: string, data: any) => {
+    const response = await Api.patch<IObrasTable>(`/construction/${id}/diary`, data);
+    return response.data;
+}

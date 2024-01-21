@@ -38,6 +38,7 @@ const Clientes = () => {
                 status: "success",
                 duration: 5000,
                 isClosable: true,
+                position: "top-right"
             })
         } catch (error: any) {
             toast({
@@ -45,6 +46,7 @@ const Clientes = () => {
                 status: "error",
                 duration: 5000,
                 isClosable: true,
+                position: "top-right"
             })
         }
     }
@@ -58,6 +60,7 @@ const Clientes = () => {
                 status: "success",
                 duration: 5000,
                 isClosable: true,
+                position: "top-right"
             })
         } catch (error: any) {
             toast({
@@ -65,6 +68,7 @@ const Clientes = () => {
                 status: "error",
                 duration: 5000,
                 isClosable: true,
+                position: "top-right"
             })
         }
     }

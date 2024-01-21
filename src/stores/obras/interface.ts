@@ -1,5 +1,28 @@
 import { z } from "zod";
 
+export const ConstructionDiarySchema = z.object({
+    item: z.string(),
+    description: z.string(),
+    supplier: z.object({
+        _id: z.string().optional(),
+        name: z.string().optional(),
+        cpfCnpj: z.string().optional(),
+        email: z.string().email().optional(),
+        phone: z.string().optional(),
+    }),
+    nfNumber: z.string(),
+    type: z.string(),
+    value: z.number(),
+    status: z.string(),
+    sendDate: z.string().optional(),
+    paymentMethod: z.string(),
+    paymentDate: z.string().optional(),
+    observation: z.string().optional(),
+    createdAt: z.date().optional(),
+});
+
+export type IConstructionDiary = z.infer<typeof ConstructionDiarySchema>
+
 export const obraSchema = z.object({
     _id: z.string().optional(),
     name: z.string(),
@@ -21,7 +44,7 @@ export const obraSchema = z.object({
     customerId: z.string(),
 });
 
-export type IObrasTable = z.infer<typeof obraSchema>
+export type IObrasTable = z.infer<typeof obraSchema> & { diary: IConstructionDiary[] }
 
 export const obraItemSchema = z.object({
     _id: z.string().optional(),
@@ -29,3 +52,4 @@ export const obraItemSchema = z.object({
 });
 
 export type IObrasItem = z.infer<typeof obraItemSchema>
+

@@ -61,6 +61,7 @@ const Obras = () => {
                 status: "success",
                 duration: 3000,
                 isClosable: true,
+                position: "top-right"
             })
         } catch (error) {
             toast({
@@ -68,6 +69,7 @@ const Obras = () => {
                 status: "error",
                 duration: 3000,
                 isClosable: true,
+                position: "top-right"
             })
         }
     }
@@ -81,6 +83,7 @@ const Obras = () => {
                 title: "Item criado com sucesso!",
                 status: "success",
                 duration: 3000,
+                position: "top-right",
                 isClosable: true,
             })
         } catch (error: any) {
@@ -88,6 +91,7 @@ const Obras = () => {
                 title: error?.response?.data?.message || "Erro ao criar item",
                 status: "error",
                 duration: 3000,
+                position: "top-right",
                 isClosable: true,
             })
         }
@@ -102,6 +106,7 @@ const Obras = () => {
                 title: "Item editado com sucesso!",
                 status: "success",
                 duration: 3000,
+                position: "top-right",
                 isClosable: true,
             })
         } catch (error: any) {
@@ -109,6 +114,7 @@ const Obras = () => {
                 title: error?.response?.data?.message || "Erro ao editar item",
                 status: "error",
                 duration: 3000,
+                position: "top-right",
                 isClosable: true,
             })
         }
