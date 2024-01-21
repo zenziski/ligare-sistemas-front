@@ -62,12 +62,8 @@ const Usuarios = () => {
     }
 
     const handleEditUser = async (data: IUser) => {
-        setLoading(true)
         try {
-            await updateUser(data)
-            const users = await getAll()
-            setUsers(users)
-            setFilteredUsers(users)
+            const response = await updateUser(data)
             toast({
                 title: 'Usuário editado com sucesso',
                 description: 'O usuário foi editado com sucesso',
@@ -76,6 +72,10 @@ const Usuarios = () => {
                 isClosable: true,
                 position: 'top-right'
             })
+            console.log(response);
+            const users = await getAll()
+            setUsers(users)
+            setFilteredUsers(users)
         } catch (error: any) {
             toast({
                 title: error?.response?.data?.message || 'Erro ao editar usuário',
@@ -84,9 +84,7 @@ const Usuarios = () => {
                 isClosable: true,
                 position: 'top-right'
             })
-        } finally {
-            setLoading(false)
-        }
+        } 
     }
 
     useEffect(() => {
