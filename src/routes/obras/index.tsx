@@ -437,12 +437,15 @@ const Obras = () => {
                                                                                     status: "success",
                                                                                     duration: 3000,
                                                                                     isClosable: true,
+                                                                                    position: "top-right",
+
                                                                                 })
                                                                             } catch (error: any) {
                                                                                 toast({
                                                                                     title: error?.response?.data?.message || "Erro ao deletar item",
                                                                                     status: "error",
                                                                                     duration: 3000,
+                                                                                    position: "top-right",
                                                                                     isClosable: true,
                                                                                 })
                                                                             }
