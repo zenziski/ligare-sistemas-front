@@ -10,9 +10,11 @@ import { useEffect, useState } from "react";
 import { getAllConstructionItems, getAllTipoLancamento, getOneConstruction } from "../../stores/obras/service";
 import { IConstructionDiary, IObrasItem, IObrasTable, ITiposLancamento } from "../../stores/obras/interface";
 import AddNewDiaryItem from "./fragments/AddNewDiaryItem";
+import ConfigurarObra from "./fragments/configurarObra";
 import EditDiaryItem from "./fragments/EditDiaryItem";
 import { getAll } from "../../stores/fornecedores/service";
 import { IFornecedorTable } from "../../stores/fornecedores/interface";
+
 
 const Obra = () => {
 
@@ -205,6 +207,9 @@ const Obra = () => {
                         mb={4}
                         gap={4}
                     >
+                        <ConfigurarObra
+                            data={data}
+                        />
                         <AddNewDiaryItem
                             id={id!}
                             flushHook={setRefresh}
@@ -213,16 +218,6 @@ const Obra = () => {
                             constructionItems={constructionItems}
                             entryType={entryType}
                         />
-                        <DrawerComponent
-                            isButton
-                            buttonIcon={<SettingsIcon />}
-                            buttonText="Configurar"
-                            headerText="Configurar Obra"
-                            buttonColorScheme="blue"
-                            size="md"
-                        >
-                            Oi
-                        </DrawerComponent>
                     </Flex>
                     <TableContainer>
                         <Table
