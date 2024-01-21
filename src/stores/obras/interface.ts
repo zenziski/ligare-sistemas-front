@@ -29,18 +29,18 @@ export const obraSchema = z.object({
     constructionAddress: z.string(),
     administration: z.object({
         value: z.number().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
-        installments: z.number().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
-        monthlyValue: z.number().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
+        installments: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
+        monthlyValue: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
     }).optional(),
     contract: z.object({
         value: z.number().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
-        installments: z.number().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
-        monthlyValue: z.number().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
+        installments: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
+        monthlyValue: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
     }).optional(),
     constructionItems: z.array(z.string().optional()).optional(),
-    extraLabor: z.number().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
-    extraAdm: z.number().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
-    builtArea: z.number().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
+    extraLabor: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
+    extraAdm: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
+    builtArea: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
     customerId: z.string(),
 });
 
