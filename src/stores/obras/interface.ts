@@ -26,6 +26,7 @@ export type IObrasTable = z.infer<typeof obraSchema>
 export const obraItemSchema = z.object({
     _id: z.string().optional(),
     name: z.string().min(1, { message: "Nome deve ter no mínimo 1 caractere" }),
+    createdAt: z.string().optional(),
 });
 
 export type IObrasItem = z.infer<typeof obraItemSchema>
