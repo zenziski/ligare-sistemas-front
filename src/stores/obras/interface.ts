@@ -54,3 +54,12 @@ export const obraItemSchema = z.object({
 
 export type IObrasItem = z.infer<typeof obraItemSchema>
 
+export const tiposLancamentoSchema = z.object({
+    _id: z.string().optional(),
+    name: z.string().min(1, { message: "Nome deve ter no mínimo 1 caractere" }),
+    createdAt: z.string().optional(),
+});
+
+export type ITiposLancamento = z.infer<typeof obraItemSchema>
+
+

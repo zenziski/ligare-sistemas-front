@@ -62,7 +62,6 @@ const Obras = () => {
                 status: "success",
                 duration: 3000,
                 isClosable: true,
-                position: "top-right"
             })
         } catch (error) {
             toast({
@@ -70,7 +69,6 @@ const Obras = () => {
                 status: "error",
                 duration: 3000,
                 isClosable: true,
-                position: "top-right"
             })
         }
     }
@@ -84,7 +82,6 @@ const Obras = () => {
                 title: "Item criado com sucesso!",
                 status: "success",
                 duration: 3000,
-                position: "top-right",
                 isClosable: true,
             })
         } catch (error: any) {
@@ -92,7 +89,6 @@ const Obras = () => {
                 title: error?.response?.data?.message || "Erro ao criar item",
                 status: "error",
                 duration: 3000,
-                position: "top-right",
                 isClosable: true,
             })
         }
@@ -107,7 +103,6 @@ const Obras = () => {
                 title: "Item editado com sucesso!",
                 status: "success",
                 duration: 3000,
-                position: "top-right",
                 isClosable: true,
             })
         } catch (error: any) {
@@ -115,7 +110,6 @@ const Obras = () => {
                 title: error?.response?.data?.message || "Erro ao editar item",
                 status: "error",
                 duration: 3000,
-                position: "top-right",
                 isClosable: true,
             })
         }
@@ -399,7 +393,7 @@ const Obras = () => {
                                         </Thead>
                                         <Tbody>
                                             {configs.map((config, index) => {
-                                                return (
+                                                return ( 
                                                     < Tr key={index} >
                                                         <Td>{config.name}</Td>
                                                         <Td>
@@ -437,15 +431,12 @@ const Obras = () => {
                                                                                     status: "success",
                                                                                     duration: 3000,
                                                                                     isClosable: true,
-                                                                                    position: "top-right",
-
                                                                                 })
                                                                             } catch (error: any) {
                                                                                 toast({
                                                                                     title: error?.response?.data?.message || "Erro ao deletar item",
                                                                                     status: "error",
                                                                                     duration: 3000,
-                                                                                    position: "top-right",
                                                                                     isClosable: true,
                                                                                 })
                                                                             }
