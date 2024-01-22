@@ -21,6 +21,7 @@ FROM nginx:alpine
 
 # Copie os arquivos construídos do estágio anterior para o diretório de publicação do Nginx
 COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Exponha a porta 80
 EXPOSE 80
