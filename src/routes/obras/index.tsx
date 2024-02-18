@@ -57,8 +57,6 @@ const Obras = () => {
             const administrationValue = parseFloat(watchObras('administration.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0");
             const contractValue = parseFloat(watchObras('contract.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0");
 
-            console.log(administrationValue, contractValue);
-
             const construction = await createConstruction({
                 ...data,
                 administration: {
@@ -214,7 +212,7 @@ const Obras = () => {
                                             <FormControl gridColumn="span 2">
                                                 <FormLabel>Nome da Obra</FormLabel>
                                                 <Input {...registerObras("name")} placeholder="Digite..." />
-                                                {errorsObras.name && <Text color="red">{errorsObras.name.message}</Text>}
+                                                {errorsObras.name && <Text color="red">{String(errorsObras.name.message)}</Text>}
                                             </FormControl>
                                             <FormControl gridColumn="span 2">
                                                 <FormLabel>Endereço da Obra</FormLabel>

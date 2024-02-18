@@ -30,13 +30,22 @@ export default class Helpers {
 
     static toViewDate(date: string): string {
         if (!date) return '-'
+        const d = new Date(date);
+        console.log(d);
         const viewDate = moment(date).format('DD/MM/YYYY')
         return viewDate
     }
 
+    static toViewDate2(date: string): string {
+        if (!date) return '-'
+        const d = date.split('T')[0]
+        console.log(d);
+        
+        return d;
+    }
+
     static toViewDateAndTime(date: string): string {
         if (date == null) return ''
-
         const viewDate = moment(date).format('DD/MM/YYYY HH:mm')
         return viewDate
     }

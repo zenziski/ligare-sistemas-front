@@ -32,7 +32,7 @@ export const obraSchema = z.object({
         value: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
         installments: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
         monthlyValue: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
-        percentage: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
+        percentage: z.string().optional().or(z.number().optional()).or(z.null().optional().transform(() => 0)),
     }).optional(),
     contract: z.object({
         value: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),

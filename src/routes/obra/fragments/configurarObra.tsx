@@ -98,10 +98,12 @@ const ConfigurarObra = ({
     const administrationValue = watch('administration.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "") || "0";
     const administrationInstallments = watch('administration.installments')
 
-    const contractMonthlyValue = contractValue && contractInstallments ? (parseFloat(contractValue.replace(",", ".")) / Number(contractInstallments)).toFixed(2) : '0';
-    const administrationMonthlyValue = administrationValue && administrationInstallments ? (parseFloat(administrationValue.replace(",", ".")) / Number(administrationInstallments)).toFixed(2) : '0';
+    const contractMonthlyValue = contractValue && contractInstallments ? (parseFloat(contractValue?.toString()?.replace(",", ".")?.replace("R$ ", "") || "") / Number(contractInstallments)).toFixed(2) : '0';
+    const administrationMonthlyValue = administrationValue && administrationInstallments ? (parseFloat(administrationValue?.toString()?.replace(",", ".")?.replace("R$ ", "") || "") / Number(administrationInstallments)).toFixed(2) : '0';
 
     useEffect(() => {
+        console.log(data.administration?.percentage);
+        
         if (data) {
             reset({
                 ...data,

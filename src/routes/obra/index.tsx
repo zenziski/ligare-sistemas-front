@@ -325,7 +325,7 @@ const Obra = () => {
                                                 {ConstructionDiaryPaymentMethod[item.paymentMethod as keyof typeof ConstructionDiaryPaymentMethod]}
                                             </Text>
                                         </Td>
-                                        <Td>{Helpers.toViewDate(String(item.paymentDate || ""))}</Td>
+                                        <Td>{Helpers.toViewDate(String(item.paymentDate || "")?.split('T')[0])}</Td>
                                         <Td>
                                             {item.item}
                                             <Text
@@ -335,7 +335,7 @@ const Obra = () => {
                                                 {item.type}
                                             </Text>
                                         </Td>
-                                        <Td>{Helpers.toViewDate(String(item.sendDate || ""))}</Td>
+                                        <Td>{Helpers.toViewDate(String(item.sendDate || "")?.split('T')[0])}</Td>
                                         <Td>
                                             {item.observation}
                                         </Td>

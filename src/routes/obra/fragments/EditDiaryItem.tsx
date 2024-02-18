@@ -8,7 +8,6 @@ import MoneyInput from "../../../components/MoneyInput";
 import { useEffect } from "react";
 import { IFornecedorTable } from "../../../stores/fornecedores/interface";
 import { editConstructionDiary } from "../../../stores/obras/service";
-import moment from "moment";
 import Helpers from "../../../utils/helper";
 
 const EditDiaryItem = ({
@@ -36,8 +35,8 @@ const EditDiaryItem = ({
         if (item) {
             reset({
                 ...item,
-                sendDate: item.sendDate ? moment(item.sendDate).format("YYYY-MM-DD") : "",
-                paymentDate: item.paymentDate ? moment(item.paymentDate).format("YYYY-MM-DD") : "",
+                sendDate: item.sendDate ? item.sendDate?.split('T')[0] : "",
+                paymentDate: item.paymentDate ? item.paymentDate?.split('T')[0] : "",
                 value: Helpers.toBrazilianCurrency(item?.value)
             });
         }
@@ -72,8 +71,6 @@ const EditDiaryItem = ({
             console.log(error);
         }
     }
-
-
 
     return (
         <DrawerComponent

@@ -46,7 +46,6 @@ const AddNewDiaryItem = ({ id, flushHook, refresh, fornecedores, entryType, cons
                 position: "top-right"
             })
             console.log(error);
-            
         }
     }
 
