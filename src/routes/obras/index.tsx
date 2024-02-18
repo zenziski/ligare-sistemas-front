@@ -11,7 +11,7 @@ import Helpers from "../../utils/helper"
 import { IObrasTable, IObrasItem, obraSchema, obraItemSchema } from "../../stores/obras/interface"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createConstruction, createConstructionItem, getAllConstruction, getAllConstructionItems, removeConstructionItem, updateConstructionItem } from "../../stores/obras/service"
+import { createConstruction, createConstructionItem, getAllConstruction, getAllConstructionItems, removeConstruction, removeConstructionItem, updateConstructionItem } from "../../stores/obras/service"
 import { IUserTable } from "../../stores/clientes/interface"
 import { getAll } from "../../stores/clientes/service"
 import ModalDelete from "../../components/ModalDelete"
@@ -53,17 +53,23 @@ const Obras = () => {
 
     const handleCreateConstruction = async (data: IObrasTable) => {
         try {
+
+            const administrationValue = parseFloat(watchObras('administration.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0");
+            const contractValue = parseFloat(watchObras('contract.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0");
+
+            console.log(administrationValue, contractValue);
+
             const construction = await createConstruction({
                 ...data,
                 administration: {
-                    value: parseFloat((data?.administration?.value?.toString() || "").replace(",", ".") || "0"),
+                    value: administrationValue,
                     installments: Number(data?.administration?.installments),
-                    monthlyValue: Number(data?.administration?.value) / Number(data?.administration?.installments)
+                    monthlyValue: administrationValue / Number(data?.administration?.installments)
                 },
                 contract: {
-                    value: parseFloat((data?.contract?.value?.toString() || "").replace(",", ".") || "0"),
+                    value: contractValue,
                     installments: Number(data?.contract?.installments),
-                    monthlyValue: Number(data?.contract?.value) / Number(data?.contract?.installments)
+                    monthlyValue: contractValue / Number(data?.contract?.installments)
                 }
             });
             const newObras = [...obras, construction];
@@ -331,6 +337,7 @@ const Obras = () => {
                                                 <Th>Endereço da Obra</Th>
                                                 <Th>Forma</Th>
                                                 <Th>{' '}</Th>
+                                                <Th>{' '}</Th>
                                             </Tr>
                                         </Thead>
                                         <Tbody>
@@ -339,6 +346,37 @@ const Obras = () => {
                                                     <Td>{obra.name}</Td>
                                                     <Td>{obra.constructionAddress}</Td>
                                                     <Td>{getContractType(obra)}</Td>
+                                                    <Td>
+                                                        <ModalDelete
+                                                            headerText="Deletar obra"
+                                                            buttonIcon={<DeleteIcon color={'red'} />}
+                                                            buttonColorScheme="red"
+                                                            onDelete={async () => {
+                                                                try {
+                                                                    await removeConstruction(obra._id || '');
+                                                                    const newObras = await getAllConstruction();
+                                                                    setObras(newObras);
+                                                                    toast({
+                                                                        title: "Obra deletada com sucesso!",
+                                                                        status: "success",
+                                                                        duration: 3000,
+                                                                        isClosable: true,
+                                                                    })
+                                                                } catch (error: any) {
+                                                                    toast({
+                                                                        title: error?.response?.data?.message || "Erro ao deletar obra",
+                                                                        status: "error",
+                                                                        duration: 3000,
+                                                                        isClosable: true,
+                                                                    })
+                                                                }
+                                                            }}
+                                                        >
+                                                            <Text>
+                                                                Tem certeza que deseja deletar a obra <strong>{obra.name}</strong>?
+                                                            </Text>
+                                                        </ModalDelete>
+                                                    </Td>
                                                     <Td>
                                                         <Link to={`/obras/${obra._id}`}>
                                                             <ArrowForwardIcon w="20px" h="20px" />

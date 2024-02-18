@@ -47,13 +47,13 @@ const ConfigurarObra = ({
                 administration: {
                     value: administrationValue,
                     installments: Number(data?.administration?.installments),
-                    monthlyValue: Number(data?.administration?.value) / Number(data?.administration?.installments),
+                    monthlyValue: Number(administrationValue) / Number(data?.administration?.installments),
                     percentage: Number(data?.administration?.percentage)
                 },
                 contract: {
                     value: contractValue,
                     installments: Number(data?.contract?.installments),
-                    monthlyValue: Number(data?.contract?.value) / Number(data?.contract?.installments)
+                    monthlyValue: Number(contractValue) / Number(data?.contract?.installments)
                 }
             })
             setRefresh(!refresh)
