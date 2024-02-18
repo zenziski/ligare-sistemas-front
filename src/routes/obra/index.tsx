@@ -14,7 +14,7 @@ import { getAll } from "../../stores/fornecedores/service";
 import { IFornecedorTable } from "../../stores/fornecedores/interface";
 import Medicao from "./fragments/Medicao";
 import ModalDelete from "../../components/ModalDelete";
-import { ArrowBackIcon, ArrowDownIcon, ArrowUpIcon, DeleteIcon } from "@chakra-ui/icons";
+import { ArrowDownIcon, ArrowUpIcon, DeleteIcon } from "@chakra-ui/icons";
 
 const Obra = () => {
 
