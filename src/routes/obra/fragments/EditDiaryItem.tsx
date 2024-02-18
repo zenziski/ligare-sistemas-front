@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { IFornecedorTable } from "../../../stores/fornecedores/interface";
 import { editConstructionDiary } from "../../../stores/obras/service";
 import moment from "moment";
+import Helpers from "../../../utils/helper";
 
 const EditDiaryItem = ({
     id,
@@ -37,15 +38,18 @@ const EditDiaryItem = ({
                 ...item,
                 sendDate: item.sendDate ? moment(item.sendDate).format("YYYY-MM-DD") : "",
                 paymentDate: item.paymentDate ? moment(item.paymentDate).format("YYYY-MM-DD") : "",
+                value: Helpers.toBrazilianCurrency(item.value ?? "")
             });
         }
     }, [item])
 
-    const handleCreateItem = async (data: IConstructionDiary) => {
+    const handleEditItem = async (data: IConstructionDiary) => {
         try {
+            console.log(data);
             await editConstructionDiary(id, item._id!, {
                 ...data,
                 supplier: data.supplier._id,
+                value: parseFloat(data.value?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0")
             });
             toast({
                 title: "Item adicionado com sucesso",
@@ -64,6 +68,7 @@ const EditDiaryItem = ({
                 isClosable: true,
                 position: "top-right"
             })
+            console.log(error);
         }
     }
 
@@ -75,7 +80,7 @@ const EditDiaryItem = ({
             buttonText="Editar"
             headerText="Editar item do diário de obra"
             size="lg"
-            onAction={() => handleSubmit(handleCreateItem)()}
+            onAction={() => handleSubmit(handleEditItem)()}
             isLoading={isSubmitting}
         >
             <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
@@ -93,7 +98,7 @@ const EditDiaryItem = ({
                         render={({ field }) => (
                             <Select defaultValue="" {...field}>
                                 <option disabled key={1} value="">Selecione o fornecedor</option>
-                                {fornecedores.map((fornecedor) => {
+                                {fornecedores.sort((a, b) => a.name.localeCompare(b.name)).map((fornecedor) => {
                                     return (
                                         <option key={fornecedor._id} value={fornecedor._id}>{fornecedor.name}</option>
                                     )
@@ -169,6 +174,7 @@ const EditDiaryItem = ({
                                 <option disabled key={0} value="">Selecione o status</option>
                                 <option key={1} value="paid">Pago</option>
                                 <option key={2} value="toPay">À pagar</option>
+                                <option key={3} value="sended">Enviado</option>
                             </Select>
                         )}
                     />

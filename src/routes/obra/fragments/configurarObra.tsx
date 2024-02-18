@@ -9,6 +9,7 @@ import { useEffect, useState } from "react"
 import { getAll } from "../../../stores/clientes/service"
 import MoneyInput from "../../../components/MoneyInput"
 import { updateConstruction } from "../../../stores/obras/service"
+import Helpers from "../../../utils/helper"
 
 interface ConfigurarObraProps {
     data: any,
@@ -37,26 +38,17 @@ const ConfigurarObra = ({
     const toast = useToast()
     const [clientes, setClientes] = useState<IUserTable[]>([])
 
-    const contractValue = parseFloat(watch('contract.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0")
-    const contractInstallments = parseFloat(watch('contract.installments')?.toString() || "0")
-
-    const administrationValue = parseFloat(watch('administration.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0")
-    const administrationInstallments = parseFloat(watch('administration.installments')?.toString() || "0")
-
-    const contractMonthlyValue = (contractValue / contractInstallments).toFixed(2)
-    const administrationMonthlyValue = (administrationValue / administrationInstallments).toFixed(2)
-
     const onSubmit = async (data: IObrasTable) => {
         try {
             await updateConstruction({
                 ...data,
                 administration: {
-                    value: Number(data?.administration?.value),
+                    value: parseFloat((data?.administration?.value?.toString() || "").replace(",", ".") || "0"),
                     installments: Number(data?.administration?.installments),
                     monthlyValue: Number(data?.administration?.value) / Number(data?.administration?.installments)
                 },
                 contract: {
-                    value: Number(data?.contract?.value),
+                    value: parseFloat((data?.contract?.value?.toString() || "").replace(",", ".") || "0"),
                     installments: Number(data?.contract?.installments),
                     monthlyValue: Number(data?.contract?.value) / Number(data?.contract?.installments)
                 }
@@ -97,18 +89,27 @@ const ConfigurarObra = ({
         setValue('contract.monthlyValue', contractMonthlyValue)
     }, [watch('contract.value'), watch('contract.installments'), watch('administration.value'), watch('administration.installments')])
 
+    const contractValue = watch('contract.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "") || "0";
+    const contractInstallments = watch('contract.installments')
+
+    const administrationValue = watch('administration.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "") || "0";
+    const administrationInstallments = watch('administration.installments')
+
+    const contractMonthlyValue = contractValue && contractInstallments ? (parseFloat(contractValue.replace(",", ".")) / Number(contractInstallments)).toFixed(2) : '0';
+    const administrationMonthlyValue = administrationValue && administrationInstallments ? (parseFloat(administrationValue.replace(",", ".")) / Number(administrationInstallments)).toFixed(2) : '0';
+
     useEffect(() => {
         if (data) {
             reset({
                 ...data,
                 customerId: data.customerId._id,
                 administration: {
-                    value: data.administration.value,
+                    value: Helpers.toBrazilianCurrency(data.administration.value),
                     installments: String(data.administration.installments),
                     monthlyValue: administrationMonthlyValue
                 },
                 contract: {
-                    value: data.contract.value,
+                    value: Helpers.toBrazilianCurrency(data.contract.value),
                     installments: String(data.contract.installments),
                     monthlyValue: contractMonthlyValue
                 }

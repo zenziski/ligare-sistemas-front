@@ -5,7 +5,7 @@ import Helpers from "../../utils/helper";
 import Chart from "react-apexcharts";
 import StatComponent from "../../components/Stats";
 import { useEffect, useState } from "react";
-import { getAllConstructionItems, getAllTipoLancamento, getOneConstruction } from "../../stores/obras/service";
+import { getAllConstructionItems, getAllTipoLancamento, getOneConstruction, removeConstructionDiary } from "../../stores/obras/service";
 import { ConstructionDiaryPaymentMethod, ConstructionDiaryStatus, IConstructionDiary, IObrasItem, IObrasTable, ITiposLancamento } from "../../stores/obras/interface";
 import AddNewDiaryItem from "./fragments/AddNewDiaryItem";
 import ConfigurarObra from "./fragments/configurarObra";
@@ -13,7 +13,8 @@ import EditDiaryItem from "./fragments/EditDiaryItem";
 import { getAll } from "../../stores/fornecedores/service";
 import { IFornecedorTable } from "../../stores/fornecedores/interface";
 import Medicao from "./fragments/Medicao";
-
+import ModalDelete from "../../components/ModalDelete";
+import { DeleteIcon } from "@chakra-ui/icons";
 
 const Obra = () => {
 
@@ -96,12 +97,14 @@ const Obra = () => {
                 if (!acc[item.type]) {
                     acc[item.type] = 0;
                 }
-                acc[item.type] += item.value;
+                acc[item.type] += Number(item.value);
                 return acc;
             }, {} as any);
 
             let _totalCost = response.diary.reduce((acc, item) => {
-                acc += item.value;
+                if (item.value !== undefined) {
+                    acc += Number(item.value);
+                }
                 return acc;
             }, 0);
 
@@ -116,8 +119,6 @@ const Obra = () => {
         }
         if (id) fetch(id)
     }, [id, refresh])
-
-
 
     return (
         <Sidebar>
@@ -140,23 +141,23 @@ const Obra = () => {
                         width={'100%'}
                     >
                         {growthPercentage && Object.entries(growthPercentage)
-                        .sort((a: any, b: any) => a[0].localeCompare(b[0]))
-                        .map((item: any, index: number) => (
-                            <GridItem
-                                mb={2}
-                                mr={2}
-                                width={['100%', '100%', '100%', 'auto']}
-                                key={index}
-                            >
-                                <StatComponent
-                                    label={item[0]}
-                                    value={Helpers.toBrazilianCurrency(item[1].value)}
-                                    hasArrow
-                                    arrowType={item[1].growth > 0 ? "increase" : "decrease"}
-                                    helpText={`${item[1].growth.toFixed(2)}% nos últimos 30 dias`}
-                                />
-                            </GridItem>
-                        ))}
+                            .sort((a: any, b: any) => a[0].localeCompare(b[0]))
+                            .map((item: any, index: number) => (
+                                <GridItem
+                                    mb={2}
+                                    mr={2}
+                                    width={['100%', '100%', '100%', 'auto']}
+                                    key={index}
+                                >
+                                    <StatComponent
+                                        label={item[0]}
+                                        value={Helpers.toBrazilianCurrency(item[1].value)}
+                                        hasArrow
+                                        arrowType={item[1].growth > 0 ? "increase" : "decrease"}
+                                        helpText={`${item[1].growth.toFixed(2)}% nos últimos 30 dias`}
+                                    />
+                                </GridItem>
+                            ))}
 
                         <GridItem
                             mb={2}
@@ -344,6 +345,19 @@ const Obra = () => {
                                                 flushHook={setRefresh}
                                                 refresh={refresh}
                                             />
+                                        </Td>
+                                        <Td>
+                                            <ModalDelete
+                                                onDelete={async () => {
+                                                    await removeConstructionDiary(id!, item._id || "")
+                                                    setDiarioItems(diarioItems.filter((diary) => diary._id !== item._id))
+                                                }}
+                                                headerText={"Deletar item"}
+                                                buttonColorScheme="red"
+                                                buttonIcon={<DeleteIcon />}
+                                            >
+                                                <Text>Tem certeza que deseja deletar este item?</Text>
+                                            </ModalDelete>
                                         </Td>
                                     </Tr>
                                 ))}

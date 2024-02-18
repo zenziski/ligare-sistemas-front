@@ -13,7 +13,7 @@ export const ConstructionDiarySchema = z.object({
     }),
     nfNumber: z.string(),
     type: z.string(),
-    value: z.number(),
+    value: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
     status: z.string(),
     sendDate: z.string().optional(),
     paymentMethod: z.string(),
@@ -29,12 +29,12 @@ export const obraSchema = z.object({
     name: z.string(),
     constructionAddress: z.string(),
     administration: z.object({
-        value: z.number().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
+        value: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
         installments: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
         monthlyValue: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
     }).optional(),
     contract: z.object({
-        value: z.number().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
+        value: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
         installments: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
         monthlyValue: z.string().optional().or(z.string().optional().transform(() => 0)).or(z.null().transform(() => 0)),
     }).optional(),
@@ -66,6 +66,7 @@ export type ITiposLancamento = z.infer<typeof obraItemSchema>
 export enum ConstructionDiaryStatus {
     toPay = "À Pagar",
     paid = "Pago",
+    sended = "Enviado"
 }
 
 export enum ConstructionDiaryPaymentMethod {

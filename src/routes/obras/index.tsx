@@ -56,12 +56,12 @@ const Obras = () => {
             const construction = await createConstruction({
                 ...data,
                 administration: {
-                    value: Number(data?.administration?.value),
+                    value: parseFloat((data?.administration?.value?.toString() || "").replace(",", ".") || "0"),
                     installments: Number(data?.administration?.installments),
                     monthlyValue: Number(data?.administration?.value) / Number(data?.administration?.installments)
                 },
                 contract: {
-                    value: Number(data?.contract?.value),
+                    value: parseFloat((data?.contract?.value?.toString() || "").replace(",", ".") || "0"),
                     installments: Number(data?.contract?.installments),
                     monthlyValue: Number(data?.contract?.value) / Number(data?.contract?.installments)
                 }
@@ -151,6 +151,8 @@ const Obras = () => {
     }
 
     useEffect(() => {
+        console.log(administrationValue);
+
         setValueObras('administration.value', administrationValue)
         setValueObras('administration.installments', administrationInstallments)
         setValueObras('contract.value', contractValue)
@@ -162,15 +164,14 @@ const Obras = () => {
         setValueObrasItem('_id', config._id);
     }, [config, setValueObrasItem])
 
-
-    const contractValue = parseFloat(watchObras('contract.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0");
+    const contractValue = watchObras('contract.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "") || "0";
     const contractInstallments = watchObras('contract.installments')
 
-    const administrationValue = parseFloat(watchObras('administration.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0");
+    const administrationValue = watchObras('administration.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "") || "0";
     const administrationInstallments = watchObras('administration.installments')
 
-    const contractMonthlyValue = contractValue && contractInstallments ? (contractValue / Number(contractInstallments)).toFixed(2) : '0';
-    const administrationMonthlyValue = administrationValue && administrationInstallments ? (administrationValue / Number(administrationInstallments)).toFixed(2) : '0';
+    const contractMonthlyValue = contractValue && contractInstallments ? (parseFloat(contractValue.replace(",", ".")) / Number(contractInstallments)).toFixed(2) : '0';
+    const administrationMonthlyValue = administrationValue && administrationInstallments ? (parseFloat(administrationValue.replace(",", ".")) / Number(administrationInstallments)).toFixed(2) : '0';
 
     return (
         <Sidebar>
@@ -409,7 +410,7 @@ const Obras = () => {
                                         </Thead>
                                         <Tbody>
                                             {configs.map((config, index) => {
-                                                return ( 
+                                                return (
                                                     < Tr key={index} >
                                                         <Td>{config.name}</Td>
                                                         <Td>

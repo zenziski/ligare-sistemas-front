@@ -62,6 +62,11 @@ export const editConstructionDiary = async (idObra: string, idDiary: string, dat
     return response.data;
 }
 
+export const removeConstructionDiary = async (idObra: string, idDiary: string) => {
+    const response = await Api.delete<IObrasTable>(`/construction/${idObra}/diary/${idDiary}`);
+    return response.data;
+}
+
 export const createTipoLancamento = async (data: any) => {
     const response = await Api.post<ITiposLancamento>('/entry-type', data);
     return response.data;

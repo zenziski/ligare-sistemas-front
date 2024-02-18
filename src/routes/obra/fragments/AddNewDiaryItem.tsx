@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { IFornecedorTable } from "../../../stores/fornecedores/interface";
 import { addConstructionDiary } from "../../../stores/obras/service";
 
-const AddNewDiaryItem = ({ id, flushHook, refresh, fornecedores, entryType, constructionItems  }: { id: string, flushHook: any, refresh: boolean, fornecedores: IFornecedorTable[], entryType: ITiposLancamento[], constructionItems: IObrasItem[] }) => {
+const AddNewDiaryItem = ({ id, flushHook, refresh, fornecedores, entryType, constructionItems }: { id: string, flushHook: any, refresh: boolean, fornecedores: IFornecedorTable[], entryType: ITiposLancamento[], constructionItems: IObrasItem[] }) => {
     const toast = useToast()
     const {
         register,
@@ -17,22 +17,17 @@ const AddNewDiaryItem = ({ id, flushHook, refresh, fornecedores, entryType, cons
         formState: { errors, isSubmitting },
         reset,
         control,
-        setValue,
-        watch,
     } = useForm<IConstructionDiary>({
         resolver: zodResolver(ConstructionDiarySchema),
         shouldFocusError: false
     });
-
-    useEffect(() => {
-        setValue('value', parseFloat(watch('value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0"))
-    }, [watch('value')])
 
     const handleCreateItem = async (data: IConstructionDiary) => {
         try {
             await addConstructionDiary(id, {
                 ...data,
                 supplier: data.supplier._id,
+                value: parseFloat(data.value?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0")
             });
             toast({
                 title: "Item adicionado com sucesso",
@@ -51,6 +46,8 @@ const AddNewDiaryItem = ({ id, flushHook, refresh, fornecedores, entryType, cons
                 isClosable: true,
                 position: "top-right"
             })
+            console.log(error);
+            
         }
     }
 
@@ -82,7 +79,7 @@ const AddNewDiaryItem = ({ id, flushHook, refresh, fornecedores, entryType, cons
                         render={({ field }) => (
                             <Select defaultValue="" {...field}>
                                 <option disabled key={1} value="">Selecione o fornecedor</option>
-                                {fornecedores.map((fornecedor) => {
+                                {fornecedores.sort((a, b) => a.name.localeCompare(b.name)).map((fornecedor) => {
                                     return (
                                         <option key={fornecedor._id} value={fornecedor._id}>{fornecedor.name}</option>
                                     )
@@ -158,6 +155,7 @@ const AddNewDiaryItem = ({ id, flushHook, refresh, fornecedores, entryType, cons
                                 <option disabled key={0} value="">Selecione o status</option>
                                 <option key={1} value="paid">Pago</option>
                                 <option key={2} value="toPay">À pagar</option>
+                                <option key={3} value="sended">Enviado</option>
                             </Select>
                         )}
                     />

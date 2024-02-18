@@ -11,37 +11,28 @@ interface IMedicao {
 const Medicao = ({
     data
 }: IMedicao) => {
-
-    console.log(data);
-
     const toast = useToast()
-
     const [dataInicial, setDataInicial] = useState<string>('')
     const [dataFinal, setDataFinal] = useState<string>('')
     const [medicoes, setMedicoes] = useState<any[]>(data.measurement || [])
     const [tiposMedicao, setTiposMedicao] = useState<any[]>([])
 
     useEffect(() => {
-
         const fetchData = async () => {
             const response = await getAllTipoLancamento()
             setTiposMedicao(response)
         }
         fetchData()
         setMedicoes(data.measurement || [])
-
     }, [data])
 
     const handleSubmit = async () => {
         try {
-
             const response = await createMedicao(data._id, {
                 initialDate: dataInicial,
                 finalDate: dataFinal
             })
-
             setMedicoes([...medicoes, response])
-
         } catch (error) {
             console.log(error);
             toast({
