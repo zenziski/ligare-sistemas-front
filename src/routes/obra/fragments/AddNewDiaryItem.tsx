@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { Grid, FormControl, FormLabel, Input, Text, InputGroup, Select, useToast } from "@chakra-ui/react";
 import MoneyInput from "../../../components/MoneyInput";
-import { useEffect } from "react";
 import { IFornecedorTable } from "../../../stores/fornecedores/interface";
 import { addConstructionDiary } from "../../../stores/obras/service";
 
