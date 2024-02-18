@@ -1,5 +1,5 @@
 import Sidebar from "../../components/Sidebar"
-import { Flex, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, GridItem, Box } from "@chakra-ui/react"
+import { Flex, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, GridItem, Box, Select, FormControl, FormLabel, Input } from "@chakra-ui/react"
 import { useParams } from "react-router-dom"
 import Helpers from "../../utils/helper";
 import Chart from "react-apexcharts";
@@ -22,6 +22,7 @@ const Obra = () => {
 
     const [diarioItems, setDiarioItems] = useState<IConstructionDiary[]>([])
     const [data, setData] = useState<IObrasTable>({} as IObrasTable)
+    const [filteredData, setFilteredData] = useState<IConstructionDiary[]>([])
     const [fornecedores, setFornecedores] = useState<IFornecedorTable[]>([]);
     const [constructionItems, setConstructionItems] = useState<IObrasItem[]>([]);
     const [entryType, setEntryType] = useState<ITiposLancamento[]>([]);
@@ -31,6 +32,47 @@ const Obra = () => {
     const [growthPercentage, setGrowthPercentage] = useState<any>({})
     const [loading, setLoading] = useState<boolean>(true)
     const [refresh, setRefresh] = useState<boolean>(false)
+    const [filters, setFilters] = useState<any>({})
+    const [sortConfig, setSortConfig] = useState<{ key?: keyof IConstructionDiary, direction?: 'ascending' | 'descending' }>({ key: "_id", direction: "ascending" });
+
+    const onHeaderClick = (key: any) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    useEffect(() => {
+        if (diarioItems) {
+            let _filteredData = [...diarioItems];
+            if (sortConfig && (sortConfig.key !== undefined && sortConfig.direction !== undefined)) {
+                const getNestedPropertyValue = (obj: any, path: string) => {
+                    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+                };
+                _filteredData = _filteredData.sort((a: any, b: any) => {
+                    if (getNestedPropertyValue(a, sortConfig.key as string) < getNestedPropertyValue(b, sortConfig.key as string)) {
+                        return sortConfig.direction === 'ascending' ? -1 : 1;
+                    }
+                    if (getNestedPropertyValue(a, sortConfig.key as string) > getNestedPropertyValue(b, sortConfig.key as string)) {
+                        return sortConfig.direction === 'ascending' ? 1 : -1;
+                    }
+                    return 0;
+                });
+            }
+            if (filters.status) _filteredData = diarioItems.filter((item) => item.status === filters.status)
+            if (filters.supplier) _filteredData = diarioItems.filter((item) => item.supplier._id === filters.supplier)
+            if (filters.nf) _filteredData = diarioItems.filter((item) => item.nfNumber.includes(filters.nf))
+            setFilteredData(_filteredData)
+        }
+    }, [diarioItems, filters, sortConfig])
+
+    const handleFilterChange = (key: string, value: any) => {
+        setFilters({
+            ...filters,
+            [key]: value
+        })
+    }
 
     useEffect(() => {
         const fetch = async (idConstruction: string) => {
@@ -54,14 +96,12 @@ const Obra = () => {
             const last30Days = response.diary.filter((item: IConstructionDiary) => new Date(item.createdAt || "") >= thirtyDaysAgo);
             const previous30Days = response.diary.filter((item: IConstructionDiary) => new Date(item.createdAt || "") < thirtyDaysAgo && new Date(item.createdAt || "") >= sixtyDaysAgo);
             const costLast30Days = last30Days.reduce((acc, item) => {
-                console.log(item.type, item.value, acc);
                 if (!acc[item.type]) {
                     acc[item.type] = 0;
                 }
                 acc[item.type] += item.value;
                 return acc;
             }, {} as any);
-            console.log("costlast30days", costLast30Days);
             const costPrevious30Days = previous30Days.reduce((acc, item) => {
                 if (!acc[item.type]) {
                     acc[item.type] = 0;
@@ -69,8 +109,6 @@ const Obra = () => {
                 acc[item.type] += item.value;
                 return acc;
             }, {} as any);
-            console.log("costPrevious30Days", costPrevious30Days);
-            console.log('aaaaaaaaaa', costLast30Days, costPrevious30Days);
 
             const allKeys = Array.from(new Set([...Object.keys(costLast30Days), ...Object.keys(costPrevious30Days)]));
 
@@ -86,7 +124,6 @@ const Obra = () => {
                     _growthPercentage[item] = { growth: ((costNow - costBefore) / costBefore) * 100, value: costNow };
                 }
             }
-            console.log(Object.entries(_growthPercentage));
             setGrowthPercentage(_growthPercentage);
             let _costByItem = response.diary.reduce((acc, item) => {
                 if (!acc[item.item]) {
@@ -262,27 +299,51 @@ const Obra = () => {
                         </Box>
                     </Flex>
                     <Flex
-                        justifyContent="flex-end"
+                        justifyContent="space-between"
                         alignItems="center"
                         mb={4}
                         gap={4}
                     >
-                        <Medicao
-                            data={data}
-                        />
-                        <ConfigurarObra
-                            data={data}
-                            refresh={refresh}
-                            setRefresh={setRefresh}
-                        />
-                        <AddNewDiaryItem
-                            id={id!}
-                            flushHook={setRefresh}
-                            refresh={refresh}
-                            fornecedores={fornecedores}
-                            constructionItems={constructionItems}
-                            entryType={entryType}
-                        />
+                        <Flex gap={2}>
+                            <FormControl>
+                                <FormLabel fontSize="14px">Status</FormLabel>
+                                <Select placeholder="Status" size="sm" onChange={(e) => handleFilterChange('status', e.target.value)}>
+                                    <option value="paid">Pago</option>
+                                    <option value="toPay">À pagar</option>
+                                    <option value="sended">Enviado</option>
+                                </Select>
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel fontSize="14px">Fornecedor</FormLabel>
+                                <Select placeholder="Fornecedor" size="sm" onChange={(e) => handleFilterChange('supplier', e.target.value)}>
+                                    {fornecedores.map((item, index) => (
+                                        <option key={index} value={item._id}>{item.name}</option>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel fontSize="14px">N° NF</FormLabel>
+                                <Input type="text" placeholder="Número da NF" size="sm" onChange={(e) => handleFilterChange('nf', e.target.value)} />
+                            </FormControl>
+                        </Flex>
+                        <Flex gap={4}>
+                            <Medicao
+                                data={data}
+                            />
+                            <ConfigurarObra
+                                data={data}
+                                refresh={refresh}
+                                setRefresh={setRefresh}
+                            />
+                            <AddNewDiaryItem
+                                id={id!}
+                                flushHook={setRefresh}
+                                refresh={refresh}
+                                fornecedores={fornecedores}
+                                constructionItems={constructionItems}
+                                entryType={entryType}
+                            />
+                        </Flex>
                     </Flex>
                     <TableContainer>
                         <Table
@@ -292,22 +353,22 @@ const Obra = () => {
                         >
                             <Thead>
                                 <Tr>
-                                    <Th>Criado em</Th>
-                                    <Th whiteSpace="normal" >Descrição</Th>
-                                    <Th>Fornecedor</Th>
-                                    <Th>Valor</Th>
-                                    <Th>N° NF</Th>
-                                    <Th>Status</Th>
-                                    <Th>Data de pagamento</Th>
-                                    <Th>Item</Th>
-                                    <Th>Data de envio</Th>
-                                    <Th>Observação</Th>
+                                    <Th onClick={() => onHeaderClick('createdAt')}>Criado em</Th>
+                                    <Th whiteSpace="normal" onClick={() => onHeaderClick('description')} >Descrição</Th>
+                                    <Th onClick={() => onHeaderClick('supplier.name')}>Fornecedor</Th>
+                                    <Th onClick={() => onHeaderClick('value')}>Valor</Th>
+                                    <Th onClick={() => onHeaderClick('nfNumber')}>N° NF</Th>
+                                    <Th onClick={() => onHeaderClick('status')}>Status</Th>
+                                    <Th onClick={() => onHeaderClick('paymentDate')}>Data de pagamento</Th>
+                                    <Th onClick={() => onHeaderClick('item')}>Item</Th>
+                                    <Th onClick={() => onHeaderClick('sendDate')}>Data de envio</Th>
+                                    <Th onClick={() => onHeaderClick('observation')}>Observação</Th>
                                     <Th>{' '}</Th>
                                     <Th>{' '}</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                {diarioItems.map((item, index) => (
+                                {filteredData.length ? (filteredData.map((item, index) => (
                                     <Tr key={index}>
                                         <Td>{Helpers.toViewDate(String(item.createdAt))}</Td>
                                         <Td maxW={'350px'} whiteSpace="normal">{item.description}</Td>
@@ -364,7 +425,12 @@ const Obra = () => {
                                             </ModalDelete>
                                         </Td>
                                     </Tr>
-                                ))}
+                                ))) : (
+                                    <Tr>
+                                        <Td colSpan={12} textAlign="center">Nenhum resultado encontrado :(</Td>
+                                    </Tr>
+                                )
+                                }
                             </Tbody>
                         </Table>
                     </TableContainer>
