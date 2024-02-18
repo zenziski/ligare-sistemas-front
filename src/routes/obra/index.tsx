@@ -1,5 +1,5 @@
 import Sidebar from "../../components/Sidebar"
-import { Flex, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, GridItem, Box, Select, FormControl, FormLabel, Input } from "@chakra-ui/react"
+import { Flex, Text, Table, Thead, Tbody, Tr, Th, Td, TableContainer, GridItem, Box, Select, FormControl, FormLabel, Input, IconButton } from "@chakra-ui/react"
 import { useParams } from "react-router-dom"
 import Helpers from "../../utils/helper";
 import Chart from "react-apexcharts";
@@ -14,7 +14,7 @@ import { getAll } from "../../stores/fornecedores/service";
 import { IFornecedorTable } from "../../stores/fornecedores/interface";
 import Medicao from "./fragments/Medicao";
 import ModalDelete from "../../components/ModalDelete";
-import { DeleteIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, ArrowDownIcon, ArrowUpIcon, DeleteIcon } from "@chakra-ui/icons";
 
 const Obra = () => {
 
@@ -36,7 +36,7 @@ const Obra = () => {
     const [sortConfig, setSortConfig] = useState<{ key?: keyof IConstructionDiary, direction?: 'ascending' | 'descending' }>({ key: "_id", direction: "ascending" });
 
     const onHeaderClick = (key: any) => {
-        let direction = 'ascending';
+        let direction: "ascending" | "descending" | undefined = 'ascending';
         if (sortConfig.key === key && sortConfig.direction === 'ascending') {
             direction = 'descending';
         }
@@ -60,9 +60,9 @@ const Obra = () => {
                     return 0;
                 });
             }
-            if (filters.status) _filteredData = diarioItems.filter((item) => item.status === filters.status)
-            if (filters.supplier) _filteredData = diarioItems.filter((item) => item.supplier._id === filters.supplier)
-            if (filters.nf) _filteredData = diarioItems.filter((item) => item.nfNumber.includes(filters.nf))
+            if (filters.status) _filteredData = _filteredData.filter((item) => item.status === filters.status)
+            if (filters.supplier) _filteredData = _filteredData.filter((item) => item.supplier._id === filters.supplier)
+            if (filters.nf) _filteredData = _filteredData.filter((item) => item.nfNumber.includes(filters.nf))
             setFilteredData(_filteredData)
         }
     }, [diarioItems, filters, sortConfig])
@@ -353,16 +353,126 @@ const Obra = () => {
                         >
                             <Thead>
                                 <Tr>
-                                    <Th onClick={() => onHeaderClick('createdAt')}>Criado em</Th>
-                                    <Th whiteSpace="normal" onClick={() => onHeaderClick('description')} >Descrição</Th>
-                                    <Th onClick={() => onHeaderClick('supplier.name')}>Fornecedor</Th>
-                                    <Th onClick={() => onHeaderClick('value')}>Valor</Th>
-                                    <Th onClick={() => onHeaderClick('nfNumber')}>N° NF</Th>
-                                    <Th onClick={() => onHeaderClick('status')}>Status</Th>
-                                    <Th onClick={() => onHeaderClick('paymentDate')}>Data de pagamento</Th>
-                                    <Th onClick={() => onHeaderClick('item')}>Item</Th>
-                                    <Th onClick={() => onHeaderClick('sendDate')}>Data de envio</Th>
-                                    <Th onClick={() => onHeaderClick('observation')}>Observação</Th>
+                                    <Th
+                                        onClick={() => onHeaderClick('_id')}
+                                        sx={{
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Criado em
+                                        <IconButton
+                                            aria-label="Voltar"
+                                            icon={sortConfig.key === "_id" && sortConfig.direction === "ascending" ? <ArrowDownIcon /> : <ArrowUpIcon />}
+                                            variant="unstyled"
+                                        />
+                                    </Th>
+                                    <Th minWidth={'150px'} whiteSpace="normal" onClick={() => onHeaderClick('description')}
+                                        sx={{
+                                            cursor: 'pointer'
+                                        }} >
+                                        Descrição
+                                        <IconButton
+                                            aria-label="Voltar"
+                                            icon={sortConfig.key === "description" && sortConfig.direction === "ascending" ? <ArrowDownIcon /> : <ArrowUpIcon />}
+                                            variant="unstyled"
+                                        />
+                                    </Th>
+                                    <Th onClick={() => onHeaderClick('supplier.name')}
+                                        sx={{
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Fornecedor
+                                        <IconButton
+                                            aria-label="Voltar"
+                                            icon={sortConfig.key as any === "supplier.name" && sortConfig.direction === "ascending" ? <ArrowDownIcon /> : <ArrowUpIcon />}
+                                            variant="unstyled"
+                                        />
+                                    </Th>
+                                    <Th onClick={() => onHeaderClick('value')}
+                                        sx={{
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Valor
+                                        <IconButton
+                                            aria-label="Voltar"
+                                            icon={sortConfig.key === "value" && sortConfig.direction === "ascending" ? <ArrowDownIcon /> : <ArrowUpIcon />}
+                                            variant="unstyled"
+                                        />
+                                    </Th>
+                                    <Th onClick={() => onHeaderClick('nfNumber')}
+                                        sx={{
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        N° NF
+                                        <IconButton
+                                            aria-label="Voltar"
+                                            icon={sortConfig.key === "nfNumber" && sortConfig.direction === "ascending" ? <ArrowDownIcon /> : <ArrowUpIcon />}
+                                            variant="unstyled"
+                                        />
+                                    </Th>
+                                    <Th onClick={() => onHeaderClick('status')}
+                                        sx={{
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Status
+                                        <IconButton
+                                            aria-label="Voltar"
+                                            icon={sortConfig.key === "status" && sortConfig.direction === "ascending" ? <ArrowDownIcon /> : <ArrowUpIcon />}
+                                            variant="unstyled"
+                                        />
+                                    </Th>
+                                    <Th onClick={() => onHeaderClick('paymentDate')}
+                                        sx={{
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Data de pagamento
+                                        <IconButton
+                                            aria-label="Voltar"
+                                            icon={sortConfig.key === "paymentDate" && sortConfig.direction === "ascending" ? <ArrowDownIcon /> : <ArrowUpIcon />}
+                                            variant="unstyled"
+                                        />
+                                    </Th>
+                                    <Th onClick={() => onHeaderClick('item')}
+                                        sx={{
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Item
+                                        <IconButton
+                                            aria-label="Voltar"
+                                            icon={sortConfig.key === "item" && sortConfig.direction === "ascending" ? <ArrowDownIcon /> : <ArrowUpIcon />}
+                                            variant="unstyled"
+                                        />
+                                    </Th>
+                                    <Th onClick={() => onHeaderClick('sendDate')}
+                                        sx={{
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Data de envio
+                                        <IconButton
+                                            aria-label="Voltar"
+                                            icon={sortConfig.key === "sendDate" && sortConfig.direction === "ascending" ? <ArrowDownIcon /> : <ArrowUpIcon />}
+                                            variant="unstyled"
+                                        />
+                                    </Th>
+                                    <Th onClick={() => onHeaderClick('observation')}
+                                        sx={{
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Observação
+                                        <IconButton
+                                            aria-label="Voltar"
+                                            icon={sortConfig.key === "observation" && sortConfig.direction === "ascending" ? <ArrowDownIcon /> : <ArrowUpIcon />}
+                                            variant="unstyled"
+                                        />
+                                    </Th>
                                     <Th>{' '}</Th>
                                     <Th>{' '}</Th>
                                 </Tr>
