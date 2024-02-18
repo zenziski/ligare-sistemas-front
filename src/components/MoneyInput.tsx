@@ -11,7 +11,7 @@ const defaultMaskOptions = {
     allowDecimal: true,
     decimalSymbol: ',',
     decimalLimit: 2,
-    integerLimit: 9,
+    integerLimit: 12,
     allowNegative: false,
     allowLeadingZeroes: true,
 };

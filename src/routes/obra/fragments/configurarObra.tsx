@@ -40,16 +40,18 @@ const ConfigurarObra = ({
 
     const onSubmit = async (data: IObrasTable) => {
         try {
+            const administrationValue = parseFloat(data?.administration?.value?.toString()?.replace(",", ".")?.replace("R$ ", "") || "") || "0"
+            const contractValue = parseFloat(data?.contract?.value?.toString()?.replace(",", ".")?.replace("R$ ", "") || "") || "0"
             await updateConstruction({
                 ...data,
                 administration: {
-                    value: parseFloat((data?.administration?.value?.toString() || "").replace(",", ".") || "0"),
+                    value: administrationValue,
                     installments: Number(data?.administration?.installments),
                     monthlyValue: Number(data?.administration?.value) / Number(data?.administration?.installments),
                     percentage: Number(data?.administration?.percentage)
                 },
                 contract: {
-                    value: parseFloat((data?.contract?.value?.toString() || "").replace(",", ".") || "0"),
+                    value: contractValue,
                     installments: Number(data?.contract?.installments),
                     monthlyValue: Number(data?.contract?.value) / Number(data?.contract?.installments)
                 }
