@@ -54,13 +54,14 @@ const Obra = () => {
             const last30Days = response.diary.filter((item: IConstructionDiary) => new Date(item.createdAt || "") >= thirtyDaysAgo);
             const previous30Days = response.diary.filter((item: IConstructionDiary) => new Date(item.createdAt || "") < thirtyDaysAgo && new Date(item.createdAt || "") >= sixtyDaysAgo);
             const costLast30Days = last30Days.reduce((acc, item) => {
+                console.log(item.type, item.value, acc);
                 if (!acc[item.type]) {
                     acc[item.type] = 0;
                 }
                 acc[item.type] += item.value;
                 return acc;
             }, {} as any);
-
+            console.log("costlast30days", costLast30Days);
             const costPrevious30Days = previous30Days.reduce((acc, item) => {
                 if (!acc[item.type]) {
                     acc[item.type] = 0;
@@ -68,6 +69,8 @@ const Obra = () => {
                 acc[item.type] += item.value;
                 return acc;
             }, {} as any);
+            console.log("costPrevious30Days", costPrevious30Days);
+            console.log('aaaaaaaaaa', costLast30Days, costPrevious30Days);
 
             const allKeys = Array.from(new Set([...Object.keys(costLast30Days), ...Object.keys(costPrevious30Days)]));
 
@@ -300,6 +303,7 @@ const Obra = () => {
                                     <Th>Data de envio</Th>
                                     <Th>Observação</Th>
                                     <Th>{' '}</Th>
+                                    <Th>{' '}</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
@@ -321,7 +325,7 @@ const Obra = () => {
                                                 {ConstructionDiaryPaymentMethod[item.paymentMethod as keyof typeof ConstructionDiaryPaymentMethod]}
                                             </Text>
                                         </Td>
-                                        <Td>{Helpers.toViewDate(item.paymentDate ? String(item.paymentDate) : '') || '-'}</Td>
+                                        <Td>{Helpers.toViewDate(String(item.paymentDate || ""))}</Td>
                                         <Td>
                                             {item.item}
                                             <Text
@@ -331,7 +335,7 @@ const Obra = () => {
                                                 {item.type}
                                             </Text>
                                         </Td>
-                                        <Td>{Helpers.toViewDate(String(item.sendDate))}</Td>
+                                        <Td>{Helpers.toViewDate(String(item.sendDate || ""))}</Td>
                                         <Td>
                                             {item.observation}
                                         </Td>

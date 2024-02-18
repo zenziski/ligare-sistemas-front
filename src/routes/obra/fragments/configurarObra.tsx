@@ -45,7 +45,8 @@ const ConfigurarObra = ({
                 administration: {
                     value: parseFloat((data?.administration?.value?.toString() || "").replace(",", ".") || "0"),
                     installments: Number(data?.administration?.installments),
-                    monthlyValue: Number(data?.administration?.value) / Number(data?.administration?.installments)
+                    monthlyValue: Number(data?.administration?.value) / Number(data?.administration?.installments),
+                    percentage: Number(data?.administration?.percentage)
                 },
                 contract: {
                     value: parseFloat((data?.contract?.value?.toString() || "").replace(",", ".") || "0"),
@@ -106,7 +107,8 @@ const ConfigurarObra = ({
                 administration: {
                     value: Helpers.toBrazilianCurrency(data.administration.value),
                     installments: String(data.administration.installments),
-                    monthlyValue: administrationMonthlyValue
+                    monthlyValue: administrationMonthlyValue,
+                    percentage: data.administration.percentage
                 },
                 contract: {
                     value: Helpers.toBrazilianCurrency(data.contract.value),
@@ -190,7 +192,7 @@ const ConfigurarObra = ({
                             Administração
                         </AbsoluteCenter>
                     </Box>
-                    <FormControl gridColumn="span 2">
+                    <FormControl>
                         <FormLabel>Contrato</FormLabel>
                         <InputGroup>
                             <MoneyInput
@@ -202,6 +204,13 @@ const ConfigurarObra = ({
                         {
                             errors.administration?.value && <Text color="red">{
                                 errors.administration?.value.message}</Text>}
+                    </FormControl>
+                    <FormControl>
+                        <FormLabel>Porcentagem</FormLabel>
+                        <Input type="number" {...register("administration.percentage")} />
+                        {
+                            errors.administration?.percentage && <Text color="red">{
+                                errors.administration?.percentage?.message}</Text>}
                     </FormControl>
                     <FormControl>
                         <FormLabel>Parcelas</FormLabel>

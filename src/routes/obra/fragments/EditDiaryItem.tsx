@@ -38,7 +38,7 @@ const EditDiaryItem = ({
                 ...item,
                 sendDate: item.sendDate ? moment(item.sendDate).format("YYYY-MM-DD") : "",
                 paymentDate: item.paymentDate ? moment(item.paymentDate).format("YYYY-MM-DD") : "",
-                value: Helpers.toBrazilianCurrency(item.value ?? "")
+                value: Helpers.toBrazilianCurrency(item?.value)
             });
         }
     }, [item])
@@ -46,10 +46,11 @@ const EditDiaryItem = ({
     const handleEditItem = async (data: IConstructionDiary) => {
         try {
             console.log(data);
+            console.log(data.value?.toString()?.replace(/R\$ /g, "")?.replace(/\./g, "")?.replace(",", "."));
             await editConstructionDiary(id, item._id!, {
                 ...data,
                 supplier: data.supplier._id,
-                value: parseFloat(data.value?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0")
+                value: parseFloat(data.value?.toString()?.replace(/R\$ /g, "")?.replace(/\./g, "")?.replace(",", ".") || "0")
             });
             toast({
                 title: "Item adicionado com sucesso",
