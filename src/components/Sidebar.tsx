@@ -81,6 +81,7 @@ const Sidebar = ({ children }: SidebarProps) => {
                     <Item to="clientes" label="Clientes" icon={<CheckIcon />} />
                     <Item to="fornecedores" label="Fornecedores" icon={<CheckIcon />} />
                     <Item to="usuarios" label="Usuários" icon={<CheckIcon />} />
+                    <Item to="financeiro" label="Financeiro" icon={<CheckIcon />} />
                 </Flex>
             </Box>
             <Box pl="64" w="100%" overflowY="auto">

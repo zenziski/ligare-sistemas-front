@@ -7,6 +7,7 @@ import Obras from "./routes/obras"
 import Obra from "./routes/obra"
 import Usuarios from "./routes/usuarios"
 import Fornecedores from "./routes/fornecedores"
+import Financeiro from "./routes/financeiro"
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="obras/:id" element={<Obra />} />
         <Route path="usuarios" element={<Usuarios />} />
         <Route path="fornecedores" element={<Fornecedores />} />
+        <Route path="financeiro" element={<Financeiro />} />
       </Route>
     </Routes>
   )
