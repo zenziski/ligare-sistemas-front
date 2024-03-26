@@ -8,6 +8,7 @@ import Obra from "./routes/obra"
 import Usuarios from "./routes/usuarios"
 import Fornecedores from "./routes/fornecedores"
 import Financeiro from "./routes/financeiro"
+import Livro from "./routes/financeiro/Livro"
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="usuarios" element={<Usuarios />} />
         <Route path="fornecedores" element={<Fornecedores />} />
         <Route path="financeiro" element={<Financeiro />} />
+        <Route path="livro" element={<Livro />} />
       </Route>
     </Routes>
   )
