@@ -9,6 +9,8 @@ import Usuarios from "./routes/usuarios"
 import Fornecedores from "./routes/fornecedores"
 import Financeiro from "./routes/financeiro"
 import Livro from "./routes/financeiro/Livro"
+import Ponto from "./routes/ponto"
+import DetalhesPonto from "./routes/detalhes-ponto"
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
         <Route path="fornecedores" element={<Fornecedores />} />
         <Route path="financeiro" element={<Financeiro />} />
         <Route path="livro" element={<Livro />} />
+        <Route path="ponto" element={<Ponto />} />
+        <Route path="detalhes-ponto" element={<DetalhesPonto />} />
       </Route>
     </Routes>
   )

@@ -40,7 +40,7 @@ export default class Helpers {
         if (!date) return '-'
         const d = date.split('T')[0]
         console.log(d);
-        
+
         return d;
     }
 
@@ -66,4 +66,17 @@ export default class Helpers {
     }
 
     static isDateValid = (dateStr: string): boolean => new Date(dateStr).toString() !== 'Invalid Date'
+
+    static translateDayOfWeek = (day: string): string => {
+        const daysOfWeek: { [key: string]: string } = {
+            'Sunday': 'Domingo',
+            'Monday': 'Segunda-feira',
+            'Tuesday': 'Terça-feira',
+            'Wednesday': 'Quarta-feira',
+            'Thursday': 'Quinta-feira',
+            'Friday': 'Sexta-feira',
+            'Saturday': 'Sábado',
+        };
+        return daysOfWeek[day] || day;
+    };
 }

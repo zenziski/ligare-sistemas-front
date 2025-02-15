@@ -25,6 +25,8 @@ const Home = () => {
                     }
                 })
             });
+            console.log(data, chartData);
+            
             temp = Object.entries(temp);
             const monthNames: any = {
                 '01': 'JAN',

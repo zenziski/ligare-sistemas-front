@@ -1,12 +1,11 @@
-import { AddIcon, EditIcon } from "@chakra-ui/icons";
+import { AddIcon } from "@chakra-ui/icons";
 import DrawerComponent from "../../components/Drawer";
 import Sidebar from "../../components/Sidebar"
-import { Flex, FormControl, FormLabel, Grid, Input, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react"
-import fornecedores from "../fornecedores";
+import { Flex, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Text, Th, Thead, Tr } from "@chakra-ui/react"
 import { useState } from "react";
 
 const Livro = () => {
-    const [loading, setLoading] = useState<boolean>(false)
+    const [loading] = useState<boolean>(false)
     return (
         <Sidebar>
             {loading ? (
@@ -15,7 +14,7 @@ const Livro = () => {
                 </Flex>
             ) : (
                 <Flex w="100%" h="100%" p={10} direction="column" fontFamily="Poppins-Regular">
-                    <Tabs variant='enclosed' onChange={(index) => { }}>
+                    <Tabs variant='enclosed' onChange={() => { }}>
                         <TabList>
                             <Tab>Livro Diário</Tab>
                             <Tab>Contas a Pagar</Tab>

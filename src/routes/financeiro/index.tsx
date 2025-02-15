@@ -1,14 +1,14 @@
-import { AddIcon, CloseIcon, EditIcon, SearchIcon } from "@chakra-ui/icons"
-import DrawerComponent from "../../components/Drawer"
+// import { AddIcon, CloseIcon, EditIcon, SearchIcon } from "@chakra-ui/icons"
+// import DrawerComponent from "../../components/Drawer"
 import Sidebar from "../../components/Sidebar"
-import { Flex, Text, Grid, FormControl, FormLabel, Input, Table, Thead, Tbody, Tr, Th, Td, TableContainer, InputGroup, InputLeftElement, Checkbox, Avatar, IconButton, Badge, useToast, InputRightElement, Progress, Tabs, Tab, TabList, TabPanel, TabPanels, Box } from "@chakra-ui/react"
+import { Flex, Text, Grid, Tabs, Tab, TabList, TabPanel, TabPanels, Box } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
-import { IUser, schema } from "../../stores/usuarios/interface"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { getAll, createUser, updateUser } from "../../stores/usuarios/service"
-import moment from "moment"
-import PhoneInput from "../../components/PhoneInput"
+// import { IUser, schema } from "../../stores/usuarios/interface"
+// import { zodResolver } from "@hookform/resolvers/zod"
+// import { useForm } from "react-hook-form"
+// import { getAll, createUser, updateUser } from "../../stores/usuarios/service"
+// import moment from "moment"
+// import PhoneInput from "../../components/PhoneInput"
 import { List, TabType } from "./fragments/List"
 import { getAccountPlanService } from "../../stores/financeiro/financeiro.service"
 
@@ -61,7 +61,7 @@ const Financeiro = () => {
                     </TabList>
                     <TabPanels>
                         {
-                            tab.map((item, index) => (
+                            tab.map((_, index) => (
                                 <TabPanel
                                     key={index}
                                 >
