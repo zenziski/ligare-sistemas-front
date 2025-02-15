@@ -41,3 +41,8 @@ export const aprovarCorrecao = async (data: {
     const response = await Api.post<IPonto>('/ponto/aprovar-correcao', { id: data.id, aprovado: data.approved });
     return response.data;
 }
+
+export const getRelatorioData = async (data: {type: string, filters: any}) => {
+    const response = await Api.post('/ponto/relatorio', data);
+    return response.data;
+}

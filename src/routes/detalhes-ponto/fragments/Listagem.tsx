@@ -1,9 +1,23 @@
-import { Box, Flex, Input, Progress, Select, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  IconButton,
+  Input,
+  Progress,
+  Select,
+  Text,
+} from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
 import { useToast } from "@chakra-ui/react";
-import { CheckCircleIcon, CloseIcon, WarningTwoIcon } from "@chakra-ui/icons";
+import {
+  CheckCircleIcon,
+  CloseIcon,
+  DownloadIcon,
+  WarningTwoIcon,
+} from "@chakra-ui/icons";
 import ModalCorrigirBatida from "./ModalCorrigirBatida";
-import { listarPontos } from "../../../stores/ponto/service";
+import { getRelatorioData, listarPontos } from "../../../stores/ponto/service";
 import moment from "moment";
 import { IPonto } from "../../../stores/ponto/interface";
 import Helpers from "../../../utils/helper";
@@ -85,51 +99,84 @@ const Listagem = () => {
     if (user?.roles?.admin) fetch();
   }, [user]);
 
+  const handleDownloadRelatorio = async () => {
+    const type = usuarioSelecionado ? "porUsuario" : "mensal";
+    const filters = {
+      year: moment(startDate).year(),
+      month: moment(startDate).month() + 1,
+      userId: type === "porUsuario" ? usuarioSelecionado : undefined,
+    };
+    const response = await getRelatorioData({ type, filters });
+    Helpers.generateXlsxFile(
+      response,
+      type,
+      type === "porUsuario"
+        ? `ponto_${usuarios.find((us) => us._id === usuarioSelecionado)?.name}`
+        : ""
+    );
+  };
+
   return (
     <Flex direction="column">
-      <Flex direction="row" gap={5} maxWidth={800} width={"100%"}>
-        <Input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-        <Input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-        />
-        {user?.roles?.admin && (
-          <Select
-            placeholder="Usuários"
-            value={usuarioSelecionado}
-            onChange={(e) => setUsuarioSelecionado(e.target.value)}
+      <Flex
+        direction="row"
+        gap={5}
+        width={"100%"}
+        justifyContent={"space-between"}
+      >
+        <Flex direction={"row"} gap={5} maxWidth={800} width={"80%"}>
+          <Input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+          <Input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+          {user?.roles?.admin && (
+            <Select
+              placeholder="Selecione..."
+              value={usuarioSelecionado}
+              onChange={(e) => setUsuarioSelecionado(e.target.value)}
+            >
+              {usuarios.map((usuario) => (
+                <option key={usuario._id} value={usuario._id}>
+                  {usuario.name}
+                </option>
+              ))}
+            </Select>
+          )}
+          <Box
+            display={"flex"}
+            alignItems={"center"}
+            fontWeight={"bold"}
+            width={300}
+            color={saldoHoras < 0 ? "red" : saldoHoras > 0 ? "green" : "black"}
+            whiteSpace={"nowrap"}
           >
-            {usuarios.map((usuario) => (
-              <option key={usuario._id} value={usuario._id}>
-                {usuario.name}
-              </option>
-            ))}
-          </Select>
-        )}
-        <Box
-          display={"flex"}
-          alignItems={"center"}
-          fontWeight={"bold"}
-          width={300}
-          color={saldoHoras < 0 ? "red" : saldoHoras > 0 ? "green" : "black"}
-          whiteSpace={"nowrap"}
-        >
-          Saldo: &nbsp;
-          {(() => {
-            const horas = Math.floor(Math.abs(saldoHoras));
-            const minutos = Math.floor((Math.abs(saldoHoras) % 1) * 60);
-            const formattedTime = `${String(horas).padStart(2, "0")}:${String(
-              minutos
-            ).padStart(2, "0")}`;
+            Saldo: &nbsp;
+            {(() => {
+              const horas = Math.floor(Math.abs(saldoHoras));
+              const minutos = Math.floor((Math.abs(saldoHoras) % 1) * 60);
+              const formattedTime = `${String(horas).padStart(2, "0")}:${String(
+                minutos
+              ).padStart(2, "0")}`;
 
-            return saldoHoras < 0 ? `-${formattedTime}` : `+${formattedTime}`;
-          })()}
-        </Box>
+              return saldoHoras < 0 ? `-${formattedTime}` : `+${formattedTime}`;
+            })()}
+          </Box>
+        </Flex>
+        <Flex width={"20%"}>
+          <Button
+            colorScheme="green"
+            leftIcon={<DownloadIcon />}
+            onClick={() => handleDownloadRelatorio()}
+          >
+            Baixar relatório
+          </Button>
+        </Flex>
       </Flex>
       <Flex direction="column" gap={5} mt={5}>
         {loading && <Progress size="xs" isIndeterminate />}
