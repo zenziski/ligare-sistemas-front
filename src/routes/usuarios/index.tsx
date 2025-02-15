@@ -84,7 +84,7 @@ const Usuarios = () => {
                 isClosable: true,
                 position: 'top-right'
             })
-        } 
+        }
     }
 
     useEffect(() => {
@@ -125,6 +125,7 @@ const Usuarios = () => {
         setValue('phoneNumber', user.phoneNumber)
         setValue('birthDate', user.admissionDate ? moment(user.birthDate).format("YYYY-MM-DD") : '')
         setValue('admissionDate', user.admissionDate ? moment(user.admissionDate).format("YYYY-MM-DD") : '')
+        setValue('hoursToWork', user.hoursToWork)
         setValue('roles', user.roles)
         setValue('password', user.password)
         setValue('confirmPassword', user.confirmPassword)
@@ -193,6 +194,11 @@ const Usuarios = () => {
                                 <FormLabel>Data Admissão</FormLabel>
                                 <Input type="date" {...register("admissionDate")} />
                                 {errors.admissionDate && <Text color="red.500" fontSize="sm">{errors.admissionDate.message}</Text>}
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel>Horas para trabalhar</FormLabel>
+                                <Input type="number" {...register("hoursToWork")} />
+                                {errors.hoursToWork && <Text color="red.500" fontSize="sm">{errors.hoursToWork.message}</Text>}
                             </FormControl>
                             <FormControl>
                                 <FormLabel>Permissões</FormLabel>
@@ -298,6 +304,11 @@ const Usuarios = () => {
                                                             <FormLabel>Data Admissão</FormLabel>
                                                             <Input type="date" {...register("admissionDate")} />
                                                             {errors.admissionDate && <Text color="red.500" fontSize="sm">{errors.admissionDate.message}</Text>}
+                                                        </FormControl>
+                                                        <FormControl>
+                                                            <FormLabel>Horas para trabalhar</FormLabel>
+                                                            <Input type="number" {...register("hoursToWork")} />
+                                                            {errors.hoursToWork && <Text color="red.500" fontSize="sm">{errors.hoursToWork.message}</Text>}
                                                         </FormControl>
                                                         <FormControl>
                                                             <FormLabel>Permissões</FormLabel>

@@ -9,7 +9,16 @@ export const schema = z.object({
     phoneNumber: z.string(),
     birthDate: z.string().optional(),
     admissionDate: z.string().optional(),
-    hoursToWork: z.number().optional(),
+    hoursToWork: z.union([z.string(), z.number()]) // Aceita string ou number
+        .transform((val) => {
+            // Converte para número se for uma string
+            if (typeof val === "string") {
+                return parseFloat(val);
+            }
+            return val;
+        })
+        .refine((val) => !isNaN(val), { message: "hoursToWork deve ser um número válido" }) // Garante que é um número válido
+        .optional(),
     roles: z.object({
         admin: z.boolean()
     }).optional(),
