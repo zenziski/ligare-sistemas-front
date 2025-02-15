@@ -11,22 +11,23 @@ import Financeiro from "./routes/financeiro"
 import Livro from "./routes/financeiro/Livro"
 import Ponto from "./routes/ponto"
 import DetalhesPonto from "./routes/detalhes-ponto"
+import { UserProvider } from "./contexts/UserContext"
 
 function App() {
   return (
     <Routes>
       <Route path="/">
         <Route index element={<Login />} />
-        <Route path="home" element={<Home />} />
-        <Route path="clientes" element={<Clientes />} />
-        <Route path="obras" element={<Obras />} />
-        <Route path="obras/:id" element={<Obra />} />
-        <Route path="usuarios" element={<Usuarios />} />
-        <Route path="fornecedores" element={<Fornecedores />} />
-        <Route path="financeiro" element={<Financeiro />} />
-        <Route path="livro" element={<Livro />} />
-        <Route path="ponto" element={<Ponto />} />
-        <Route path="detalhes-ponto" element={<DetalhesPonto />} />
+        <Route path="home" element={<UserProvider><Home /></UserProvider>} />
+        <Route path="clientes" element={<UserProvider><Clientes /></UserProvider>} />
+        <Route path="obras" element={<UserProvider><Obras /></UserProvider>} />
+        <Route path="obras/:id" element={<UserProvider><Obra /></UserProvider>} />
+        <Route path="usuarios" element={<UserProvider><Usuarios /></UserProvider>} />
+        <Route path="fornecedores" element={<UserProvider><Fornecedores /></UserProvider>} />
+        <Route path="financeiro" element={<UserProvider><Financeiro /> </UserProvider>} />
+        <Route path="livro" element={<UserProvider><Livro /></UserProvider>} />
+        <Route path="ponto" element={<UserProvider><Ponto /></UserProvider>} />
+        <Route path="detalhes-ponto" element={<UserProvider><DetalhesPonto /></UserProvider>} />
       </Route>
     </Routes>
   )

@@ -9,6 +9,7 @@ export const schema = z.object({
     phoneNumber: z.string(),
     birthDate: z.string().optional(),
     admissionDate: z.string().optional(),
+    hoursToWork: z.number().optional(),
     roles: z.object({
         admin: z.boolean()
     }).optional(),
