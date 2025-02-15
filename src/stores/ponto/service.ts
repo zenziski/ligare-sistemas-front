@@ -28,8 +28,16 @@ export const corrigirPonto = async (data: {
 }
 
 export const listarSoliciacoesCorrecao = async (data: {
-    userToFilter: string
+    userToFilter?: string
 }) => {
-    const response = await Api.post<IPonto[]>('/ponto/solicitacoes-correcao', data);
+    const response = await Api.post<IPonto[]>('/ponto/listar-solicitacoes', data);
+    return response.data;
+}
+
+export const aprovarCorrecao = async (data: {
+    id: string,
+    approved: boolean
+}) => {
+    const response = await Api.post<IPonto>('/ponto/aprovar-correcao', { id: data.id, aprovado: data.approved });
     return response.data;
 }

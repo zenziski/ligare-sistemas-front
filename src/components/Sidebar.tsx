@@ -1,6 +1,8 @@
 import { CheckIcon } from "@chakra-ui/icons";
 import { Box, Flex, Divider, Text } from "@chakra-ui/react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import UserContext from "../contexts/UserContext";
 
 interface SidebarProps {
     children: React.ReactNode
@@ -15,7 +17,7 @@ interface ItemProps {
 
 const Item = ({ label, icon, to }: ItemProps) => {
 
-    const isActive = window.location.pathname.includes(to)
+    const isActive = window.location.pathname === `/${to}`;
 
     return (
         <Link to={`/${to}`}>
@@ -61,6 +63,7 @@ const Item = ({ label, icon, to }: ItemProps) => {
 }
 
 const Sidebar = ({ children }: SidebarProps) => {
+  const { user } = useContext(UserContext);
     return (
         <>
             <Box position="fixed" top="0" left="0" h="100vh" w="64" p="6" bg="blackAlpha.50" color="white">
@@ -76,12 +79,9 @@ const Sidebar = ({ children }: SidebarProps) => {
                 </Flex>
                 <Divider />
                 <Flex direction="column">
-                    <Item to="home" label="Home" icon={<CheckIcon />} />
-                    <Item to="obras" label="Obras" icon={<CheckIcon />} />
-                    <Item to="clientes" label="Clientes" icon={<CheckIcon />} />
-                    <Item to="fornecedores" label="Fornecedores" icon={<CheckIcon />} />
-                    <Item to="usuarios" label="Usuários" icon={<CheckIcon />} />
-                    <Item to="financeiro" label="Financeiro" icon={<CheckIcon />} />
+                    <Item to="ponto" label="Registrar" icon={<CheckIcon />} />
+                    <Item to="detalhes-ponto" label="Espelho de ponto" icon={<CheckIcon />} />
+                    {user?.roles?.admin && <Item to="usuarios" label="Usuários" icon={<CheckIcon />} />}
                 </Flex>
             </Box>
             <Box pl="64" w="100%" overflowY="auto">
