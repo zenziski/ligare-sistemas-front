@@ -130,11 +130,12 @@ const Listagem = () => {
                             saldoHoras > 0 ? 'green' :
                                 'black'
                     }
+                    whiteSpace={'nowrap'}
                 >
                     Saldo: &nbsp;
                     {(() => {
-                        const horas = Math.floor(Math.abs(saldoHoras)); // Pegando o valor absoluto das horas
-                        const minutos = Math.floor((Math.abs(saldoHoras) % 1) * 60); // Pegando os minutos
+                        const horas = Math.floor(Math.abs(saldoHoras));
+                        const minutos = Math.floor((Math.abs(saldoHoras) % 1) * 60);
                         const formattedTime = `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;
 
                         return saldoHoras < 0 ? `-${formattedTime}` : `+${formattedTime}`
@@ -214,8 +215,8 @@ const Listagem = () => {
                                 >
                                     {(() => {
                                         const saldo = pontos[key][0].saldo;
-                                        const horas = Math.floor(Math.abs(saldo)); // Pegando o valor absoluto das horas
-                                        const minutos = Math.floor((Math.abs(saldo) % 1) * 60); // Pegando os minutos
+                                        const horas = Math.floor(Math.abs(saldo));
+                                        const minutos = Math.floor((Math.abs(saldo) % 1) * 60);
                                         const formattedTime = `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`;
 
                                         return saldo < 0 ? `-${formattedTime}` : `+${formattedTime}`;
