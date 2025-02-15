@@ -1,5 +1,5 @@
-import { Box, Flex, Input, Progress, Text } from "@chakra-ui/react"
-import { useEffect, useState } from "react";
+import { Box, Flex, Input, Progress, Select, Text } from "@chakra-ui/react"
+import { useContext, useEffect, useState } from "react";
 import { useToast } from "@chakra-ui/react";
 import { CheckCircleIcon, CloseIcon, WarningTwoIcon } from "@chakra-ui/icons";
 import ModalCorrigirBatida from "./ModalCorrigirBatida";
@@ -7,11 +7,17 @@ import { listarPontos } from "../../../stores/ponto/service";
 import moment from "moment";
 import { IPonto } from "../../../stores/ponto/interface";
 import Helpers from "../../../utils/helper";
+import UserContext from "../../../contexts/UserContext";
+import { getAll } from "../../../stores/usuarios/service";
+import { IUser } from "../../../stores/usuarios/interface";
 
 const Listagem = () => {
 
     const toast = useToast()
+    const { user } = useContext(UserContext)
 
+    const [usuarios, setUsuarios] = useState<IUser[]>([]);
+    const [usuarioSelecionado, setUsuarioSelecionado] = useState<string>('');
     const [startDate, setStartDate] = useState(moment().format('YYYY-MM-DD'));
     const [endDate, setEndDate] = useState(moment().format('YYYY-MM-DD'));
     const [pontos, setPontos] = useState<Record<string, IPonto[]>>({});
@@ -37,7 +43,7 @@ const Listagem = () => {
                 const response = await listarPontos({
                     startDate: moment(startDate).startOf('day').toISOString(),
                     endDate: moment(endDate).endOf('day').toISOString(),
-                    // userToFilter: '1'
+                    userToFilter: user._id === usuarioSelecionado ? undefined : usuarioSelecionado
                 })
                 setSaldoHoras(response.saldoHoras);
                 setPontos(groupByDay(response.pontos));
@@ -55,7 +61,26 @@ const Listagem = () => {
         }
 
         fetch();
-    }, [startDate, endDate, flushHook]);
+    }, [startDate, endDate, flushHook, usuarioSelecionado]);
+
+    useEffect(() => {
+        const fetch = async () => {
+            try {
+                const response = await getAll();
+                setUsuarios(response);
+            } catch (error) {
+                toast({
+                    title: "Erro ao carregar lista de pontos",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "top-right"
+                })
+            }
+        }
+        if (user?.roles?.admin) fetch();
+
+    }, [user])
 
     return (
         <Flex
@@ -64,7 +89,7 @@ const Listagem = () => {
             <Flex
                 direction="row"
                 gap={5}
-                maxWidth={700}
+                maxWidth={800}
                 width={'100%'}
             >
                 <Input
@@ -77,6 +102,24 @@ const Listagem = () => {
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
                 />
+                {
+                    user?.roles?.admin && <Select
+                        placeholder="Usuários"
+                        value={usuarioSelecionado}
+                        onChange={(e) => setUsuarioSelecionado(e.target.value)}
+                    >
+                        {
+                            usuarios.map((usuario) => (
+                                <option
+                                    key={usuario._id}
+                                    value={usuario._id}
+                                >
+                                    {usuario.name}
+                                </option>
+                            ))
+                        }
+                    </Select>
+                }
                 <Box
                     display={'flex'}
                     alignItems={'center'}
