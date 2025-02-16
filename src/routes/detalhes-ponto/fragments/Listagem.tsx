@@ -303,12 +303,12 @@ const Listagem = () => {
                     <Box display={"flex"} alignItems={"center"} gap={6}>
                       {pontos[key].some((p) => p.type === "falta") ? (
                         <ModalSolicitarAbono
-                          dia={key}
+                          dia={date}
                           setFlushHook={setFlushHook}
                         />
                       ) : (
                         <ModalCorrigirBatida
-                          dia={key}
+                          dia={date}
                           setFlushHook={setFlushHook}
                         />
                       )}
