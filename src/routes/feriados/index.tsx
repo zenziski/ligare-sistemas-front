@@ -87,7 +87,7 @@ const Feriados = () => {
                                         {feriado.description}
                                     </Th>
                                     <Th>
-                                        {moment(`${feriado.year}-${feriado.month}-${feriado.day}`).format(feriado.year ? 'DD/MM/YYYY' : 'DD/MM')}
+                                        {moment(`${feriado.year || new Date().getFullYear()}-${feriado.month}-${feriado.day}`).format(feriado.year ? 'DD/MM/YYYY' : 'DD/MM')}
                                     </Th>
                                     <Th>
                                         <ModalDelete

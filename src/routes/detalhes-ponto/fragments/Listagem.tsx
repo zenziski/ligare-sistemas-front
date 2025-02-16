@@ -92,7 +92,7 @@ const Listagem = () => {
     const fetch = async () => {
       try {
         const response = await getAll();
-        setUsuarios(response.filter((us) => !us.roles?.admin));
+        setUsuarios(response);
       } catch (error) {
         toast({
           title: "Erro ao carregar lista de pontos",
@@ -132,11 +132,7 @@ const Listagem = () => {
         justifyContent={"space-between"}
       >
         <Flex direction={"row"} gap={5} width={"100%"}>
-          <Flex
-            direction={"row"}
-            gap={5}
-            justifyContent={"space-between"}
-          >
+          <Flex direction={"row"} gap={5} justifyContent={"space-between"}>
             <Input
               type="date"
               value={startDate}
@@ -153,11 +149,13 @@ const Listagem = () => {
                 value={usuarioSelecionado}
                 onChange={(e) => setUsuarioSelecionado(e.target.value)}
               >
-                {usuarios.map((usuario) => (
-                  <option key={usuario._id} value={usuario._id}>
-                    {usuario.name}
-                  </option>
-                ))}
+                {usuarios
+                  .filter((us) => !us.roles?.admin)
+                  .map((usuario) => (
+                    <option key={usuario._id} value={usuario._id}>
+                      {usuario.name}
+                    </option>
+                  ))}
               </Select>
             )}
             <Box
@@ -165,31 +163,40 @@ const Listagem = () => {
               alignItems={"center"}
               fontWeight={"bold"}
               width={300}
-              color={saldoHoras < 0 ? "red" : saldoHoras > 0 ? "green" : "black"}
+              color={
+                saldoHoras < 0 ? "red" : saldoHoras > 0 ? "green" : "black"
+              }
               whiteSpace={"nowrap"}
             >
               Saldo: &nbsp;
               {(() => {
                 const horas = Math.floor(Math.abs(saldoHoras));
-                const minutos = Math.fround((Math.abs(saldoHoras) % 1) * 60).toFixed(0);
-                const formattedTime = `${String(horas).padStart(2, "0")}:${String(
-                  minutos
-                ).padStart(2, "0")}`;
+                const minutos = Math.fround(
+                  (Math.abs(saldoHoras) % 1) * 60
+                ).toFixed(0);
+                const formattedTime = `${String(horas).padStart(
+                  2,
+                  "0"
+                )}:${String(minutos).padStart(2, "0")}`;
 
-                return saldoHoras < 0 ? `-${formattedTime}` : `+${formattedTime}`;
+                return saldoHoras < 0
+                  ? `-${formattedTime}`
+                  : `+${formattedTime}`;
               })()}
             </Box>
           </Flex>
         </Flex>
-        <Flex>
-          <Button
-            colorScheme="green"
-            leftIcon={<DownloadIcon />}
-            onClick={() => handleDownloadRelatorio()}
-          >
-            Baixar relatório
-          </Button>
-        </Flex>
+        {user?.roles?.admin && (
+          <Flex>
+            <Button
+              colorScheme="green"
+              leftIcon={<DownloadIcon />}
+              onClick={() => handleDownloadRelatorio()}
+            >
+              Baixar relatório
+            </Button>
+          </Flex>
+        )}
       </Flex>
       <Flex direction="column" gap={5} mt={5}>
         {loading && <Progress size="xs" isIndeterminate />}
@@ -197,9 +204,10 @@ const Listagem = () => {
           <Thead>
             <Tr>
               <Th></Th>
+              {user?.roles?.admin && <Th>Usuário</Th>}
               <Th>Horários</Th>
               <Th>Saldo de Horas</Th>
-              <Th></Th>
+              {!user?.roles?.admin && <Th>Ações</Th>}
             </Tr>
           </Thead>
           <Tbody>
@@ -215,27 +223,30 @@ const Listagem = () => {
                         )}
                       {pontos[key][0].saldo < 0 &&
                         !pontos[key].some((p) => p.type === "falta") &&
-                        !pontos[key].some((p) => p.type === "abono")
-                        && (
+                        !pontos[key].some((p) => p.type === "abono") && (
                           <WarningTwoIcon color={"orange"} />
                         )}
                       {pontos[key].some((p) => p.type === "falta") && (
                         <CloseIcon color={"red"} />
                       )}
-                      {pontos[key].some((p) => p.type === "abono" && !p.isPending) && (
-                        <CheckCircleIcon color={"blue.400"} />
-                      )}
-                      {pontos[key].some((p) => p.type === "abono" && p.isPending) && (
-                        <TimeIcon color={"orange.400"} />
-                      )}
+                      {pontos[key].some(
+                        (p) => p.type === "abono" && !p.isPending
+                      ) && <CheckCircleIcon color={"blue.400"} />}
+                      {pontos[key].some(
+                        (p) => p.type === "abono" && p.isPending
+                      ) && <TimeIcon color={"orange.400"} />}
                     </Box>
                   </Td>
+                  {user?.roles?.admin && (
+                    <Td>
+                      {
+                        usuarios.find((us) => us._id === pontos[key][0].user)
+                          ?.name
+                      }
+                    </Td>
+                  )}
                   <Td>
-                    <Box
-                      display={"flex"}
-                      flexDirection={"column"}
-                      gap={1}
-                    >
+                    <Box display={"flex"} flexDirection={"column"} gap={1}>
                       <Box fontWeight="bold" fontSize={18}>
                         {Helpers.translateDayOfWeek(
                           moment(date).format("dddd")
@@ -259,9 +270,7 @@ const Listagem = () => {
                               <Text color={"gray"}>
                                 {["falta", "abono"].includes(ponto.type)
                                   ? Helpers.capitalizeFirstLetter(ponto.type)
-                                  : `${ponto.type
-                                    .slice(0, 1)
-                                    .toUpperCase()}: `}
+                                  : `${ponto.type.slice(0, 1).toUpperCase()}: `}
                               </Text>
                               &nbsp;
                               {ponto.registration &&
@@ -283,12 +292,11 @@ const Listagem = () => {
                         pontos[key].some((p) => p.type === "falta")
                           ? "red"
                           : pontos[key][0].saldo < 0
-                            ? "orange"
-                            : "green"
+                          ? "orange"
+                          : "green"
                       }
                     >
                       {(() => {
-                        console.log('------', pontos[key]);
                         const saldo = pontos[key][0].saldo;
                         const horas = Math.floor(Math.abs(saldo));
                         const minutos = Math.fround(
@@ -305,21 +313,23 @@ const Listagem = () => {
                       })()}
                     </Box>
                   </Td>
-                  <Td>
-                    <Box display={"flex"} alignItems={"center"} gap={6}>
-                      {pontos[key].some((p) => p.type === "falta") ? (
-                        <ModalSolicitarAbono
-                          dia={date}
-                          setFlushHook={setFlushHook}
-                        />
-                      ) : (
-                        <ModalCorrigirBatida
-                          dia={date}
-                          setFlushHook={setFlushHook}
-                        />
-                      )}
-                    </Box>
-                  </Td>
+                  {!user?.roles?.admin && (
+                    <Td>
+                      <Box display={"flex"} alignItems={"center"} gap={6}>
+                        {pontos[key].some((p) => p.type === "falta") ? (
+                          <ModalSolicitarAbono
+                            dia={date}
+                            setFlushHook={setFlushHook}
+                          />
+                        ) : (
+                          <ModalCorrigirBatida
+                            dia={date}
+                            setFlushHook={setFlushHook}
+                          />
+                        )}
+                      </Box>
+                    </Td>
+                  )}
                 </Tr>
               );
             })}

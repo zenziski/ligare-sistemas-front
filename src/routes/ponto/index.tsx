@@ -25,9 +25,9 @@ const Ponto = () => {
 
             })
             window.location.href = "/detalhes-ponto"
-        } catch (error) {
+        } catch (error: any) {
             toast({
-                title: "Erro ao registrar ponto",
+                title: error?.response?.data?.message || "Erro ao registrar ponto",
                 status: "error",
                 duration: 5000,
                 isClosable: true,
