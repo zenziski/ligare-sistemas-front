@@ -166,7 +166,7 @@ const Listagem = () => {
             Saldo: &nbsp;
             {(() => {
               const horas = Math.floor(Math.abs(saldoHoras));
-              const minutos = Math.floor((Math.abs(saldoHoras) % 1) * 60);
+              const minutos = Math.ceil((Math.abs(saldoHoras) % 1) * 60);
               const formattedTime = `${String(horas).padStart(2, "0")}:${String(
                 minutos
               ).padStart(2, "0")}`;
