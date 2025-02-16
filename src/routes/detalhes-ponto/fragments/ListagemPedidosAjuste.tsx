@@ -12,6 +12,14 @@ import { getAll } from "../../../stores/usuarios/service";
 import { IUser } from "../../../stores/usuarios/interface";
 import UserContext from "../../../contexts/UserContext";
 
+enum types {
+  entrada = 'Entrada',
+  saida = 'Saída',
+  abono = 'Abono'
+}
+
+
+
 const ListagemPedidosAjuste = () => {
   const toast = useToast();
   const { user } = useContext(UserContext);
@@ -90,59 +98,60 @@ const ListagemPedidosAjuste = () => {
     <CircularProgress isIndeterminate color="green.300" />
   ) : (
     solicitacoes.length > 0 ? (
-        <>
-      <Flex direction="column" gap={5} mt={5}>
-        {solicitacoes.map((key) => {
-          return (
-            <Flex
-              key={key._id}
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-              p={5}
-              borderRadius="md"
-              borderWidth="1px"
-            >
-              <Flex direction="column">
-                <Flex direction="row" alignItems="center" gap={2}>
-                  <WarningTwoIcon fontSize={25} color={"orange"} />
-                  <Box ml={2}>
-                    <Box fontWeight={"bold"}>
-                      {
-                        usuarios.find((usuario) => usuario._id === key.user)
-                          ?.name
-                      }
+      <>
+        <Flex direction="column" gap={5} mt={5}>
+          {solicitacoes.map((key) => {
+            return (
+              <Flex
+                key={key._id}
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                p={5}
+                borderRadius="md"
+                borderWidth="1px"
+              >
+                <Flex direction="column">
+                  <Flex direction="row" alignItems="center" gap={2}>
+                    <WarningTwoIcon fontSize={25} color={"orange"} />
+                    <Box ml={2}>
+                      <Box fontWeight={"bold"}>
+                        {
+                          usuarios.find((usuario) => usuario._id === key.user)
+                            ?.name
+                        }
+                      </Box>
+                      <Box fontSize="sm">
+                        {types[key.type as keyof typeof types]}
+                        {key.type === 'abono' ? ` - ${moment(`${key.year}-${key.month}-${key.day}`).format('DD/MM/YYYY')}` : ` - ${moment(key.registration).format("DD/MM/YYYY HH:mm")}`}
+                      </Box>
+                      <Box><strong>Justificativa:</strong> {key.justificative}</Box>
                     </Box>
-                    <Box fontSize="sm">
-                      {key.type === "entrada" ? "Entrada " : "Saída "}-{" "}
-                      {moment(key.registration).format("DD/MM/YYYY HH:mm")}
-                    </Box>
-                  </Box>
+                  </Flex>
+                </Flex>
+                <Flex direction="row" gap={4}>
+                  <IconButton
+                    aria-label="Aceitar"
+                    icon={<CheckCircleIcon />}
+                    colorScheme="green"
+                    onClick={() => {
+                      handleApprove(key._id, true);
+                    }}
+                  />
+                  <IconButton
+                    aria-label="Recusar"
+                    icon={<CloseIcon />}
+                    colorScheme="red"
+                    onClick={() => {
+                      handleApprove(key._id, false);
+                    }}
+                  />
                 </Flex>
               </Flex>
-              <Flex direction="row" gap={4}>
-                <IconButton
-                  aria-label="Aceitar"
-                  icon={<CheckCircleIcon />}
-                  colorScheme="green"
-                  onClick={() => {
-                    handleApprove(key._id, true);
-                  }}
-                />
-                <IconButton
-                  aria-label="Recusar"
-                  icon={<CloseIcon />}
-                  colorScheme="red"
-                  onClick={() => {
-                    handleApprove(key._id, false);
-                  }}
-                />
-              </Flex>
-            </Flex>
-          );
-        })}
-      </Flex>
-    </>
+            );
+          })}
+        </Flex>
+      </>
     ) : "Nenhuma solicitação de ajuste de ponto"
   );
 };

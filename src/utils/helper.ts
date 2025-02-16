@@ -101,8 +101,8 @@ export default class Helpers {
         const { pontos: registros, horasTrabalhadas, saldoHoras } = pontos;
 
         const formattedData = registros.map((ponto: any) => ({
-          Data: new Date(ponto.registration).toLocaleDateString(),
-          Registro: new Date(ponto.registration).toLocaleTimeString(),
+          Data: new Date(['falta', 'abono'].includes(ponto.type) ? `${ponto.year}-${ponto.month}-${ponto.day}` : ponto.registration).toLocaleDateString(),
+          Registro: ['falta', 'abono'].includes(ponto.type) ? 'N/A' : new Date(ponto.registration).toLocaleTimeString(),
           Tipo: ponto.type,
           Corrigido: ponto.isCorrected,
           Pendente: ponto.isPending ? "Sim" : "Não",
@@ -126,8 +126,8 @@ export default class Helpers {
       const { pontos, horasTrabalhadas, saldoHoras } = data;
 
       const formattedData = pontos.map((ponto: any) => ({
-        Data: new Date(ponto.registration).toLocaleDateString(),
-        Registro: new Date(ponto.registration).toLocaleTimeString(),
+        Data: new Date(['falta', 'abono'].includes(ponto.type) ? `${ponto.year}-${ponto.month}-${ponto.day}` : ponto.registration).toLocaleDateString(),
+        Registro: ['falta', 'abono'].includes(ponto.type) ? 'N/A' : new Date(ponto.registration).toLocaleTimeString(),
         Tipo: ponto.type,
         Corrigido: ponto.isCorrected || "N/A",
         Pendente: ponto.isPending ? "Sim" : "Não",
@@ -146,5 +146,9 @@ export default class Helpers {
       utils.book_append_sheet(workbook, worksheet, "Usuario");
       writeFile(workbook, `${filename}.xlsx`);
     }
+  };
+
+  static capitalizeFirstLetter = (string: string): string => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
   };
 }

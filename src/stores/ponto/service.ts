@@ -22,6 +22,7 @@ export const listarPontos = async (data: {
 export const corrigirPonto = async (data: {
     dataCorrecao: string,
     tipo: string,
+    justificative?: string
 }) => {
     const response = await Api.post<IPonto>('/ponto/corrigir', data);
     return response.data;
@@ -42,7 +43,7 @@ export const aprovarCorrecao = async (data: {
     return response.data;
 }
 
-export const getRelatorioData = async (data: {type: string, filters: any}) => {
+export const getRelatorioData = async (data: { type: string, filters: any }) => {
     const response = await Api.post('/ponto/relatorio', data);
     return response.data;
 }

@@ -11,6 +11,7 @@ export const schema = z.object({
     user: z.string(),
     isPending: z.boolean(),
     isCorrected: z.boolean(),
+    justificative: z.string(),
     createdAt: z.date(),
     updatedAt: z.date(),
 });

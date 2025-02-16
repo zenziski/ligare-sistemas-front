@@ -2,10 +2,15 @@ import {
   Box,
   Button,
   Flex,
-  IconButton,
   Input,
   Progress,
   Select,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
   Text,
 } from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
@@ -14,6 +19,7 @@ import {
   CheckCircleIcon,
   CloseIcon,
   DownloadIcon,
+  TimeIcon,
   WarningTwoIcon,
 } from "@chakra-ui/icons";
 import ModalCorrigirBatida from "./ModalCorrigirBatida";
@@ -24,6 +30,7 @@ import Helpers from "../../../utils/helper";
 import UserContext from "../../../contexts/UserContext";
 import { getAll } from "../../../stores/usuarios/service";
 import { IUser } from "../../../stores/usuarios/interface";
+import ModalSolicitarAbono from "./ModalSolicitarAbono.tsx";
 
 const Listagem = () => {
   const toast = useToast();
@@ -180,82 +187,136 @@ const Listagem = () => {
       </Flex>
       <Flex direction="column" gap={5} mt={5}>
         {loading && <Progress size="xs" isIndeterminate />}
-        {Object.keys(pontos || {}).map((key) => {
-          return (
-            <Flex borderBottom="1px solid #ccc" pb={2} gap={4} key={key}>
-              <Box fontSize={25} display={"flex"} alignItems={"center"}>
-                {pontos[key][0].saldo > 0 &&
-                  !pontos[key].some((p) => p.type === "falta") && (
-                    <CheckCircleIcon color={"green"} />
-                  )}
-                {pontos[key][0].saldo < 0 &&
-                  !pontos[key].some((p) => p.type === "falta") && (
-                    <WarningTwoIcon color={"orange"} />
-                  )}
-                {pontos[key].some((p) => p.type === "falta") && (
-                  <CloseIcon color={"red"} />
-                )}
-              </Box>
-              <Box minWidth={300}>
-                <Box fontWeight="bold" fontSize={18}>
-                  {Helpers.translateDayOfWeek(moment(key).format("dddd"))},{" "}
-                  {moment(key).format("DD/MM/YYYY")}
-                </Box>
-                <Flex>
-                  {pontos[key]
-                    .sort((a, b) => {
-                      if (a.registration < b.registration) return -1;
-                      if (a.registration > b.registration) return 1;
-                      return 0;
-                    })
-                    .map((ponto, index) => (
-                      <Box
-                        key={ponto._id}
-                        display={"flex"}
-                        color={ponto.isPending ? "orange" : "black"}
-                        fontWeight={"bold"}
-                      >
-                        <Text color={"gray"}>
-                          {ponto.type.slice(0, 1).toUpperCase()}:
-                        </Text>
-                        &nbsp;
-                        {ponto.registration &&
-                          moment(ponto.registration).format("HH:mm")}
-                        {index !== pontos[key].length - 1 && <>&nbsp;-&nbsp;</>}
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              <Th></Th>
+              <Th>Horários</Th>
+              <Th>Saldo de Horas</Th>
+              <Th></Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {Object.keys(pontos || {}).map((key) => {
+              return (
+                <Tr key={key}>
+                  <Td>
+                    <Box fontSize={25} display={"flex"} alignItems={"center"}>
+                      {pontos[key][0].saldo > 0 &&
+                        !pontos[key].some((p) => p.type === "falta") && (
+                          <CheckCircleIcon color={"green"} />
+                        )}
+                      {pontos[key][0].saldo < 0 &&
+                        !pontos[key].some((p) => p.type === "falta") &&
+                        !pontos[key].some((p) => p.type === "abono")
+                        && (
+                          <WarningTwoIcon color={"orange"} />
+                        )}
+                      {pontos[key].some((p) => p.type === "falta") && (
+                        <CloseIcon color={"red"} />
+                      )}
+                      {pontos[key].some((p) => p.type === "abono" && !p.isPending) && (
+                        <CheckCircleIcon color={"blue.400"} />
+                      )}
+                      {pontos[key].some((p) => p.type === "abono" && p.isPending) && (
+                        <TimeIcon color={"orange.400"} />
+                      )}
+                    </Box>
+                  </Td>
+                  <Td>
+                    <Box
+                      display={"flex"}
+                      flexDirection={"column"}
+                      gap={1}
+                    >
+                      <Box fontWeight="bold" fontSize={18}>
+                        {Helpers.translateDayOfWeek(
+                          moment(key).format("dddd")
+                        )}
+                        , {moment(key).format("DD/MM/YYYY")}
                       </Box>
-                    ))}
-                </Flex>
-              </Box>
-              <Box
-                display={"flex"}
-                alignItems={"center"}
-                fontWeight={"bold"}
-                color={
-                  pontos[key].some((p) => p.type === "falta")
-                    ? "red"
-                    : pontos[key][0].saldo < 0
-                    ? "orange"
-                    : "green"
-                }
-              >
-                {(() => {
-                  const saldo = pontos[key][0].saldo;
-                  const horas = Math.floor(Math.abs(saldo));
-                  const minutos = Math.floor((Math.abs(saldo) % 1) * 60);
-                  const formattedTime = `${String(horas).padStart(
-                    2,
-                    "0"
-                  )}:${String(minutos).padStart(2, "0")}`;
+                      <Flex>
+                        {pontos[key]
+                          .sort((a, b) => {
+                            if (a.registration < b.registration) return -1;
+                            if (a.registration > b.registration) return 1;
+                            return 0;
+                          })
+                          .map((ponto, index) => (
+                            <Box
+                              key={ponto._id}
+                              display={"flex"}
+                              color={ponto.isPending ? "orange" : "black"}
+                              fontWeight={"bold"}
+                            >
+                              <Text color={"gray"}>
+                                {["falta", "abono"].includes(ponto.type)
+                                  ? Helpers.capitalizeFirstLetter(ponto.type)
+                                  : `${ponto.type
+                                    .slice(0, 1)
+                                    .toUpperCase()}: `}
+                              </Text>
+                              &nbsp;
+                              {ponto.registration &&
+                                moment(ponto.registration).format("HH:mm")}
+                              {index !== pontos[key].length - 1 && (
+                                <>&nbsp;-&nbsp;</>
+                              )}
+                            </Box>
+                          ))}
+                      </Flex>
+                    </Box>
+                  </Td>
+                  <Td>
+                    <Box
+                      display={"flex"}
+                      alignItems={"center"}
+                      fontWeight={"bold"}
+                      color={
+                        pontos[key].some((p) => p.type === "falta")
+                          ? "red"
+                          : pontos[key][0].saldo < 0
+                            ? "orange"
+                            : "green"
+                      }
+                    >
+                      {(() => {
+                        const saldo = pontos[key][0].saldo;
+                        const horas = Math.floor(Math.abs(saldo));
+                        const minutos = Math.floor(
+                          (Math.abs(saldo) % 1) * 60
+                        );
+                        const formattedTime = `${String(horas).padStart(
+                          2,
+                          "0"
+                        )}:${String(minutos).padStart(2, "0")}`;
 
-                  return saldo < 0 ? `-${formattedTime}` : `+${formattedTime}`;
-                })()}
-              </Box>
-              <Box ml="auto" display={"flex"} alignItems={"center"} gap={6}>
-                <ModalCorrigirBatida dia={key} setFlushHook={setFlushHook} />
-              </Box>
-            </Flex>
-          );
-        })}
+                        return saldo < 0
+                          ? `-${formattedTime}`
+                          : `+${formattedTime}`;
+                      })()}
+                    </Box>
+                  </Td>
+                  <Td>
+                    <Box display={"flex"} alignItems={"center"} gap={6}>
+                      {pontos[key].some((p) => p.type === "falta") ? (
+                        <ModalSolicitarAbono
+                          dia={key}
+                          setFlushHook={setFlushHook}
+                        />
+                      ) : (
+                        <ModalCorrigirBatida
+                          dia={key}
+                          setFlushHook={setFlushHook}
+                        />
+                      )}
+                    </Box>
+                  </Td>
+                </Tr>
+              );
+            })}
+          </Tbody>
+        </Table>
       </Flex>
     </Flex>
   );

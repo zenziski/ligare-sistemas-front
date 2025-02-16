@@ -1,12 +1,11 @@
 import { HamburgerIcon } from "@chakra-ui/icons"
-import { Button, CircularProgress, Flex, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Radio, RadioGroup, Stack, useDisclosure } from "@chakra-ui/react"
+import { Button, CircularProgress, Flex, IconButton, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Radio, RadioGroup, Stack, Textarea, useDisclosure } from "@chakra-ui/react"
 import { useState } from "react"
 import { useToast } from "@chakra-ui/react"
 import moment from "moment"
 import { corrigirPonto } from "../../../stores/ponto/service"
 
 interface IModalCorrigirBatidaProps {
-    // Props definition
     dia: string,
     setFlushHook: any
 }
@@ -17,15 +16,36 @@ const ModalCorrigirBatida = (props: IModalCorrigirBatidaProps) => {
 
     const [tipo, setTipo] = useState<string>('entrada')
     const [horario, setHorario] = useState<string>('')
+    const [justificative, setJustificative] = useState<string>('')
     const [loading, setLoading] = useState<boolean>(false)
 
     const handleEnviar = async () => {
         setLoading(true)
         try {
-            console.log(moment(`${props.dia} ${horario}`).toISOString());
+            if(horario === '') {
+                toast({
+                    title: "Preencha o horário",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "top-right"
+                })
+                return
+            }
+            if(justificative === '') {
+                toast({
+                    title: "Preencha a justificativa",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "top-right"
+                })
+                return
+            }
             await corrigirPonto({
                 dataCorrecao: moment(`${props.dia} ${horario}`).toISOString(),
-                tipo
+                tipo,
+                justificative
             })
             toast({
                 title: "Correção enviada com sucesso",
@@ -83,6 +103,11 @@ const ModalCorrigirBatida = (props: IModalCorrigirBatidaProps) => {
                                     <Radio value="saida">Saída</Radio>
                                 </Stack>
                             </RadioGroup>
+                            <Textarea
+                                placeholder="Justificativa"
+                                value={justificative}
+                                onChange={(e) => setJustificative(e.target.value)}
+                            />
                         </Flex>
                     </ModalBody>
                     <ModalFooter>
