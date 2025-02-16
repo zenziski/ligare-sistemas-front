@@ -1,5 +1,5 @@
 import { Api } from "../../utils/api";
-import { IPonto } from "./interface";
+import { IFeriado, IPonto } from "./interface";
 
 export const registrarPonto = async () => {
     const response = await Api.post<IPonto>('/ponto/registrar');
@@ -45,5 +45,25 @@ export const aprovarCorrecao = async (data: {
 
 export const getRelatorioData = async (data: { type: string, filters: any }) => {
     const response = await Api.post('/ponto/relatorio', data);
+    return response.data;
+}
+
+export const getFeriados = async () => {
+    const response = await Api.get<IFeriado[]>('/ponto/feriados');
+    return response.data;
+}
+
+export const createFeriado = async (data: {
+    year?: number,
+    month: number,
+    day: number,
+    description: string
+}) => {
+    const response = await Api.post<IFeriado>('/ponto/feriados', data);
+    return response.data;
+}
+
+export const deleteFeriado = async (id: string) => {
+    const response = await Api.delete<IFeriado>(`/ponto/feriados/${id}`);
     return response.data;
 }

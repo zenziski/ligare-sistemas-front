@@ -12,6 +12,7 @@ import Livro from "./routes/financeiro/Livro"
 import Ponto from "./routes/ponto"
 import DetalhesPonto from "./routes/detalhes-ponto"
 import { UserProvider } from "./contexts/UserContext"
+import Feriados from "./routes/feriados"
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="livro" element={<UserProvider><Livro /></UserProvider>} />
         <Route path="ponto" element={<UserProvider><Ponto /></UserProvider>} />
         <Route path="detalhes-ponto" element={<UserProvider><DetalhesPonto /></UserProvider>} />
+        <Route path="Feriados" element={<UserProvider><Feriados /></UserProvider>} />
       </Route>
     </Routes>
   )

@@ -81,6 +81,7 @@ const Sidebar = ({ children }: SidebarProps) => {
                 <Flex direction="column">
                     <Item to="ponto" label="Registrar" icon={<CheckIcon />} />
                     <Item to="detalhes-ponto" label="Espelho de ponto" icon={<CheckIcon />} />
+                    {user?.roles?.admin && <Item to="feriados" label="Feriados" icon={<CheckIcon />} />}
                     {user?.roles?.admin && <Item to="usuarios" label="Usuários" icon={<CheckIcon />} />}
                 </Flex>
             </Box>
