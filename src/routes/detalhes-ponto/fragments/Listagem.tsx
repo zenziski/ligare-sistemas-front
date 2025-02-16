@@ -92,7 +92,7 @@ const Listagem = () => {
     const fetch = async () => {
       try {
         const response = await getAll();
-        setUsuarios(response);
+        setUsuarios(response.filter((us) => !us.roles?.admin));
       } catch (error) {
         toast({
           title: "Erro ao carregar lista de pontos",
@@ -131,51 +131,57 @@ const Listagem = () => {
         width={"100%"}
         justifyContent={"space-between"}
       >
-        <Flex direction={"row"} gap={5} maxWidth={800} width={"80%"}>
-          <Input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <Input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-          {user?.roles?.admin && (
-            <Select
-              placeholder="Selecione..."
-              value={usuarioSelecionado}
-              onChange={(e) => setUsuarioSelecionado(e.target.value)}
-            >
-              {usuarios.map((usuario) => (
-                <option key={usuario._id} value={usuario._id}>
-                  {usuario.name}
-                </option>
-              ))}
-            </Select>
-          )}
-          <Box
-            display={"flex"}
-            alignItems={"center"}
-            fontWeight={"bold"}
-            width={300}
-            color={saldoHoras < 0 ? "red" : saldoHoras > 0 ? "green" : "black"}
-            whiteSpace={"nowrap"}
+        <Flex direction={"row"} gap={5} width={"100%"}>
+          <Flex
+            direction={"row"}
+            gap={5}
+            justifyContent={"space-between"}
           >
-            Saldo: &nbsp;
-            {(() => {
-              const horas = Math.floor(Math.abs(saldoHoras));
-              const minutos = Math.fround((Math.abs(saldoHoras) % 1) * 60).toFixed(0);
-              const formattedTime = `${String(horas).padStart(2, "0")}:${String(
-                minutos
-              ).padStart(2, "0")}`;
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+            <Input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+            {user?.roles?.admin && (
+              <Select
+                placeholder="Selecione..."
+                value={usuarioSelecionado}
+                onChange={(e) => setUsuarioSelecionado(e.target.value)}
+              >
+                {usuarios.map((usuario) => (
+                  <option key={usuario._id} value={usuario._id}>
+                    {usuario.name}
+                  </option>
+                ))}
+              </Select>
+            )}
+            <Box
+              display={"flex"}
+              alignItems={"center"}
+              fontWeight={"bold"}
+              width={300}
+              color={saldoHoras < 0 ? "red" : saldoHoras > 0 ? "green" : "black"}
+              whiteSpace={"nowrap"}
+            >
+              Saldo: &nbsp;
+              {(() => {
+                const horas = Math.floor(Math.abs(saldoHoras));
+                const minutos = Math.fround((Math.abs(saldoHoras) % 1) * 60).toFixed(0);
+                const formattedTime = `${String(horas).padStart(2, "0")}:${String(
+                  minutos
+                ).padStart(2, "0")}`;
 
-              return saldoHoras < 0 ? `-${formattedTime}` : `+${formattedTime}`;
-            })()}
-          </Box>
+                return saldoHoras < 0 ? `-${formattedTime}` : `+${formattedTime}`;
+              })()}
+            </Box>
+          </Flex>
         </Flex>
-        <Flex width={"20%"}>
+        <Flex>
           <Button
             colorScheme="green"
             leftIcon={<DownloadIcon />}

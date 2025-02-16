@@ -21,7 +21,7 @@ const DetalhesPonto = () => {
         <Flex direction="row" mb="15px" justifyContent="space-between">
           <Text fontSize="4xl">Detalhes Ponto</Text>
         </Flex>
-        <Tabs variant="enclosed">
+        <Tabs variant="enclosed" isLazy>
           <TabList>
             <Tab>Lista de Pontos</Tab>
             {user?.roles?.admin && <Tab>Solicitações de Ajuste</Tab>}
