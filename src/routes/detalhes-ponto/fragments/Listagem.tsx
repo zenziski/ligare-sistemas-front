@@ -51,7 +51,7 @@ const Listagem = () => {
 
   function groupByDay(pontos: IPonto[]): Record<string, IPonto[]> {
     return pontos.reduce((acc, ponto) => {
-      const data = `${ponto.year}-${ponto.month}-${ponto.day}`;
+      const data = `${ponto.year}-${ponto.month}-${ponto.day}-${ponto.user}`;
       if (!acc[data]) {
         acc[data] = [];
       }
@@ -198,6 +198,7 @@ const Listagem = () => {
           </Thead>
           <Tbody>
             {Object.keys(pontos || {}).map((key) => {
+              const date = key.split("-").slice(0, 3).join("-");
               return (
                 <Tr key={key}>
                   <Td>
@@ -231,9 +232,9 @@ const Listagem = () => {
                     >
                       <Box fontWeight="bold" fontSize={18}>
                         {Helpers.translateDayOfWeek(
-                          moment(key).format("dddd")
+                          moment(date).format("dddd")
                         )}
-                        , {moment(key).format("DD/MM/YYYY")}
+                        , {moment(date).format("DD/MM/YYYY")}
                       </Box>
                       <Flex>
                         {pontos[key]
@@ -281,6 +282,7 @@ const Listagem = () => {
                       }
                     >
                       {(() => {
+                        console.log('------', pontos[key]);
                         const saldo = pontos[key][0].saldo;
                         const horas = Math.floor(Math.abs(saldo));
                         const minutos = Math.fround(
@@ -301,12 +303,12 @@ const Listagem = () => {
                     <Box display={"flex"} alignItems={"center"} gap={6}>
                       {pontos[key].some((p) => p.type === "falta") ? (
                         <ModalSolicitarAbono
-                          dia={key}
+                          dia={date}
                           setFlushHook={setFlushHook}
                         />
                       ) : (
                         <ModalCorrigirBatida
-                          dia={key}
+                          dia={date}
                           setFlushHook={setFlushHook}
                         />
                       )}
