@@ -17,11 +17,12 @@ export const schema = z.object({
             }
             return val;
         })
-        .refine((val) => !isNaN(val), { message: "hoursToWork deve ser um número válido" }) // Garante que é um número válido
+        .refine((val) => !isNaN(val), { message: "Carga horária deve ser um número válido" }) // Garante que é um número válido
         .optional(),
     roles: z.object({
         admin: z.boolean()
     }).optional(),
+    changePassword: z.string().optional(),
 });
 
 export type IUser = z.infer<typeof schema>;

@@ -6,9 +6,10 @@ import { useEffect, useState } from "react"
 import { IUser, schema } from "../../stores/usuarios/interface"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { getAll, createUser, updateUser } from "../../stores/usuarios/service"
+import { getAll, createUser, updateUser, removeUser } from "../../stores/usuarios/service"
 import moment from "moment"
 import PhoneInput from "../../components/PhoneInput"
+import ModalDelete from "../../components/ModalDelete"
 
 const Usuarios = () => {
 
@@ -28,6 +29,7 @@ const Usuarios = () => {
     const [user, setUser] = useState<IUser>({} as IUser)
     const [filter, setFilter] = useState<string>('')
     const [loading, setLoading] = useState<boolean>(false)
+    const [refresh, setRefresh] = useState<boolean>(false)
 
     const toast = useToast()
 
@@ -63,7 +65,10 @@ const Usuarios = () => {
 
     const handleEditUser = async (data: IUser) => {
         try {
-            const response = await updateUser(data)
+            if(data.changePassword) {
+                data.password = data.changePassword
+            }
+            await updateUser(data)
             toast({
                 title: 'Usuário editado com sucesso',
                 description: 'O usuário foi editado com sucesso',
@@ -72,7 +77,6 @@ const Usuarios = () => {
                 isClosable: true,
                 position: 'top-right'
             })
-            console.log(response);
             const users = await getAll()
             setUsers(users)
             setFilteredUsers(users)
@@ -117,7 +121,7 @@ const Usuarios = () => {
             }
         }
         fetch()
-    }, [])
+    }, [refresh])
 
     useEffect(() => {
         setValue('name', user.name)
@@ -306,9 +310,14 @@ const Usuarios = () => {
                                                             {errors.admissionDate && <Text color="red.500" fontSize="sm">{errors.admissionDate.message}</Text>}
                                                         </FormControl>
                                                         <FormControl>
-                                                            <FormLabel>Horas para trabalhar</FormLabel>
+                                                            <FormLabel>Carga horária</FormLabel>
                                                             <Input type="number" {...register("hoursToWork")} />
                                                             {errors.hoursToWork && <Text color="red.500" fontSize="sm">{errors.hoursToWork.message}</Text>}
+                                                        </FormControl>
+                                                        <FormControl>
+                                                            <FormLabel>Alterar senha</FormLabel>
+                                                            <Input {...register("changePassword")} />
+                                                            {errors.changePassword && <Text color="red.500" fontSize="sm">{errors.changePassword.message}</Text>}
                                                         </FormControl>
                                                         <FormControl>
                                                             <FormLabel>Permissões</FormLabel>
@@ -320,6 +329,19 @@ const Usuarios = () => {
                                                         </FormControl>
                                                     </Grid>
                                                 </DrawerComponent>
+                                                <ModalDelete
+                                                    headerText="Remover Usuário"
+                                                    buttonColorScheme="red"
+                                                    buttonIcon={<CloseIcon />}
+                                                    onDelete={async () => {
+                                                        setLoading(true)
+                                                        await removeUser(user._id!);
+                                                        setLoading(false)
+                                                        setRefresh(!refresh)
+                                                    }}
+                                                >
+                                                    Deseja realmente remover o usuário <b>{user.name}</b>?
+                                                </ModalDelete>
                                             </Td>
                                         </Tr>
                                     ))

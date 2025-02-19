@@ -32,7 +32,7 @@ const ModalDelete = ({
                         {buttonText || ''}
                     </Button>
                 ) : (
-                    <IconButton color={buttonColorScheme || 'red'} aria-label="Abrir" icon={buttonIcon} onClick={onOpen} />
+                    <IconButton bg="transparent" color={buttonColorScheme || 'red'} aria-label="Abrir" icon={buttonIcon} onClick={onOpen} />
                 )}
             <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />
