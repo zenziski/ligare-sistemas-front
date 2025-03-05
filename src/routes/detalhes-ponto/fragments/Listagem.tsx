@@ -111,6 +111,8 @@ const Listagem = () => {
     const filters = {
       year: moment(startDate).year(),
       month: moment(startDate).month() + 1,
+      startDate: moment(startDate).startOf("day").toISOString(),
+      endDate: moment(endDate).endOf("day").toISOString(),
       userId: type === "porUsuario" ? usuarioSelecionado : undefined,
     };
     const response = await getRelatorioData({ type, filters });
