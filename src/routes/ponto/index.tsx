@@ -6,8 +6,8 @@ import { TimeIcon } from "@chakra-ui/icons";
 import { registrarPonto } from "../../stores/ponto/service";
 
 // Coordenadas alvo
-const TARGET_LAT = -25.57087;
-const TARGET_LNG = -49.31777;
+const TARGET_LAT = -25.4284;
+const TARGET_LNG = -49.2827;
 
 // Função para calcular distância em metros usando Haversine
 function getDistanceFromLatLonInMeters(
