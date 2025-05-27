@@ -50,7 +50,7 @@ const Ponto = () => {
           TARGET_LAT,
           TARGET_LNG
         );
-        setInRange(distance <= 100);
+        setInRange(distance <= 2300);
       },
       () => {
         setGeoAllowed(false);
