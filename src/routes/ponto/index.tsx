@@ -34,7 +34,6 @@ const Ponto = () => {
   const [time, setTime] = useState(new Date());
   const [geoAllowed, setGeoAllowed] = useState<boolean>(false);
   const [inRange, setInRange] = useState<boolean>(false);
-  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   const toast = useToast();
 
@@ -50,7 +49,7 @@ const Ponto = () => {
           TARGET_LAT,
           TARGET_LNG
         );
-        setInRange(distance <= 2300);
+        setInRange(distance <= 100);
       },
       () => {
         setGeoAllowed(false);
@@ -92,35 +91,6 @@ const Ponto = () => {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.matchMedia("(max-width: 600px)").matches);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
-  if (isMobile) {
-    return (
-      <Flex
-        position="fixed"
-        top={0}
-        left={0}
-        width="100vw"
-        height="100vh"
-        bg="rgba(255,255,255,0.95)"
-        zIndex={9999}
-        alignItems="center"
-        justifyContent="center"
-        flexDirection="column"
-      >
-        <Flex fontSize="2xl" color="red.500" fontWeight="bold">
-          O uso em dispositivos móveis não é permitido.
-        </Flex>
-      </Flex>
-    );
-  }
 
   return (
     <Sidebar>
