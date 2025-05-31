@@ -77,6 +77,11 @@ const Item = ({ label, icon, to, onClick }: ItemProps) => {
 const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   const { user } = useContext(UserContext);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  };
+
   return (
     <Box h="100vh" w="100%" p="6" bg="blackAlpha.50" color="white">
       <Flex
@@ -121,6 +126,75 @@ const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
             onClick={onClose}
           />
         )}
+      </Flex>
+      <Divider my={4} />
+      <Flex
+        bg="transparent"
+        color="#555"
+        p={4}
+        cursor="pointer"
+        alignItems="center"
+        borderRadius="md"
+        transition="all 0.2s ease-in-out"
+        _hover={{
+          bg: "red.50",
+          color: "red.500",
+        }}
+        onClick={handleLogout}
+        w="100%"
+      >
+        <Flex
+          mr={2}
+          alignItems="center"
+          justifyContent="center"
+          w={6}
+          h={6}
+          borderRadius="md"
+          bg="red.100"
+          color="red.500"
+          transition="all 0.2s ease-in-out"
+        >
+          <svg
+            width="24"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <polyline
+              points="16,17 21,12 16,7"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <line
+              x1="21"
+              y1="12"
+              x2="9"
+              y2="12"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </Flex>
+        <Box
+          fontSize="md"
+          color="#555"
+          fontFamily="Poppins-Medium"
+          fontWeight="medium"
+        >
+          Sair
+        </Box>
       </Flex>
     </Box>
   );
