@@ -1,4 +1,13 @@
-import { Flex, Grid, Text } from "@chakra-ui/layout";
+import { 
+    Flex, 
+    Text, 
+    Card, 
+    CardBody, 
+    CardHeader, 
+    VStack, 
+    HStack, 
+    Button 
+} from "@chakra-ui/react";
 import DrawerComponent from "../../../components/Drawer";
 import { Input, InputGroup, InputLeftElement, InputRightElement } from "@chakra-ui/input";
 import { AddIcon, CloseIcon, DeleteIcon, EditIcon, SearchIcon } from "@chakra-ui/icons";
@@ -36,19 +45,21 @@ const TiposDeLancamento = () => {
         try {
             const response = await createTipoLancamento(data);
             setTiposLancamento([...tiposLancamento, response]);
+            reset();
             toast({
-                title: "Sucesso!",
+                title: "Tipo de lançamento criado",
                 description: "Tipo de lançamento criado com sucesso!",
                 status: "success",
-                duration: 9000,
+                duration: 5000,
                 isClosable: true,
             })
-        } catch (error: any) {
+        } catch (error) {
+            console.log(error);
             toast({
-                title: "Erro!",
-                description: error?.response?.data?.message || "Erro ao criar tipo de lançamento!",
+                title: "Erro ao criar tipo de lançamento",
+                description: "Erro ao criar tipo de lançamento!",
                 status: "error",
-                duration: 9000,
+                duration: 5000,
                 isClosable: true,
             })
         }
@@ -56,43 +67,43 @@ const TiposDeLancamento = () => {
 
     const handleUpdate = async (data: ITiposLancamento) => {
         try {
-            await updateTipoLancamento(data);
-            const response = await getAllTipoLancamento();
-            setTiposLancamento(response);
+            const response = await updateTipoLancamento(data);
+            setTiposLancamento(tiposLancamento.map((tipo) => tipo._id === response._id ? response : tipo));
+            reset();
             toast({
-                title: "Sucesso!",
-                description: "Tipo de lançamento atualizado com sucesso!",
+                title: "Tipo de lançamento editado",
+                description: "Tipo de lançamento editado com sucesso!",
                 status: "success",
-                duration: 9000,
+                duration: 5000,
                 isClosable: true,
             })
         } catch (error) {
+            console.log(error);
             toast({
-                title: "Erro!",
-                description: "Erro ao atualizar tipo de lançamento!",
+                title: "Erro ao editar tipo de lançamento",
+                description: "Erro ao editar tipo de lançamento!",
                 status: "error",
-                duration: 9000,
+                duration: 5000,
                 isClosable: true,
             })
         }
     }
 
-    const handleDelete = async (data: ITiposLancamento) => {
+    const handleDelete = async (tipoLancamento: ITiposLancamento) => {
         try {
-            if (data._id) {
-                await removeTipoLancamento(data._id);
-            }
-            setTiposLancamento(tiposLancamento.filter(tipoLancamento => tipoLancamento._id !== data._id));
+            await removeTipoLancamento(tipoLancamento._id!);
+            setTiposLancamento(tiposLancamento.filter((tipo) => tipo._id !== tipoLancamento._id));
             toast({
-                title: "Sucesso!",
+                title: "Tipo de lançamento deletado",
                 description: "Tipo de lançamento deletado com sucesso!",
                 status: "success",
                 duration: 5000,
                 isClosable: true,
             })
         } catch (error) {
+            console.log(error);
             toast({
-                title: "Erro!",
+                title: "Erro ao deletar tipo de lançamento",
                 description: "Erro ao deletar tipo de lançamento!",
                 status: "error",
                 duration: 5000,
@@ -115,152 +126,149 @@ const TiposDeLancamento = () => {
     }, [])
 
     return (
-        <Flex
-            direction={'column'}
-            w={'100%'}
-            h={'100%'}
-        >
-            <Flex
-                direction={'row'}
-                mb={'15px'}
-                justifyContent={'space-between'}
-            >
-                <Text fontSize="4xl">
-                    Tipos de lançamento
-                </Text>
-                <DrawerComponent
-                    headerText="Adicionar"
-                    buttonText="Adicionar"
-                    buttonIcon={<AddIcon />}
-                    buttonColorScheme="green"
-                    isButton
-                    onAction={handleSubmit(handleCreate)}
-                    isLoading={isSubmitting}
-                    onOpenHook={() => {
-                        reset();
-                    }}
-                >
-                    <Grid
-                        templateColumns="repeat(2, 1fr)"
-                        gap={6}
-                        fontFamily="Poppins-Regular"
-                    >
-                        <FormControl gridColumn="span 2">
-                            <FormLabel>Nome da categoria</FormLabel>
+        <VStack spacing={6} align="stretch">
+            <Card>
+                <CardHeader>
+                    <Flex justify="space-between" align="center">
+                        <VStack align="start" spacing={1}>
+                            <Text fontSize="xl" fontWeight="bold">
+                                Tipos de Lançamento
+                            </Text>
+                            <Text color="gray.600" fontSize="sm">
+                                Gerencie os tipos de lançamento disponíveis para as obras
+                            </Text>
+                        </VStack>
+                        
+                        <DrawerComponent
+                            headerText="Novo Tipo de Lançamento"
+                            buttonText="Novo Tipo"
+                            buttonIcon={<AddIcon />}
+                            buttonColorScheme="green"
+                            isButton
+                            onAction={handleSubmit(handleCreate)}
+                            isLoading={isSubmitting}
+                            onOpenHook={() => {
+                                reset();
+                            }}
+                        >
+                            <FormControl>
+                                <FormLabel fontWeight="medium">Nome do Tipo de Lançamento</FormLabel>
+                                <Input
+                                    placeholder="Ex: Material, Mão de obra, Equipamento..."
+                                    {...register("name")}
+                                />
+                                {errors.name && <Text color="red.500" fontSize="sm">{errors.name.message}</Text>}
+                            </FormControl>
+                        </DrawerComponent>
+                    </Flex>
+                </CardHeader>
+                
+                <CardBody>
+                    <VStack spacing={4} align="stretch">
+                        {/* Barra de busca */}
+                        <InputGroup maxW="400px">
+                            <InputLeftElement pointerEvents="none">
+                                <SearchIcon color="gray.400" />
+                            </InputLeftElement>
                             <Input
-                                placeholder="Digite..."
-                                {...register("name")}
+                                type="text"
+                                placeholder="Buscar tipos de lançamento..."
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
+                                bg="white"
+                                border="1px"
+                                borderColor="gray.200"
+                                _focus={{ borderColor: "blue.400", boxShadow: "0 0 0 1px blue.400" }}
                             />
-                            {errors.name && <Text color="red">{errors.name.message}</Text>}
-                        </FormControl>
-                    </Grid>
-                </DrawerComponent>
-            </Flex>
-            <Flex
-                w="100%"
-                h="50px"
-                borderRadius="md"
-                bg="white"
-                alignItems="center"
-                px={4}
-                mb={4}
-            >
-                <InputGroup>
-                    <InputLeftElement
-                        pointerEvents="none"
-                        children={<SearchIcon color="gray.300" />}
-                    />
-                    <Input
-                        type="text"
-                        placeholder="Pesquisar..."
-                        value={filter}
-                        onChange={(e) => {
-                            setFilter(e.target.value);
-                        }}
-                    />
-                    <InputRightElement
-                        children={filter !== '' && <IconButton onClick={() => setFilter('')} bg="transparent" aria-label="Abrir" icon={<CloseIcon />} />}
-                    />
-                </InputGroup>
-            </Flex>
-            <TableContainer>
-                <Table variant={'striped'}>
-                    <Thead>
-                        <Tr>
-                            <Th>Tipo Lançamento</Th>
-                            <Th>Data de Cadastro</Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        {
-                            tiposLancamento.filter(tipoLancamento => tipoLancamento.name.toLowerCase().includes(filter.toLowerCase())).map((tipoLancamento) => (
-                                <Tr key={tipoLancamento._id}>
-                                    <Td>
-                                        <Text>{tipoLancamento.name}</Text>
-                                    </Td>
-                                    <Td>
-                                        <Flex
-                                            direction="row"
-                                            justifyContent="space-between"
-                                            alignItems="center"
-                                        >
-                                            <Text>{Helpers.toViewDate(tipoLancamento?.createdAt ?? '')}</Text>
-                                            <Flex>
-                                                <DrawerComponent
-                                                    headerText="Editar"
-                                                    buttonText="Editar"
-                                                    buttonIcon={<EditIcon />}
-                                                    buttonColorScheme="teal"
-                                                    onAction={handleSubmit(handleUpdate)}
-                                                    isLoading={isSubmitting}
-                                                    onOpenHook={() => {
-                                                        setTipoLancamento(tipoLancamento);
-                                                    }}
-                                                >
-                                                    <Grid
-                                                        templateColumns="repeat(2, 1fr)"
-                                                        gap={6}
-                                                        fontFamily="Poppins-Regular"
+                            {filter !== '' && (
+                                <InputRightElement>
+                                    <IconButton 
+                                        onClick={() => setFilter('')} 
+                                        bg="transparent" 
+                                        aria-label="Limpar busca" 
+                                        icon={<CloseIcon />} 
+                                        size="sm"
+                                    />
+                                </InputRightElement>
+                            )}
+                        </InputGroup>
+
+                        {/* Tabela */}
+                        <TableContainer>
+                            <Table variant="simple">
+                                <Thead>
+                                    <Tr>
+                                        <Th>Nome do Tipo</Th>
+                                        <Th>Data de Cadastro</Th>
+                                        <Th width="120px">Ações</Th>
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    {tiposLancamento
+                                        .filter(tipo => tipo.name.toLowerCase().includes(filter.toLowerCase()))
+                                        .map((tipo) => (
+                                        <Tr key={tipo._id}>
+                                            <Td fontWeight="medium">{tipo.name}</Td>
+                                            <Td color="gray.600">
+                                                {Helpers.toViewDate(tipo?.createdAt ?? '')}
+                                            </Td>
+                                            <Td>
+                                                <HStack spacing={2}>
+                                                    <DrawerComponent
+                                                        headerText="Editar Tipo de Lançamento"
+                                                        buttonText=""
+                                                        buttonIcon={<EditIcon />}
+                                                        buttonColorScheme="blue"
+                                                        onAction={handleSubmit(handleUpdate)}
+                                                        isLoading={isSubmitting}
+                                                        onOpenHook={() => {
+                                                            setTipoLancamento(tipo);
+                                                        }}
                                                     >
-                                                        <FormControl gridColumn="span 2">
-                                                            <FormLabel>Nome da categoria</FormLabel>
+                                                        <FormControl>
+                                                            <FormLabel fontWeight="medium">Nome do Tipo de Lançamento</FormLabel>
                                                             <Input
-                                                                placeholder="Digite..."
+                                                                placeholder="Nome do tipo de lançamento"
                                                                 {...register("name")}
                                                             />
-                                                            {errors.name && <Text color="red">{errors.name.message}</Text>}
+                                                            {errors.name && <Text color="red.500" fontSize="sm">{errors.name.message}</Text>}
                                                         </FormControl>
-                                                    </Grid>
-                                                </DrawerComponent>
-                                                <ModalDelete
-                                                    onDelete={() => {
-                                                        handleDelete(tipoLancamento);
-                                                    }}
-                                                    headerText="Deletar tipo de lançamento"
-                                                    buttonIcon={<DeleteIcon color={'red'} />}
-                                                    buttonColorScheme="red"
-                                                >
-                                                    <Text>Você tem certeza que deseja deletar o tipo de lançamento {tipoLancamento.name}?</Text>
-                                                </ModalDelete>
-                                            </Flex>
-                                        </Flex>
-                                    </Td>
-                                </Tr>
-                            ))
-                        }
-                        {
-                            tiposLancamento.filter(tipoLancamento => tipoLancamento.name.toLowerCase().includes(filter.toLowerCase())).length === 0 && (
-                                <Tr>
-                                    <Td colSpan={2}>
-                                        <Text>Nenhum tipo de lançamento encontrado :(</Text>
-                                    </Td>
-                                </Tr>
-                            )
-                        }
-                    </Tbody>
-                </Table>
-            </TableContainer>
-        </Flex>
+                                                    </DrawerComponent>
+                                                    
+                                                    <ModalDelete
+                                                        onDelete={() => {
+                                                            handleDelete(tipo);
+                                                        }}
+                                                        headerText="Excluir Tipo de Lançamento"
+                                                        buttonIcon={<DeleteIcon />}
+                                                        buttonColorScheme="red"
+                                                    >
+                                                        <Text>Você tem certeza que deseja excluir o tipo de lançamento <strong>{tipo.name}</strong>?</Text>
+                                                        <Text fontSize="sm" color="gray.600" mt={2}>
+                                                            Esta ação não pode ser desfeita.
+                                                        </Text>
+                                                    </ModalDelete>
+                                                </HStack>
+                                            </Td>
+                                        </Tr>
+                                    ))}
+                                    
+                                    {tiposLancamento.filter(tipo => tipo.name.toLowerCase().includes(filter.toLowerCase())).length === 0 && (
+                                        <Tr>
+                                            <Td colSpan={3} textAlign="center" py={8}>
+                                                <Text color="gray.500">
+                                                    {filter ? 'Nenhum tipo de lançamento encontrado.' : 'Nenhum tipo de lançamento cadastrado ainda.'}
+                                                </Text>
+                                            </Td>
+                                        </Tr>
+                                    )}
+                                </Tbody>
+                            </Table>
+                        </TableContainer>
+                    </VStack>
+                </CardBody>
+            </Card>
+        </VStack>
     )
 }
 

@@ -1,22 +1,54 @@
-import { AbsoluteCenter, Box, Divider, Flex, FormControl, FormLabel, Grid, Input, InputGroup, InputLeftElement, Select, Tab, TabList, TabPanel, TabPanels, Table, TableContainer, Tabs, Tbody, Td, Text, Th, Thead, Tr, useToast } from "@chakra-ui/react"
+import { 
+  Box, 
+  Flex, 
+  FormControl, 
+  FormLabel, 
+  Grid, 
+  Input, 
+  InputGroup, 
+  InputLeftElement, 
+  Select, 
+  Tab, 
+  TabList, 
+  TabPanel, 
+  TabPanels, 
+  Table, 
+  TableContainer, 
+  Tabs, 
+  Tbody, 
+  Td, 
+  Text, 
+  Th, 
+  Thead, 
+  Tr, 
+  useToast,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Badge,
+  IconButton,
+  HStack,
+  VStack,
+  Divider
+} from "@chakra-ui/react"
 import Sidebar from "../../components/Sidebar"
 import DrawerComponent from "../../components/Drawer"
 
 import { useEffect, useState } from "react"
-import { AddIcon, ArrowForwardIcon, DeleteIcon, EditIcon, SearchIcon } from "@chakra-ui/icons"
+import { AddIcon, SearchIcon, EditIcon, DeleteIcon, ViewIcon } from "@chakra-ui/icons"
 
 import MoneyInput from "../../components/MoneyInput"
 import { Link } from "react-router-dom"
 import Helpers from "../../utils/helper"
 import { IObrasTable, IObrasItem, obraSchema, obraItemSchema } from "../../stores/obras/interface"
 import { Controller, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from "@hookform/resolvers/zod"
 import { createConstruction, createConstructionItem, getAllConstruction, getAllConstructionItems, removeConstruction, removeConstructionItem, updateConstructionItem } from "../../stores/obras/service"
 import { IUserTable } from "../../stores/clientes/interface"
 import { getAll } from "../../stores/clientes/service"
 import ModalDelete from "../../components/ModalDelete"
 import TiposDeLancamento from "./fragments/TiposDeLancamento"
-
 
 const Obras = () => {
     const toast = useToast()
@@ -53,16 +85,16 @@ const Obras = () => {
 
     const handleCreateConstruction = async (data: IObrasTable) => {
         try {
-
             const administrationValue = parseFloat(watchObras('administration.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0");
             const contractValue = parseFloat(watchObras('contract.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "")?.replace(",", ".") || "0");
-
-            const construction = await createConstruction({
+            
+            await createConstruction({
                 ...data,
                 administration: {
                     value: administrationValue,
                     installments: Number(data?.administration?.installments),
-                    monthlyValue: administrationValue / Number(data?.administration?.installments)
+                    monthlyValue: administrationValue / Number(data?.administration?.installments),
+                    percentage: Number(data?.administration?.percentage)
                 },
                 contract: {
                     value: contractValue,
@@ -70,17 +102,20 @@ const Obras = () => {
                     monthlyValue: contractValue / Number(data?.contract?.installments)
                 }
             });
-            const newObras = [...obras, construction];
+            
+            const newObras = await getAllConstruction();
             setObras(newObras);
+            resetObras();
+            
             toast({
                 title: "Obra criada com sucesso!",
                 status: "success",
                 duration: 3000,
                 isClosable: true,
             })
-        } catch (error) {
+        } catch (error: any) {
             toast({
-                title: "Erro ao criar obra!",
+                title: error?.response?.data?.message || "Erro ao criar obra",
                 status: "error",
                 duration: 3000,
                 isClosable: true,
@@ -146,22 +181,25 @@ const Obras = () => {
 
     const getContractType = (obra: IObrasTable) => {
         if (obra?.contract?.value && obra?.administration?.value) {
-            return 'Administração/Empreitada'
+            return 'Administração + Empreitada'
         } else if (obra?.contract?.value) {
             return 'Empreitada'
         } else if (obra?.administration?.value) {
             return 'Administração'
         }
+        return 'Não definido'
     }
 
-    useEffect(() => {
-        console.log(administrationValue);
-
-        setValueObras('administration.value', administrationValue)
-        setValueObras('administration.installments', administrationInstallments)
-        setValueObras('contract.value', contractValue)
-        setValueObras('contract.installments', contractInstallments)
-    }, [watchObras('contract.value'), watchObras('contract.installments'), watchObras('administration.value'), watchObras('administration.installments')])
+    const getContractTypeColor = (obra: IObrasTable) => {
+        if (obra?.contract?.value && obra?.administration?.value) {
+            return 'purple'
+        } else if (obra?.contract?.value) {
+            return 'blue'
+        } else if (obra?.administration?.value) {
+            return 'green'
+        }
+        return 'gray'
+    }
 
     useEffect(() => {
         setValueObrasItem('name', config.name);
@@ -170,7 +208,6 @@ const Obras = () => {
 
     const contractValue = watchObras('contract.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "") || "0";
     const contractInstallments = watchObras('contract.installments')
-
     const administrationValue = watchObras('administration.value')?.toString()?.replace("R$ ", "")?.replace(/\./g, "") || "0";
     const administrationInstallments = watchObras('administration.installments')
 
@@ -184,310 +221,269 @@ const Obras = () => {
                     <Text fontSize="2xl">Carregando...</Text>
                 </Flex>
             ) : (
-                <Flex w="100%" h="100%" p={10} direction="column" fontFamily="Poppins-Regular">
-                    <Tabs variant='enclosed'>
-                        <TabList>
-                            <Tab>Obras</Tab>
-                            <Tab>Configurações</Tab>
-                            <Tab>Tipos De Lançamento</Tab>
-                        </TabList>
-                        <TabPanels>
-                            <TabPanel>
-                                <Flex direction={'row'} mb={'15px'} justifyContent={'space-between'}>
-                                    <Text fontSize="4xl">
-                                        Todas as obras
-                                    </Text>
-                                    <DrawerComponent
-                                        buttonIcon={<AddIcon />}
-                                        buttonText="Adicionar"
-                                        headerText="Adicionar obra"
-                                        buttonColorScheme="green"
-                                        size="md"
-                                        isButton
-                                        onOpenHook={() => resetObras()}
-                                        onAction={() => handleSubmitObras(handleCreateConstruction)()}
-                                        isLoading={isSubmittingObras}
-                                    >
-                                        <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
-                                            <FormControl gridColumn="span 2">
-                                                <FormLabel>Nome da Obra</FormLabel>
-                                                <Input {...registerObras("name")} placeholder="Digite..." />
-                                                {errorsObras.name && <Text color="red">{String(errorsObras.name.message)}</Text>}
-                                            </FormControl>
-                                            <FormControl gridColumn="span 2">
-                                                <FormLabel>Endereço da Obra</FormLabel>
-                                                <Input {...registerObras("constructionAddress")} placeholder="Digite..." />
-                                                {errorsObras.constructionAddress && <Text color="red">{errorsObras.constructionAddress.message}</Text>}
-                                            </FormControl>
-                                            <FormControl>
-                                                <FormLabel>Cliente</FormLabel>
-                                                <Controller
-                                                    name="customerId"
-                                                    control={controlObras}
-                                                    defaultValue=""
-                                                    render={({ field }) => (
-                                                        <Select defaultValue="" {...field} gridColumn="span 2">
-                                                            <option key={10000} disabled value="">Escolha um cliente</option>
-                                                            {clientes.map((cliente, index) => (
-                                                                <option key={index} value={cliente._id}>{cliente.name}</option>
-                                                            ))}
-                                                        </Select>
-                                                    )}
-                                                />
-                                                {errorsObras.customerId && <Text color="red">{errorsObras.customerId.message}</Text>}
-                                            </FormControl>
-                                            <Box position='relative' gridColumn="span 2" >
-                                                <Divider
-                                                    borderColor={'gray.500'}
-                                                />
-                                                <AbsoluteCenter bg='white' px='4'>
-                                                    Administração
-                                                </AbsoluteCenter>
-                                            </Box>
-                                            <FormControl gridColumn="span 2">
-                                                <FormLabel>Contrato</FormLabel>
-                                                <InputGroup>
-                                                    <MoneyInput
-                                                        control={controlObras}
-                                                        name="administration.value"
-                                                        defaultValue={null}
-                                                    />
-                                                </InputGroup>
-                                                {errorsObras.administration?.value && <Text color="red">{errorsObras.administration?.value.message}</Text>}
-                                            </FormControl>
-                                            <FormControl>
-                                                <FormLabel>Parcelas</FormLabel>
-                                                <Input {...registerObras("administration.installments")} type="number" placeholder="Digite..." />
-                                                {errorsObras.administration?.installments && <Text color="red">{errorsObras.administration?.installments.message}</Text>}
-                                            </FormControl>
-                                            <FormControl>
-                                                <FormLabel>Valor Mensal</FormLabel>
-                                                <Input value={`R$ ${administrationMonthlyValue}`} placeholder="R$" readOnly={true} />
-                                                {errorsObras.administration?.installments && <Text color="red">{errorsObras.administration?.installments.message}</Text>}
-                                            </FormControl>
-                                            <Box position='relative' gridColumn="span 2" >
-                                                <Divider
-                                                    borderColor={'gray.500'}
-                                                />
-                                                <AbsoluteCenter bg='white' px='4'>
-                                                    Empreitada
-                                                </AbsoluteCenter>
-                                            </Box>
-                                            <FormControl gridColumn="span 2">
-                                                <FormLabel>Contrato</FormLabel>
-                                                <MoneyInput
-                                                    control={controlObras}
-                                                    name="contract.value"
-                                                    defaultValue={null}
-                                                />
-                                                {errorsObras.contract?.value && <Text color="red">{errorsObras.contract?.value.message}</Text>}
-                                            </FormControl>
-                                            <FormControl>
-                                                <FormLabel>Parcelas</FormLabel>
-                                                <Input {...registerObras("contract.installments")} type="number" placeholder="Digite..." />
-                                                {errorsObras.contract?.installments && <Text color="red">{errorsObras.contract?.installments.message}</Text>}
-                                            </FormControl>
-                                            <FormControl>
-                                                <FormLabel>Valor Mensal</FormLabel>
-                                                <Input value={`R$ ${contractMonthlyValue}`} placeholder="R$" readOnly />
-                                                {errorsObras.contract?.installments && <Text color="red">{errorsObras.contract?.installments.message}</Text>}
-                                            </FormControl>
-                                            <Divider gridColumn="span 2" borderColor={'gray.500'} />
-                                            <FormControl>
-                                                <FormLabel>Extras (mão de obra)</FormLabel>
-                                                <Input {...registerObras("extraLabor")} type="number" placeholder="Digite..." />
-                                                {errorsObras.extraLabor && <Text color="red">{errorsObras.extraLabor.message}</Text>}
-                                            </FormControl>
-                                            <FormControl>
-                                                <FormLabel>Extra (adm)</FormLabel>
-                                                <Input {...registerObras("extraAdm")} placeholder="Digite..." />
-                                                {errorsObras.extraAdm && <Text color="red">{errorsObras.extraAdm.message}</Text>}
-                                            </FormControl>
-                                        </Grid>
-                                    </DrawerComponent>
-                                </Flex>
-                                <Flex
-                                    w="100%"
-                                    h="50px"
-                                    borderRadius="md"
-                                    bg="white"
-                                    alignItems="center"
-                                    px={4}
-                                    mb={4}
-                                >
-                                    <InputGroup>
-                                        <InputLeftElement
-                                            pointerEvents="none"
-                                            children={<SearchIcon color="gray.300" />}
-                                        />
-                                        <Input
-                                            value={searchTerm}
-                                            onChange={event => setSearchTerm(event.target.value)}
-                                            type="text" placeholder="Pesquisar..."
-                                        />
-                                    </InputGroup>
-                                </Flex>
-                                <TableContainer>
-                                    <Table variant={'striped'}>
-                                        <Thead>
-                                            <Tr>
-                                                <Th>Nome da Obra</Th>
-                                                <Th>Endereço da Obra</Th>
-                                                <Th>Forma</Th>
-                                                <Th>{' '}</Th>
-                                                <Th>{' '}</Th>
-                                            </Tr>
-                                        </Thead>
-                                        <Tbody>
-                                            {obras.filter(obra => obra.name.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())).map((obra, index) => (
-                                                <Tr key={index}>
-                                                    <Td>{obra.name}</Td>
-                                                    <Td>{obra.constructionAddress}</Td>
-                                                    <Td>{getContractType(obra)}</Td>
-                                                    <Td>
-                                                        <ModalDelete
-                                                            headerText="Deletar obra"
-                                                            buttonIcon={<DeleteIcon color={'red'} />}
-                                                            buttonColorScheme="red"
-                                                            onDelete={async () => {
-                                                                try {
-                                                                    await removeConstruction(obra._id || '');
-                                                                    const newObras = await getAllConstruction();
-                                                                    setObras(newObras);
-                                                                    toast({
-                                                                        title: "Obra deletada com sucesso!",
-                                                                        status: "success",
-                                                                        duration: 3000,
-                                                                        isClosable: true,
-                                                                    })
-                                                                } catch (error: any) {
-                                                                    toast({
-                                                                        title: error?.response?.data?.message || "Erro ao deletar obra",
-                                                                        status: "error",
-                                                                        duration: 3000,
-                                                                        isClosable: true,
-                                                                    })
-                                                                }
-                                                            }}
-                                                        >
-                                                            <Text>
-                                                                Tem certeza que deseja deletar a obra <strong>{obra.name}</strong>?
-                                                            </Text>
-                                                        </ModalDelete>
-                                                    </Td>
-                                                    <Td>
-                                                        <Link to={`/obras/${obra._id}`}>
-                                                            <ArrowForwardIcon w="20px" h="20px" />
-                                                        </Link>
-                                                    </Td>
-                                                </Tr>
-                                            ))}
-                                            {obras.filter(obra => obra.name.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())).length === 0 &&
-                                                <Text p={4} fontSize="18px">
-                                                    Nenhum resultado encontrado :(
-                                                </Text>
-                                            }
-                                        </Tbody>
-                                    </Table>
-                                </TableContainer>
-                            </TabPanel>
-                            <TabPanel>
-                                <Flex direction={'row'} mb={'15px'} justifyContent={'space-between'}>
-                                    <Text fontSize="4xl">
-                                        Configurações gerais das obras
-                                    </Text>
-                                    <DrawerComponent
-                                        buttonIcon={<AddIcon />}
-                                        buttonText="Adicionar"
-                                        headerText="Adicionar item"
-                                        buttonColorScheme="green"
-                                        size="md"
-                                        isButton
-                                        onOpenHook={() => resetObrasItem()}
-                                        onAction={() => handleSubmitObrasItem(handleCreateConstructionItem)()}
-                                        isLoading={isSubmittingObrasItem}
-                                    >
-                                        <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
-                                            <FormControl gridColumn="span 2">
-                                                <FormLabel>Nome da categoria</FormLabel>
-                                                <Input
-                                                    placeholder="Digite..."
-                                                    {...registerObrasItem("name")}
-                                                />
-                                                {errorsObrasItem.name && <Text color="red">{errorsObrasItem.name.message}</Text>}
-                                            </FormControl>
-                                        </Grid>
-                                    </DrawerComponent>
-                                </Flex>
-                                <Flex
-                                    w="100%"
-                                    h="50px"
-                                    borderRadius="md"
-                                    bg="white"
-                                    alignItems="center"
-                                    px={4}
-                                    mb={4}
-                                >
-                                    <InputGroup>
-                                        <InputLeftElement
-                                            pointerEvents="none"
-                                            children={<SearchIcon color="gray.300" />}
-                                        />
-                                        <Input type="text" placeholder="Pesquisar..." />
-                                    </InputGroup>
-                                </Flex>
-                                <TableContainer>
-                                    <Table variant={'striped'}>
-                                        <Thead>
-                                            <Tr>
-                                                <Th>Item</Th>
-                                                <Th>Data de cadastro</Th>
-                                            </Tr>
-                                        </Thead>
-                                        <Tbody>
-                                            {configs.map((config, index) => {
-                                                return (
-                                                    < Tr key={index} >
-                                                        <Td>{config.name}</Td>
-                                                        <Td>
-                                                            <Flex direction="row" alignItems="center" justifyContent="space-between" gap={1}>
-                                                                {Helpers.toViewDate(config.createdAt ?? '')}
-                                                                <Box>
-                                                                    <DrawerComponent
-                                                                        buttonIcon={<EditIcon />}
-                                                                        buttonText="Editar"
-                                                                        headerText="Editar item"
-                                                                        buttonColorScheme="yellow"
-                                                                        size="md"
-                                                                        onOpenHook={() => setConfig(config)}
-                                                                        onAction={() => handleSubmitObrasItem(handleEditConstructionItem)()}
-                                                                        isLoading={isSubmittingObrasItem}
-                                                                    >
-                                                                        <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
-                                                                            <FormControl gridColumn="span 2">
-                                                                                <FormLabel>Nome da categoria</FormLabel>
-                                                                                <Input {...registerObrasItem("name")} placeholder="Digite..." />
-                                                                            </FormControl>
-                                                                        </Grid>
-                                                                    </DrawerComponent>
+                <Box w="100%" h="100%" p={6} fontFamily="Poppins-Regular">
+                    <VStack spacing={6} align="stretch">
+                        {/* Header */}
+                        <Flex justify="space-between" align="center">
+                            <VStack align="start" spacing={1}>
+                                <Text fontSize="3xl" fontWeight="bold" color="gray.800">
+                                    Gestão de Obras
+                                </Text>
+                                <Text color="gray.600" fontSize="md">
+                                    Gerencie suas obras, configurações e tipos de lançamento
+                                </Text>
+                            </VStack>
+                        </Flex>
+
+                        <Tabs variant="enclosed" size="lg" colorScheme="blue">
+                            <TabList>
+                                <Tab fontWeight="medium">
+                                    <HStack spacing={2}>
+                                        <ViewIcon />
+                                        <Text>Obras Ativas</Text>
+                                    </HStack>
+                                </Tab>
+                                <Tab fontWeight="medium">
+                                    <HStack spacing={2}>
+                                        <EditIcon />
+                                        <Text>Configurações</Text>
+                                    </HStack>
+                                </Tab>
+                                <Tab fontWeight="medium">
+                                    <HStack spacing={2}>
+                                        <AddIcon />
+                                        <Text>Tipos de Lançamento</Text>
+                                    </HStack>
+                                </Tab>
+                            </TabList>
+
+                            <TabPanels>
+                                {/* Aba: Obras Ativas */}
+                                <TabPanel px={0}>
+                                    <VStack spacing={6} align="stretch">
+                                        {/* Actions Bar */}
+                                        <Card>
+                                            <CardBody>
+                                                <Flex justify="space-between" align="center" wrap="wrap" gap={4}>
+                                                    <HStack spacing={4} flex="1">
+                                                        <InputGroup maxW="400px">
+                                                            <InputLeftElement pointerEvents="none">
+                                                                <SearchIcon color="gray.400" />
+                                                            </InputLeftElement>
+                                                            <Input
+                                                                placeholder="Buscar obras..."
+                                                                value={searchTerm}
+                                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                                bg="white"
+                                                                border="1px"
+                                                                borderColor="gray.200"
+                                                                _focus={{ borderColor: "blue.400", boxShadow: "0 0 0 1px blue.400" }}
+                                                            />
+                                                        </InputGroup>
+                                                    </HStack>
+                                                    
+                                                    <DrawerComponent
+                                                        buttonIcon={<AddIcon />}
+                                                        buttonText="Nova Obra"
+                                                        headerText="Cadastrar Nova Obra"
+                                                        buttonColorScheme="blue"
+                                                        size="lg"
+                                                        isButton
+                                                        onOpenHook={() => resetObras()}
+                                                        onAction={() => handleSubmitObras(handleCreateConstruction)()}
+                                                        isLoading={isSubmittingObras}
+                                                    >
+                                                        <VStack spacing={6} align="stretch">
+                                                            <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                                                                <FormControl gridColumn="span 2">
+                                                                    <FormLabel fontWeight="medium" color="gray.700">Nome da Obra</FormLabel>
+                                                                    <Input {...registerObras("name")} placeholder="Ex: Residencial Jardim das Flores" />
+                                                                    {errorsObras.name && <Text color="red.500" fontSize="sm">{String(errorsObras.name.message)}</Text>}
+                                                                </FormControl>
+
+                                                                <FormControl gridColumn="span 2">
+                                                                    <FormLabel fontWeight="medium" color="gray.700">Endereço da Obra</FormLabel>
+                                                                    <Input {...registerObras("constructionAddress")} placeholder="Rua, Número, Bairro, Cidade" />
+                                                                    {errorsObras.constructionAddress && <Text color="red.500" fontSize="sm">{errorsObras.constructionAddress.message}</Text>}
+                                                                </FormControl>
+
+                                                                <FormControl gridColumn="span 2">
+                                                                    <FormLabel fontWeight="medium" color="gray.700">Cliente</FormLabel>
+                                                                    <Controller
+                                                                        name="customerId"
+                                                                        control={controlObras}
+                                                                        defaultValue=""
+                                                                        render={({ field }) => (
+                                                                            <Select {...field} placeholder="Selecione o cliente">
+                                                                                {clientes.map((cliente, index) => (
+                                                                                    <option key={index} value={cliente._id}>{cliente.name}</option>
+                                                                                ))}
+                                                                            </Select>
+                                                                        )}
+                                                                    />
+                                                                    {errorsObras.customerId && <Text color="red.500" fontSize="sm">{errorsObras.customerId.message}</Text>}
+                                                                </FormControl>
+                                                            </Grid>
+
+                                                            <Divider />
+
+                                                            {/* Seção Administração */}
+                                                            <Box>
+                                                                <Text fontSize="lg" fontWeight="semibold" color="green.600" mb={4}>
+                                                                    💼 Configuração de Administração
+                                                                </Text>
+                                                                <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                                                                    <FormControl>
+                                                                        <FormLabel fontWeight="medium" color="gray.700">Valor do Contrato</FormLabel>
+                                                                        <MoneyInput
+                                                                            control={controlObras}
+                                                                            name="administration.value"
+                                                                            defaultValue={null}
+                                                                        />
+                                                                        {errorsObras.administration?.value && <Text color="red.500" fontSize="sm">{errorsObras.administration?.value.message}</Text>}
+                                                                    </FormControl>
+
+                                                                    <FormControl>
+                                                                        <FormLabel fontWeight="medium" color="gray.700">Número de Parcelas</FormLabel>
+                                                                        <Input {...registerObras("administration.installments")} type="number" placeholder="12" />
+                                                                        {errorsObras.administration?.installments && <Text color="red.500" fontSize="sm">{errorsObras.administration?.installments.message}</Text>}
+                                                                    </FormControl>
+
+                                                                    <FormControl>
+                                                                        <FormLabel fontWeight="medium" color="gray.700">Valor Mensal</FormLabel>
+                                                                        <Input value={`R$ ${administrationMonthlyValue}`} readOnly bg="gray.50" />
+                                                                    </FormControl>
+                                                                </Grid>
+                                                            </Box>
+
+                                                            <Divider />
+
+                                                            {/* Seção Empreitada */}
+                                                            <Box>
+                                                                <Text fontSize="lg" fontWeight="semibold" color="blue.600" mb={4}>
+                                                                    🏗️ Configuração de Empreitada
+                                                                </Text>
+                                                                <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                                                                    <FormControl>
+                                                                        <FormLabel fontWeight="medium" color="gray.700">Valor do Contrato</FormLabel>
+                                                                        <MoneyInput
+                                                                            control={controlObras}
+                                                                            name="contract.value"
+                                                                            defaultValue={null}
+                                                                        />
+                                                                        {errorsObras.contract?.value && <Text color="red.500" fontSize="sm">{errorsObras.contract?.value.message}</Text>}
+                                                                    </FormControl>
+
+                                                                    <FormControl>
+                                                                        <FormLabel fontWeight="medium" color="gray.700">Número de Parcelas</FormLabel>
+                                                                        <Input {...registerObras("contract.installments")} type="number" placeholder="24" />
+                                                                        {errorsObras.contract?.installments && <Text color="red.500" fontSize="sm">{errorsObras.contract?.installments.message}</Text>}
+                                                                    </FormControl>
+
+                                                                    <FormControl>
+                                                                        <FormLabel fontWeight="medium" color="gray.700">Valor Mensal</FormLabel>
+                                                                        <Input value={`R$ ${contractMonthlyValue}`} readOnly bg="gray.50" />
+                                                                    </FormControl>
+                                                                </Grid>
+                                                            </Box>
+
+                                                            <Divider />
+
+                                                            {/* Valores Extras */}
+                                                            <Box>
+                                                                <Text fontSize="lg" fontWeight="semibold" color="orange.600" mb={4}>
+                                                                    ➕ Valores Extras
+                                                                </Text>
+                                                                <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                                                                    <FormControl>
+                                                                        <FormLabel fontWeight="medium" color="gray.700">Extra - Mão de Obra</FormLabel>
+                                                                        <Input {...registerObras("extraLabor")} type="number" placeholder="0" />
+                                                                        {errorsObras.extraLabor && <Text color="red.500" fontSize="sm">{errorsObras.extraLabor.message}</Text>}
+                                                                    </FormControl>
+
+                                                                    <FormControl>
+                                                                        <FormLabel fontWeight="medium" color="gray.700">Extra - Administração</FormLabel>
+                                                                        <Input {...registerObras("extraAdm")} placeholder="0" />
+                                                                        {errorsObras.extraAdm && <Text color="red.500" fontSize="sm">{errorsObras.extraAdm.message}</Text>}
+                                                                    </FormControl>
+                                                                </Grid>
+                                                            </Box>
+                                                        </VStack>
+                                                    </DrawerComponent>
+                                                </Flex>
+                                            </CardBody>
+                                        </Card>
+
+                                        {/* Lista de Obras */}
+                                        <Grid templateColumns="repeat(auto-fill, minmax(350px, 1fr))" gap={6}>
+                                            {obras
+                                                .filter(obra => obra.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                                                .map((obra, index) => (
+                                                <Card key={index} shadow="md" _hover={{ shadow: "lg" }} transition="all 0.2s">
+                                                    <CardHeader pb={2}>
+                                                        <Flex justify="space-between" align="start">
+                                                            <VStack align="start" spacing={1} flex="1">
+                                                                <Text fontSize="lg" fontWeight="bold" color="gray.800" noOfLines={1}>
+                                                                    {obra.name}
+                                                                </Text>
+                                                                <Text fontSize="sm" color="gray.600" noOfLines={2}>
+                                                                    📍 {obra.constructionAddress}
+                                                                </Text>
+                                                            </VStack>
+                                                            <Badge 
+                                                                colorScheme={getContractTypeColor(obra)} 
+                                                                variant="subtle"
+                                                                fontSize="xs"
+                                                                px={2}
+                                                                py={1}
+                                                            >
+                                                                {getContractType(obra)}
+                                                            </Badge>
+                                                        </Flex>
+                                                    </CardHeader>
+                                                    
+                                                    <CardBody pt={0}>
+                                                        <VStack spacing={3} align="stretch">
+                                                            {obra.contract?.value && (
+                                                                <Box p={3} bg="blue.50" borderRadius="md" borderLeft="4px" borderLeftColor="blue.400">
+                                                                    <Text fontSize="xs" color="blue.600" fontWeight="medium">EMPREITADA</Text>
+                                                                    <Text fontSize="sm" fontWeight="bold" color="blue.800">
+                                                                        {Helpers.toBrazilianCurrency(obra.contract.value)}
+                                                                    </Text>
+                                                                </Box>
+                                                            )}
+                                                            
+                                                            {obra.administration?.value && (
+                                                                <Box p={3} bg="green.50" borderRadius="md" borderLeft="4px" borderLeftColor="green.400">
+                                                                    <Text fontSize="xs" color="green.600" fontWeight="medium">ADMINISTRAÇÃO</Text>
+                                                                    <Text fontSize="sm" fontWeight="bold" color="green.800">
+                                                                        {Helpers.toBrazilianCurrency(obra.administration.value)}
+                                                                    </Text>
+                                                                </Box>
+                                                            )}
+
+                                                            <Divider />
+                                                            
+                                                            <Flex justify="space-between" align="center">
+                                                                <HStack spacing={2}>
                                                                     <ModalDelete
-                                                                        headerText="Deletar item"
-                                                                        buttonIcon={<DeleteIcon color={'red'} />}
+                                                                        headerText="Excluir Obra"
+                                                                        buttonIcon={<DeleteIcon />}
                                                                         buttonColorScheme="red"
                                                                         onDelete={async () => {
                                                                             try {
-                                                                                await removeConstructionItem(config._id ?? '');
-                                                                                const newConfigs = await getAllConstructionItems();
-                                                                                setConfigs(newConfigs);
+                                                                                await removeConstruction(obra._id || '');
+                                                                                const newObras = await getAllConstruction();
+                                                                                setObras(newObras);
                                                                                 toast({
-                                                                                    title: "Item deletado com sucesso!",
+                                                                                    title: "Obra excluída com sucesso!",
                                                                                     status: "success",
                                                                                     duration: 3000,
                                                                                     isClosable: true,
                                                                                 })
                                                                             } catch (error: any) {
                                                                                 toast({
-                                                                                    title: error?.response?.data?.message || "Erro ao deletar item",
+                                                                                    title: error?.response?.data?.message || "Erro ao excluir obra",
                                                                                     status: "error",
                                                                                     duration: 3000,
                                                                                     isClosable: true,
@@ -496,28 +492,166 @@ const Obras = () => {
                                                                         }}
                                                                     >
                                                                         <Text>
-                                                                            Tem certeza que deseja deletar o item <strong>{config.name}</strong>?
+                                                                            Tem certeza que deseja excluir a obra <strong>{obra.name}</strong>?
+                                                                        </Text>
+                                                                        <Text fontSize="sm" color="gray.600" mt={2}>
+                                                                            Esta ação não pode ser desfeita.
                                                                         </Text>
                                                                     </ModalDelete>
-                                                                </Box>
+                                                                </HStack>
+                                                                
+                                                                <Button 
+                                                                    as={Link} 
+                                                                    to={`/obras/${obra._id}`} 
+                                                                    size="sm" 
+                                                                    colorScheme="blue"
+                                                                    rightIcon={<ViewIcon />}
+                                                                >
+                                                                    Ver Detalhes
+                                                                </Button>
                                                             </Flex>
-                                                        </Td>
-                                                    </Tr>
-                                                )
-                                            })}
-                                        </Tbody>
-                                    </Table>
-                                </TableContainer>
-                            </TabPanel>
-                            <TabPanel>
-                                <TiposDeLancamento />
-                            </TabPanel>
-                        </TabPanels>
-                    </Tabs>
-                </Flex>
-            )
-            }
-        </Sidebar >
+                                                        </VStack>
+                                                    </CardBody>
+                                                </Card>
+                                            ))}
+                                        </Grid>
+
+                                        {obras.filter(obra => obra.name.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && (
+                                            <Card>
+                                                <CardBody textAlign="center" py={12}>
+                                                    <Text fontSize="lg" color="gray.500">
+                                                        {searchTerm ? 'Nenhuma obra encontrada com esse termo.' : 'Nenhuma obra cadastrada ainda.'}
+                                                    </Text>
+                                                </CardBody>
+                                            </Card>
+                                        )}
+                                    </VStack>
+                                </TabPanel>
+
+                                {/* Aba: Configurações */}
+                                <TabPanel px={0}>
+                                    <VStack spacing={6} align="stretch">
+                                        <Card>
+                                            <CardHeader>
+                                                <Flex justify="space-between" align="center">
+                                                    <VStack align="start" spacing={1}>
+                                                        <Text fontSize="xl" fontWeight="bold">
+                                                            Itens de Configuração
+                                                        </Text>
+                                                        <Text color="gray.600" fontSize="sm">
+                                                            Gerencie os itens disponíveis para suas obras
+                                                        </Text>
+                                                    </VStack>
+                                                    
+                                                    <DrawerComponent
+                                                        buttonIcon={<AddIcon />}
+                                                        buttonText="Novo Item"
+                                                        headerText="Adicionar Item de Configuração"
+                                                        buttonColorScheme="green"
+                                                        size="md"
+                                                        isButton
+                                                        onOpenHook={() => resetObrasItem()}
+                                                        onAction={() => handleSubmitObrasItem(handleCreateConstructionItem)()}
+                                                        isLoading={isSubmittingObrasItem}
+                                                    >
+                                                        <FormControl>
+                                                            <FormLabel fontWeight="medium">Nome do Item</FormLabel>
+                                                            <Input 
+                                                                {...registerObrasItem("name")} 
+                                                                placeholder="Ex: Cimento, Tijolo, Areia..."
+                                                            />
+                                                            {errorsObrasItem.name && <Text color="red.500" fontSize="sm">{errorsObrasItem.name.message}</Text>}
+                                                        </FormControl>
+                                                    </DrawerComponent>
+                                                </Flex>
+                                            </CardHeader>
+                                            
+                                            <CardBody>
+                                                <TableContainer>
+                                                    <Table variant="simple">
+                                                        <Thead>
+                                                            <Tr>
+                                                                <Th>Nome do Item</Th>
+                                                                <Th>Data de Cadastro</Th>
+                                                                <Th width="120px">Ações</Th>
+                                                            </Tr>
+                                                        </Thead>
+                                                        <Tbody>
+                                                            {configs.map((config, index) => (
+                                                                <Tr key={index}>
+                                                                    <Td fontWeight="medium">{config.name}</Td>
+                                                                    <Td color="gray.600">
+                                                                        {Helpers.toViewDate(config.createdAt ?? '')}
+                                                                    </Td>
+                                                                    <Td>
+                                                                        <HStack spacing={2}>
+                                                                            <DrawerComponent
+                                                                                buttonIcon={<EditIcon />}
+                                                                                buttonText=""
+                                                                                headerText="Editar Item"
+                                                                                buttonColorScheme="blue"
+                                                                                size="md"
+                                                                                onOpenHook={() => setConfig(config)}
+                                                                                onAction={() => handleSubmitObrasItem(handleEditConstructionItem)()}
+                                                                                isLoading={isSubmittingObrasItem}
+                                                                            >
+                                                                                <FormControl>
+                                                                                    <FormLabel fontWeight="medium">Nome do Item</FormLabel>
+                                                                                    <Input {...registerObrasItem("name")} placeholder="Nome do item" />
+                                                                                </FormControl>
+                                                                            </DrawerComponent>
+                                                                            
+                                                                            <ModalDelete
+                                                                                headerText="Excluir Item"
+                                                                                buttonIcon={<DeleteIcon />}
+                                                                                buttonColorScheme="red"
+                                                                                onDelete={async () => {
+                                                                                    try {
+                                                                                        await removeConstructionItem(config._id ?? '');
+                                                                                        const newConfigs = await getAllConstructionItems();
+                                                                                        setConfigs(newConfigs);
+                                                                                        toast({
+                                                                                            title: "Item excluído com sucesso!",
+                                                                                            status: "success",
+                                                                                            duration: 3000,
+                                                                                            isClosable: true,
+                                                                                        })
+                                                                                    } catch (error: any) {
+                                                                                        toast({
+                                                                                            title: error?.response?.data?.message || "Erro ao excluir item",
+                                                                                            status: "error",
+                                                                                            duration: 3000,
+                                                                                            isClosable: true,
+                                                                                        })
+                                                                                    }
+                                                                                }}
+                                                                            >
+                                                                                <Text>
+                                                                                    Tem certeza que deseja excluir o item <strong>{config.name}</strong>?
+                                                                                </Text>
+                                                                            </ModalDelete>
+                                                                        </HStack>
+                                                                    </Td>
+                                                                </Tr>
+                                                            ))}
+                                                        </Tbody>
+                                                    </Table>
+                                                </TableContainer>
+                                            </CardBody>
+                                        </Card>
+                                    </VStack>
+                                </TabPanel>
+
+                                {/* Aba: Tipos de Lançamento */}
+                                <TabPanel px={0}>
+                                    <TiposDeLancamento />
+                                </TabPanel>
+                            </TabPanels>
+                        </Tabs>
+                    </VStack>
+                </Box>
+            )}
+        </Sidebar>
     )
 }
 

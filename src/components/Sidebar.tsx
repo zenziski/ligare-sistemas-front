@@ -97,36 +97,68 @@ const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
         </Text>
       </Flex>
       <Divider />
-      <Flex direction="column" mt={4}>
-        <Item
-          to="ponto"
-          label="Registrar"
-          icon={<CheckIcon />}
-          onClick={onClose}
-        />
-        <Item
-          to="detalhes-ponto"
-          label="Espelho de ponto"
-          icon={<CheckIcon />}
-          onClick={onClose}
-        />
-        {user?.roles?.admin && (
+      <Box mt={4}>
+        <Text
+          fontSize="sm"
+          color="gray.600"
+          fontWeight="bold"
+          mb={2}
+          px={2}
+          fontFamily="Poppins-Medium"
+        >
+          CONTROLE DE PONTO
+        </Text>
+        <Flex direction="column">
           <Item
-            to="feriados"
-            label="Feriados"
+            to="ponto"
+            label="Registrar"
             icon={<CheckIcon />}
             onClick={onClose}
           />
-        )}
-        {user?.roles?.admin && (
           <Item
-            to="usuarios"
-            label="Usuários"
+            to="detalhes-ponto"
+            label="Espelho de ponto"
             icon={<CheckIcon />}
             onClick={onClose}
           />
-        )}
-      </Flex>
+          {user?.roles?.admin && (
+            <Item
+              to="feriados"
+              label="Feriados"
+              icon={<CheckIcon />}
+              onClick={onClose}
+            />
+          )}
+        </Flex>
+      </Box>
+
+      <Divider my={4} />
+      <Box>
+        <Text
+          fontSize="sm"
+          color="gray.600"
+          fontWeight="bold"
+          mb={2}
+          px={2}
+          fontFamily="Poppins-Medium"
+        >
+          GESTÃO
+        </Text>
+        <Flex direction="column">
+          {user?.roles?.admin && (
+            <Item
+              to="usuarios"
+              label="Usuários"
+              icon={<CheckIcon />}
+              onClick={onClose}
+            />
+          )}
+          <Item to="obras" label="Obras" icon={<CheckIcon />} />
+          <Item to="clientes" label="Clientes" icon={<CheckIcon />} />
+          <Item to="fornecedores" label="Fornecedores" icon={<CheckIcon />} />
+          <Item to="financeiro" label="Financeiro" icon={<CheckIcon />} />
+        </Flex>
+      </Box>
       <Divider my={4} />
       <Flex
         bg="transparent"
