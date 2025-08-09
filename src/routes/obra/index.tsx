@@ -9,11 +9,8 @@ import {
     Th, 
     Td, 
     TableContainer, 
-    GridItem, 
     Box, 
     Select, 
-    FormControl, 
-    FormLabel, 
     Input, 
     IconButton,
     Grid,
@@ -30,11 +27,6 @@ import {
     StatArrow,
     Divider,
     Button,
-    Tab,
-    TabList,
-    TabPanel,
-    TabPanels,
-    Tabs,
     InputGroup,
     InputLeftElement,
     useToast
@@ -42,10 +34,9 @@ import {
 import { useParams } from "react-router-dom"
 import Helpers from "../../utils/helper";
 import Chart from "react-apexcharts";
-import StatComponent from "../../components/Stats";
 import { useEffect, useState } from "react";
 import { getAllConstructionItems, getAllTipoLancamento, getOneConstruction, removeConstructionDiary } from "../../stores/obras/service";
-import { ConstructionDiaryPaymentMethod, ConstructionDiaryStatus, IConstructionDiary, IObrasItem, IObrasTable, ITiposLancamento } from "../../stores/obras/interface";
+import { IConstructionDiary, IObrasItem, IObrasTable, ITiposLancamento } from "../../stores/obras/interface";
 import AddNewDiaryItem from "./fragments/AddNewDiaryItem";
 import ConfigurarObra from "./fragments/configurarObra";
 import EditDiaryItem from "./fragments/EditDiaryItem";
@@ -53,7 +44,7 @@ import { getAll } from "../../stores/fornecedores/service";
 import { IFornecedorTable } from "../../stores/fornecedores/interface";
 import Medicao from "./fragments/Medicao";
 import ModalDelete from "../../components/ModalDelete";
-import { ArrowDownIcon, ArrowUpIcon, DeleteIcon, SearchIcon, ChevronLeftIcon, SettingsIcon, AddIcon, CalendarIcon } from "@chakra-ui/icons";
+import { ArrowDownIcon, ArrowUpIcon, DeleteIcon, SearchIcon, ChevronLeftIcon, CalendarIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 
 const Obra = () => {
@@ -169,7 +160,7 @@ const Obra = () => {
 
                 // Calculate costs and statistics
                 const diary = obra.diary || []
-                const total = diary.reduce((acc, item) => acc + (item.value || 0), 0)
+                const total = diary.reduce((acc, item) => acc + (item.value as number || 0), 0)
                 setTotalCost(total)
 
                 // Group by type
@@ -272,10 +263,10 @@ const Obra = () => {
                     bValue = b.supplier?.name || ''
                 }
 
-                if (aValue < bValue) {
+                if (aValue! < bValue!) {
                     return sortConfig.direction === 'ascending' ? -1 : 1
                 }
-                if (aValue > bValue) {
+                if (aValue! > bValue!) {
                     return sortConfig.direction === 'ascending' ? 1 : -1
                 }
                 return 0
@@ -340,7 +331,7 @@ const Obra = () => {
                                             📍 {data?.constructionAddress || 'Endereço não informado'}
                                         </Text>
                                         <Text color="gray.500" fontSize="sm">
-                                            Cliente: {data?.customerId?.name || 'Não informado'}
+                                            Cliente: {(data?.customerId as any)?.name || 'Não informado'}
                                         </Text>
                                     </VStack>
                                 </HStack>
@@ -453,7 +444,7 @@ const Obra = () => {
                                                 }
                                             }
                                         }}
-                                        series={Object.values(costByType)}
+                                        series={Object.values(costByType) as number[]}
                                         type="donut"
                                         height={300}
                                     />
@@ -501,7 +492,7 @@ const Obra = () => {
                                         }}
                                         series={[{
                                             name: 'Valor',
-                                            data: Object.values(costByItem).slice(0, 8)
+                                            data: Object.values(costByItem).slice(0, 8) as number[]
                                         }]}
                                         type="bar"
                                         height={300}
@@ -616,7 +607,7 @@ const Obra = () => {
                                     </Text>
                                     <Text color="gray.600" fontSize="sm" fontWeight="medium">
                                         Total: {Helpers.toBrazilianCurrency(
-                                            filteredData.reduce((acc, item) => acc + (item.value || 0), 0)
+                                            filteredData.reduce((acc, item) => acc + (item.value as number || 0), 0)
                                         )}
                                     </Text>
                                 </Flex>
@@ -676,7 +667,7 @@ const Obra = () => {
                                                 <Tr key={index} _hover={{ bg: 'gray.50' }}>
                                                     <Td>
                                                         <Text fontSize="sm" fontWeight="medium">
-                                                            {Helpers.toViewDate(item.createdAt || '')}
+                                                            {Helpers.toViewDate((item.createdAt || '') as string)}
                                                         </Text>
                                                     </Td>
                                                     <Td>

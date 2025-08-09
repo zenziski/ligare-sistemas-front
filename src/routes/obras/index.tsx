@@ -27,7 +27,6 @@ import {
   CardBody,
   CardHeader,
   Badge,
-  IconButton,
   HStack,
   VStack,
   Divider
@@ -65,7 +64,6 @@ const Obras = () => {
         formState: { errors: errorsObras, isSubmitting: isSubmittingObras },
         reset: resetObras,
         control: controlObras,
-        setValue: setValueObras,
         watch: watchObras,
     } = useForm<IObrasTable>({
         resolver: zodResolver(obraSchema),
