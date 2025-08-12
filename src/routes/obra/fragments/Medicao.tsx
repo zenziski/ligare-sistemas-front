@@ -1,8 +1,9 @@
-import { Button, Divider, Flex, FormControl, FormLabel, Input, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useToast } from "@chakra-ui/react"
+import { Button, Divider, Flex, FormControl, FormLabel, Input, Table, TableContainer, Tbody, Td, Th, Thead, Tr, useToast, Text } from "@chakra-ui/react"
 import DrawerComponent from "../../../components/Drawer"
 import { useEffect, useState } from "react"
 import { createMedicao, getAllTipoLancamento } from "../../../stores/obras/service"
 import Helpers from "../../../utils/helper"
+import { DownloadIcon } from "@chakra-ui/icons"
 
 interface IMedicao {
     data: any
@@ -33,6 +34,13 @@ const Medicao = ({
                 finalDate: dataFinal
             })
             setMedicoes([...medicoes, response])
+            toast({
+                title: "Medição gerada com sucesso!",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right"
+            })
         } catch (error) {
             console.log(error);
             toast({
@@ -44,6 +52,41 @@ const Medicao = ({
             })
         }
     }
+
+    const handleExportMedicoes = () => {
+        if (medicoes.length === 0) {
+            toast({
+                title: "Nenhuma medição para exportar",
+                description: "Não há medições disponíveis para exportar.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right"
+            });
+            return;
+        }
+
+        try {
+            Helpers.generateMedicaoXlsxFile(medicoes, tiposMedicao, data?.name || 'obra');
+            toast({
+                title: "Arquivo exportado com sucesso!",
+                description: `${medicoes.length} medições exportadas para Excel.`,
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right"
+            });
+        } catch (error) {
+            toast({
+                title: "Erro ao exportar arquivo",
+                description: "Ocorreu um erro ao gerar o arquivo Excel.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right"
+            });
+        }
+    };
 
     return (
         <>
@@ -92,39 +135,102 @@ const Medicao = ({
                         </FormControl>
                     </Flex>
                     <Divider />
-                    <TableContainer>
-                        <Table
-                            size='sm'
-                            variant="striped"
-                            colorScheme="purple"
+                    
+                    {/* Header with export button */}
+                    <Flex justify="space-between" align="center" mb={4}>
+                        <Text fontSize="md" fontWeight="semibold" color="purple.600">
+                            📊 Medições Geradas ({medicoes.length})
+                        </Text>
+                        <Button
+                            leftIcon={<DownloadIcon />}
+                            colorScheme="green"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleExportMedicoes}
+                            isDisabled={medicoes.length === 0}
                         >
-                            <Thead>
-                                <Tr>
-                                    <Th>Data inicial</Th>
-                                    <Th>Data final</Th>
+                            Exportar Excel
+                        </Button>
+                    </Flex>
+
+                    <TableContainer>
+                        {medicoes.length === 0 ? (
+                            <Flex 
+                                direction="column" 
+                                align="center" 
+                                justify="center" 
+                                py={12} 
+                                color="gray.500"
+                                textAlign="center"
+                            >
+                                <Text fontSize="lg" mb={2}>📋 Nenhuma medição gerada ainda</Text>
+                                <Text fontSize="sm">
+                                    Use o formulário acima para gerar sua primeira medição
+                                </Text>
+                            </Flex>
+                        ) : (
+                            <Table
+                                size='sm'
+                                variant="striped"
+                                colorScheme="purple"
+                            >
+                                <Thead>
+                                    <Tr>
+                                        <Th>Medição</Th>
+                                        <Th>Data inicial</Th>
+                                        <Th>Data final</Th>
+                                        <Th>Período</Th>
+                                        {
+                                            tiposMedicao.map((item, index) => (
+                                                <Th key={index}>{item.name}</Th>
+                                            ))
+                                        }
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
                                     {
-                                        tiposMedicao.map((item, index) => (
-                                            <Th key={index}>{item.name}</Th>
+                                        medicoes.map((item, index) => (
+                                            <Tr key={index}>
+                                                <Td fontWeight="medium">Medição {index + 1}</Td>
+                                                <Td>{Helpers.toViewDate(item.initialDate)}</Td>
+                                                <Td>{Helpers.toViewDate(item.finalDate)}</Td>
+                                                <Td fontSize="sm" color="gray.600">
+                                                    {Helpers.toViewDate(item.initialDate)} - {Helpers.toViewDate(item.finalDate)}
+                                                </Td>
+                                                {
+                                                    tiposMedicao.map((tipo) => (
+                                                        <Td key={tipo._id} fontWeight="medium" color="green.600">
+                                                            {Helpers.toBrazilianCurrency(item[tipo.name] || 0)}
+                                                        </Td>
+                                                    ))
+                                                }
+                                            </Tr>
                                         ))
                                     }
-                                </Tr>
-                            </Thead>
-                            <Tbody>
-                                {
-                                    medicoes.map((item, index) => (
-                                        <Tr key={index}>
-                                            <Td>{Helpers.toViewDate(item.initialDate)}</Td>
-                                            <Td>{Helpers.toViewDate(item.finalDate)}</Td>
+                                    {/* Total Row */}
+                                    {medicoes.length > 1 && (
+                                        <Tr bg="purple.50" fontWeight="bold">
+                                            <Td fontWeight="bold">TOTAL</Td>
+                                            <Td>-</Td>
+                                            <Td>-</Td>
+                                            <Td fontSize="sm" color="purple.600">
+                                                {medicoes.length} medições
+                                            </Td>
                                             {
-                                                tiposMedicao.map((tipo) => (
-                                                    <Td key={tipo._id}>{Helpers.toBrazilianCurrency(item[tipo.name])}</Td>
-                                                ))
+                                                tiposMedicao.map((tipo) => {
+                                                    const total = medicoes.reduce((acc, medicao) => acc + (medicao[tipo.name] || 0), 0);
+                                                    return (
+                                                        <Td key={tipo._id} fontWeight="bold" color="purple.700">
+                                                            {Helpers.toBrazilianCurrency(total)}
+                                                        </Td>
+                                                    );
+                                                })
                                             }
                                         </Tr>
-                                    ))
-                                }
-                            </Tbody>
-                        </Table>
+                                    )}
+                                </Tbody>
+                            </Table>
+                        )}
                     </TableContainer>
                 </Flex>
             </DrawerComponent>

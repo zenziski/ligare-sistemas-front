@@ -386,32 +386,6 @@ const Fornecedores = () => {
                   ),
                 },
                 {
-                  key: "status",
-                  label: "Status",
-                  render: (fornecedor) => (
-                    <Badge
-                      colorScheme={getFornecedorStatusColor(fornecedor)}
-                      variant="subtle"
-                      fontSize="0.7rem"
-                      px={3}
-                      py={1}
-                      display="inline-flex"
-                      alignItems="center"
-                      gap={1}
-                      borderRadius="full"
-                    >
-                      <Icon
-                        as={
-                          getFornecedorStatus(fornecedor) === "Completo"
-                            ? CheckCircleIcon
-                            : WarningIcon
-                        }
-                      />
-                      {getFornecedorStatus(fornecedor)}
-                    </Badge>
-                  ),
-                },
-                {
                   key: "acoes",
                   label: "Ações",
                   width: "140px",

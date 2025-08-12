@@ -441,9 +441,7 @@ const Usuarios = () => {
                     <Th>Usuário</Th>
                     <Th>Telefone</Th>
                     <Th>Data de Admissão</Th>
-                    <Th>Data de Nascimento</Th>
                     <Th>Carga Horária</Th>
-                    <Th>Status</Th>
                     <Th width="140px">Ações</Th>
                   </Tr>
                 </Thead>
@@ -508,37 +506,8 @@ const Usuarios = () => {
                       </Td>
                       <Td>
                         <Text fontSize="sm">
-                          {user.birthDate
-                            ? moment(user.birthDate).format("DD/MM/YYYY")
-                            : "-"}
-                        </Text>
-                      </Td>
-                      <Td>
-                        <Text fontSize="sm">
                           {user.hoursToWork ? `${user.hoursToWork}h` : "-"}
                         </Text>
-                      </Td>
-                      <Td>
-                        <Badge
-                          colorScheme={getUserStatusColor(user)}
-                          variant="subtle"
-                          fontSize="0.7rem"
-                          px={3}
-                          py={1}
-                          display="inline-flex"
-                          alignItems="center"
-                          gap={1}
-                          borderRadius="full"
-                        >
-                          <Icon
-                            as={
-                              getUserStatus(user) === "Completo"
-                                ? CheckCircleIcon
-                                : WarningIcon
-                            }
-                          />
-                          {getUserStatus(user)}
-                        </Badge>
                       </Td>
                       <Td>
                         <HStack spacing={2}>

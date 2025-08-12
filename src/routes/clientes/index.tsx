@@ -407,43 +407,6 @@ const Clientes = () => {
                   ),
                 },
                 {
-                  key: "birthDate",
-                  label: "Data de Nascimento",
-                  render: (cliente) => (
-                    <Text fontSize="sm">
-                      {cliente.birthDate
-                        ? Helpers.toViewDate(cliente.birthDate)
-                        : "-"}
-                    </Text>
-                  ),
-                },
-                {
-                  key: "status",
-                  label: "Status",
-                  render: (cliente) => (
-                    <Badge
-                      colorScheme={getClienteStatusColor(cliente)}
-                      variant="subtle"
-                      fontSize="0.7rem"
-                      px={3}
-                      py={1}
-                      display="inline-flex"
-                      alignItems="center"
-                      gap={1}
-                      borderRadius="full"
-                    >
-                      <Icon
-                        as={
-                          getClienteStatus(cliente) === "Completo"
-                            ? CheckCircleIcon
-                            : WarningIcon
-                        }
-                      />
-                      {getClienteStatus(cliente)}
-                    </Badge>
-                  ),
-                },
-                {
                   key: "acoes",
                   label: "Ações",
                   width: "140px",

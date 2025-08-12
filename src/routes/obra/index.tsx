@@ -44,7 +44,7 @@ import { getAll } from "../../stores/fornecedores/service";
 import { IFornecedorTable } from "../../stores/fornecedores/interface";
 import Medicao from "./fragments/Medicao";
 import ModalDelete from "../../components/ModalDelete";
-import { ArrowDownIcon, ArrowUpIcon, DeleteIcon, SearchIcon, ChevronLeftIcon, CalendarIcon } from "@chakra-ui/icons";
+import { ArrowDownIcon, ArrowUpIcon, DeleteIcon, SearchIcon, ChevronLeftIcon, CalendarIcon, DownloadIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 
 const Obra = () => {
@@ -142,6 +142,69 @@ const Obra = () => {
             default: return method
         }
     }
+
+    const handleExportDiary = () => {
+        if (filteredData.length === 0) {
+            toast({
+                title: "Nenhum dado para exportar",
+                description: "Não há itens no diário para exportar.",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+            });
+            return;
+        }
+
+        try {
+            Helpers.generateObraDiaryXlsxFile(filteredData, data?.name || 'obra');
+            toast({
+                title: "Arquivo exportado com sucesso!",
+                description: `${filteredData.length} itens exportados para Excel.`,
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+            });
+        } catch (error) {
+            toast({
+                title: "Erro ao exportar arquivo",
+                description: "Ocorreu um erro ao gerar o arquivo Excel.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            });
+        }
+    };
+
+    const handleGenerateReport = async () => {
+        try {
+            // Get all medições for the report
+            const medicoes = (data as any)?.measurement || [];
+            
+            await Helpers.generateObraReportPDF(
+                data,
+                diarioItems,
+                medicoes,
+                entryType
+            );
+            
+            toast({
+                title: "Relatório gerado com sucesso!",
+                description: "O relatório PDF foi baixado automaticamente.",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+            });
+        } catch (error) {
+            console.error('Error generating PDF report:', error);
+            toast({
+                title: "Erro ao gerar relatório",
+                description: "Ocorreu um erro ao gerar o relatório PDF.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            });
+        }
+    };
 
     useEffect(() => {
         const fetch = async () => {
@@ -339,6 +402,15 @@ const Obra = () => {
                                 <HStack spacing={3}>
                                     {data && (
                                         <>
+                                            <Button
+                                                leftIcon={<ExternalLinkIcon />}
+                                                colorScheme="blue"
+                                                variant="solid"
+                                                size="sm"
+                                                onClick={handleGenerateReport}
+                                            >
+                                                Gerar Relatório PDF
+                                            </Button>
                                             <ConfigurarObra
                                                 data={data}
                                                 refresh={refresh}
@@ -513,14 +585,26 @@ const Obra = () => {
                                 <Text fontSize="lg" fontWeight="semibold">
                                     📋 Diário da Obra
                                 </Text>
-                                <AddNewDiaryItem
-                                    id={id!}
-                                    flushHook={setRefresh}
-                                    refresh={refresh}
-                                    fornecedores={fornecedores}
-                                    constructionItems={constructionItems}
-                                    entryType={entryType}
-                                />
+                                <HStack spacing={3}>
+                                    <Button
+                                        leftIcon={<DownloadIcon />}
+                                        colorScheme="green"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleExportDiary}
+                                        isDisabled={filteredData.length === 0}
+                                    >
+                                        Exportar Excel
+                                    </Button>
+                                    <AddNewDiaryItem
+                                        id={id!}
+                                        flushHook={setRefresh}
+                                        refresh={refresh}
+                                        fornecedores={fornecedores}
+                                        constructionItems={constructionItems}
+                                        entryType={entryType}
+                                    />
+                                </HStack>
                             </Flex>
                         </CardHeader>
 
@@ -604,12 +688,34 @@ const Obra = () => {
                                 <Flex justify="space-between" align="center" py={2}>
                                     <Text color="gray.600" fontSize="sm">
                                         {filteredData.length} de {diarioItems.length} itens
+                                        {Object.values(filters).some(f => f) || searchTerm ? ' (filtrados)' : ''}
                                     </Text>
-                                    <Text color="gray.600" fontSize="sm" fontWeight="medium">
-                                        Total: {Helpers.toBrazilianCurrency(
-                                            filteredData.reduce((acc, item) => acc + (item.value as number || 0), 0)
+                                    <HStack spacing={4}>
+                                        <Text color="gray.600" fontSize="sm" fontWeight="medium">
+                                            Total: {Helpers.toBrazilianCurrency(
+                                                filteredData.reduce((acc, item) => acc + (item.value as number || 0), 0)
+                                            )}
+                                        </Text>
+                                        {(Object.values(filters).some(f => f) || searchTerm) && (
+                                            <Button
+                                                size="xs"
+                                                variant="ghost"
+                                                colorScheme="blue"
+                                                onClick={() => {
+                                                    setSearchTerm('');
+                                                    setFilters({
+                                                        supplier: '',
+                                                        status: '',
+                                                        type: '',
+                                                        item: '',
+                                                        nf: ''
+                                                    });
+                                                }}
+                                            >
+                                                Limpar filtros
+                                            </Button>
                                         )}
-                                    </Text>
+                                    </HStack>
                                 </Flex>
 
                                 {/* Table */}
@@ -764,11 +870,32 @@ const Obra = () => {
                                 {filteredData.length === 0 && (
                                     <Card>
                                         <CardBody textAlign="center" py={12}>
-                                            <Text fontSize="lg" color="gray.500">
-                                                {searchTerm || Object.values(filters).some(f => f) 
-                                                    ? 'Nenhum item encontrado com os filtros aplicados.' 
-                                                    : 'Nenhum item cadastrado ainda.'}
-                                            </Text>
+                                            <VStack spacing={4}>
+                                                <Text fontSize="lg" color="gray.500">
+                                                    {searchTerm || Object.values(filters).some(f => f) 
+                                                        ? 'Nenhum item encontrado com os filtros aplicados.' 
+                                                        : 'Nenhum item cadastrado ainda.'}
+                                                </Text>
+                                                {(searchTerm || Object.values(filters).some(f => f)) && (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        colorScheme="blue"
+                                                        onClick={() => {
+                                                            setSearchTerm('');
+                                                            setFilters({
+                                                                supplier: '',
+                                                                status: '',
+                                                                type: '',
+                                                                item: '',
+                                                                nf: ''
+                                                            });
+                                                        }}
+                                                    >
+                                                        Limpar filtros
+                                                    </Button>
+                                                )}
+                                            </VStack>
                                         </CardBody>
                                     </Card>
                                 )}

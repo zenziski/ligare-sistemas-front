@@ -1,4 +1,15 @@
-import { CheckIcon, HamburgerIcon } from "@chakra-ui/icons";
+import { 
+  HamburgerIcon, 
+  CloseIcon, 
+  TimeIcon,
+  CalendarIcon,
+  StarIcon,
+  SettingsIcon,
+  InfoIcon,
+  AtSignIcon,
+  PhoneIcon,
+  ViewIcon
+} from "@chakra-ui/icons";
 import {
   Box,
   Flex,
@@ -13,7 +24,7 @@ import {
   DrawerCloseButton,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import UserContext from "../contexts/UserContext";
 
@@ -27,9 +38,10 @@ interface ItemProps {
   to: string;
   isActive?: boolean;
   onClick?: () => void;
+  isCollapsed?: boolean;
 }
 
-const Item = ({ label, icon, to, onClick }: ItemProps) => {
+const Item = ({ label, icon, to, onClick, isCollapsed = false }: ItemProps) => {
   const isActive = window.location.pathname === `/${to}`;
 
   return (
@@ -37,44 +49,50 @@ const Item = ({ label, icon, to, onClick }: ItemProps) => {
       <Flex
         bg={isActive ? "gray.200" : "transparent"}
         color="black"
-        p={4}
+        p={isCollapsed ? 2 : 4}
         cursor="pointer"
         alignItems="center"
+        justifyContent={isCollapsed ? "center" : "flex-start"}
         borderRadius="md"
         mb={2}
         transition="all 0.2s ease-in-out"
         _hover={{
-          bg: isActive ? "primary-500" : "gray.100",
-          color: "primary-400",
+          bg: isActive ? "yellow.500" : "gray.100",
+          color: "gray.800",
         }}
+        title={isCollapsed ? label : undefined}
       >
         <Flex
-          mr={2}
+          mr={isCollapsed ? 0 : 2}
           alignItems="center"
           justifyContent="center"
           w={6}
           h={6}
           borderRadius="md"
-          bg="primary-500"
-          color="primary-400"
+          bg={isActive ? "yellow.500" : "yellow.400"}
+          color={isActive ? "gray.800" : "gray.700"}
+          border="1px solid"
+          borderColor={isActive ? "yellow.600" : "yellow.500"}
           transition="all 0.2s ease-in-out"
         >
           {icon}
         </Flex>
-        <Box
-          fontSize="md"
-          color="#555"
-          fontFamily="Poppins-Medium"
-          fontWeight={isActive ? "bold" : "medium"}
-        >
-          {label}
-        </Box>
+        {!isCollapsed && (
+          <Box
+            fontSize="md"
+            color="#555"
+            fontFamily="Poppins-Medium"
+            fontWeight={isActive ? "bold" : "medium"}
+          >
+            {label}
+          </Box>
+        )}
       </Flex>
     </Link>
   );
 };
 
-const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
+const SidebarContent = ({ onToggle, isCollapsed = false }: { onToggle?: () => void; isCollapsed?: boolean }) => {
   const { user } = useContext(UserContext);
 
   const handleLogout = () => {
@@ -83,50 +101,67 @@ const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   };
 
   return (
-    <Box h="100vh" w="100%" p="6" bg="blackAlpha.50" color="white">
+    <Box h="100vh" w="100%" p={isCollapsed ? 2 : 6} bg="gray.50" color="white">
       <Flex
-        p={4}
+        p={isCollapsed ? 2 : 4}
         textAlign="center"
         fontSize="2xl"
         fontWeight="bold"
-        justifyContent="center"
+        justifyContent={isCollapsed ? "center" : "space-between"}
         alignItems="center"
+        mb={isCollapsed ? 2 : 0}
+        color="gray.800"
       >
-        <Text fontFamily="Poppins-Light" fontSize="36px" color="black">
-          Ligare
-        </Text>
+        {!isCollapsed && (
+          <Text fontFamily="Poppins-Light" fontSize="36px" color="gray.800">
+            Ligare
+          </Text>
+        )}
+        {onToggle && (
+          <IconButton
+            aria-label={isCollapsed ? "Expandir sidebar" : "Recolher sidebar"}
+            icon={isCollapsed ? <HamburgerIcon /> : <CloseIcon />}
+            onClick={onToggle}
+            variant="ghost"
+            color="gray.800"
+            size="sm"
+            _hover={{ bg: "yellow.500" }}
+          />
+        )}
       </Flex>
       <Divider />
       <Box mt={4}>
-        <Text
-          fontSize="sm"
-          color="gray.600"
-          fontWeight="bold"
-          mb={2}
-          px={2}
-          fontFamily="Poppins-Medium"
-        >
-          CONTROLE DE PONTO
-        </Text>
+        {!isCollapsed && (
+          <Text
+            fontSize="sm"
+            color="gray.600"
+            fontWeight="bold"
+            mb={2}
+            px={2}
+            fontFamily="Poppins-Medium"
+          >
+            CONTROLE DE PONTO
+          </Text>
+        )}
         <Flex direction="column">
           <Item
             to="ponto"
             label="Registrar"
-            icon={<CheckIcon />}
-            onClick={onClose}
+            icon={<TimeIcon />}
+            isCollapsed={isCollapsed}
           />
           <Item
             to="detalhes-ponto"
             label="Espelho de ponto"
-            icon={<CheckIcon />}
-            onClick={onClose}
+            icon={<CalendarIcon />}
+            isCollapsed={isCollapsed}
           />
           {user?.roles?.admin && (
             <Item
               to="feriados"
               label="Feriados"
-              icon={<CheckIcon />}
-              onClick={onClose}
+              icon={<StarIcon />}
+              isCollapsed={isCollapsed}
             />
           )}
         </Flex>
@@ -134,38 +169,67 @@ const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
       <Divider my={4} />
       <Box>
-        <Text
-          fontSize="sm"
-          color="gray.600"
-          fontWeight="bold"
-          mb={2}
-          px={2}
-          fontFamily="Poppins-Medium"
-        >
-          GESTÃO
-        </Text>
+        {!isCollapsed && (
+          <Text
+            fontSize="sm"
+            color="gray.600"
+            fontWeight="bold"
+            mb={2}
+            px={2}
+            fontFamily="Poppins-Medium"
+          >
+            GESTÃO
+          </Text>
+        )}
         <Flex direction="column">
           {user?.roles?.admin && (
             <Item
               to="usuarios"
               label="Usuários"
-              icon={<CheckIcon />}
-              onClick={onClose}
+              icon={<SettingsIcon />}
+              isCollapsed={isCollapsed}
             />
           )}
-          <Item to="obras" label="Obras" icon={<CheckIcon />} />
-          <Item to="clientes" label="Clientes" icon={<CheckIcon />} />
-          <Item to="fornecedores" label="Fornecedores" icon={<CheckIcon />} />
-          <Item to="financeiro" label="Financeiro" icon={<CheckIcon />} />
+          <Item 
+            to="obras" 
+            label="Obras" 
+            icon={
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7V10C2 16 6 20.5 12 22C18 20.5 22 16 22 10V7L12 2Z"/>
+              </svg>
+            } 
+            isCollapsed={isCollapsed} 
+          />
+          <Item 
+            to="clientes" 
+            label="Clientes" 
+            icon={
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z"/>
+              </svg>
+            } 
+            isCollapsed={isCollapsed} 
+          />
+          <Item 
+            to="fornecedores" 
+            label="Fornecedores" 
+            icon={
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.5 4L19.66 8H21V10H19L18.5 12H6.5L6 10H4V8H5.34L6.5 4H18.5ZM7.33 6L6.83 8H17.17L16.67 6H7.33ZM5 14H19V16H5V14ZM5 18H19V20H5V18Z"/>
+              </svg>
+            } 
+            isCollapsed={isCollapsed} 
+          />
         </Flex>
       </Box>
       <Divider my={4} />
       <Flex
         bg="transparent"
         color="#555"
-        p={4}
+        p={isCollapsed ? 2 : 4}
         cursor="pointer"
         alignItems="center"
+        justifyContent={isCollapsed ? "center" : "flex-start"}
         borderRadius="md"
         transition="all 0.2s ease-in-out"
         _hover={{
@@ -174,9 +238,10 @@ const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
         }}
         onClick={handleLogout}
         w="100%"
+        title={isCollapsed ? "Sair" : undefined}
       >
         <Flex
-          mr={2}
+          mr={isCollapsed ? 0 : 2}
           alignItems="center"
           justifyContent="center"
           w={6}
@@ -219,14 +284,16 @@ const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
             />
           </svg>
         </Flex>
-        <Box
-          fontSize="md"
-          color="#555"
-          fontFamily="Poppins-Medium"
-          fontWeight="medium"
-        >
-          Sair
-        </Box>
+        {!isCollapsed && (
+          <Box
+            fontSize="md"
+            color="#555"
+            fontFamily="Poppins-Medium"
+            fontWeight="medium"
+          >
+            Sair
+          </Box>
+        )}
       </Flex>
     </Box>
   );
@@ -234,7 +301,12 @@ const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
 const Sidebar = ({ children }: SidebarProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
   const isMobile = useBreakpointValue({ base: true, lg: false });
+
+  const toggleDesktopSidebar = () => {
+    setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed);
+  };
 
   if (isMobile) {
     // Layout Mobile com Drawer
@@ -274,7 +346,7 @@ const Sidebar = ({ children }: SidebarProps) => {
           <DrawerContent>
             <DrawerCloseButton color="black" />
             <DrawerBody p={0}>
-              <SidebarContent onClose={onClose} />
+              <SidebarContent />
             </DrawerBody>
           </DrawerContent>
         </Drawer>
@@ -290,19 +362,29 @@ const Sidebar = ({ children }: SidebarProps) => {
   // Layout Desktop (original)
   return (
     <>
+      {/* Desktop Sidebar */}
       <Box
         position="fixed"
         top="0"
         left="0"
         h="100vh"
-        w="64"
+        w={isDesktopSidebarCollapsed ? "16" : "64"}
         bg="blackAlpha.50"
         color="white"
         zIndex="sticky"
+        transition="all 0.3s ease-in-out"
       >
-        <SidebarContent />
+        <SidebarContent onToggle={toggleDesktopSidebar} isCollapsed={isDesktopSidebarCollapsed} />
       </Box>
-      <Box pl="64" w="100%" overflowY="auto" minH="100vh">
+
+      {/* Main Content */}
+      <Box 
+        pl={isDesktopSidebarCollapsed ? "16" : "64"} 
+        w="100%" 
+        overflowY="auto" 
+        minH="100vh"
+        transition="all 0.3s ease-in-out"
+      >
         {children}
       </Box>
     </>
