@@ -1,15 +1,4 @@
-import {
-  Flex,
-  Progress,
-  Table,
-  TableContainer,
-  Tbody,
-  Text,
-  Th,
-  Thead,
-  Tr,
-  useToast,
-} from "@chakra-ui/react";
+import { Flex, Text, useToast } from "@chakra-ui/react";
 import Sidebar from "../../components/Sidebar";
 import { useEffect, useState } from "react";
 import moment from "moment";
@@ -18,6 +7,7 @@ import { deleteFeriado, getFeriados } from "../../stores/ponto/service";
 import ModalDelete from "../../components/ModalDelete";
 import { DeleteIcon } from "@chakra-ui/icons";
 import ModalCriarFeriado from "./fragments/ModalCriarFeriado";
+import StyledTable from "../../components/StyledTable";
 
 const Feriados = () => {
   const toast = useToast();
@@ -55,54 +45,59 @@ const Feriados = () => {
         <Flex direction="row" mb="15px" justifyContent="space-between">
           <Text fontSize="4xl">Feriados</Text>
         </Flex>
-        <Flex justifyContent={"flex-end"}>
+        <Flex justifyContent={"flex-end"} mb="15px">
           <ModalCriarFeriado onFlushHook={() => setFlushHook(!flushHook)} />
         </Flex>
-        <TableContainer mt={10} width="100%" height="100%" overflow="auto">
-          <Table>
-            <Thead>
-              <Tr>
-                <Th>Feriado</Th>
-                <Th>Data</Th>
-                <Th>Ações</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {loading && (
-                <Tr>
-                  <Th colSpan={3}>
-                    {loading && <Progress size="xs" isIndeterminate />}
-                  </Th>
-                </Tr>
-              )}
-              {feriados.map((feriado) => (
-                <Tr>
-                  <Th>{feriado.description}</Th>
-                  <Th>
-                    {moment(
-                      `${feriado.year || new Date().getFullYear()}-${
-                        feriado.month
-                      }-${feriado.day}`
-                    ).format(feriado.year ? "DD/MM/YYYY" : "DD/MM")}
-                  </Th>
-                  <Th>
-                    <ModalDelete
-                      headerText="Remover Feriado"
-                      buttonColorScheme="red"
-                      buttonIcon={<DeleteIcon />}
-                      onDelete={async () => {
-                        await deleteFeriado(feriado._id);
-                        setFlushHook(!flushHook);
-                      }}
-                    >
-                      Remover Feriado {feriado.description}
-                    </ModalDelete>
-                  </Th>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
+        <StyledTable
+          columns={[
+            {
+              key: "description",
+              label: "Feriado",
+              render: (feriado) => <Text>{feriado.description}</Text>,
+            },
+            {
+              key: "date",
+              label: "Data",
+              render: (feriado) => (
+                <Text>
+                  {moment(
+                    `${feriado.year || new Date().getFullYear()}-${
+                      feriado.month
+                    }-${feriado.day}`
+                  ).format(feriado.year ? "DD/MM/YYYY" : "DD/MM")}
+                </Text>
+              ),
+            },
+            {
+              key: "acoes",
+              label: "Ações",
+              width: "140px",
+              render: (feriado) => (
+                <ModalDelete
+                  headerText="Remover Feriado"
+                  buttonColorScheme="red"
+                  buttonIcon={<DeleteIcon />}
+                  onDelete={async () => {
+                    await deleteFeriado(feriado._id);
+                    setFlushHook(!flushHook);
+                  }}
+                >
+                  Remover Feriado {feriado.description}
+                </ModalDelete>
+              ),
+            },
+          ]}
+          data={feriados}
+          loading={loading}
+          emptyMessage={"Nenhum feriado cadastrado."}
+          rowProps={() => ({
+            _hover: {
+              bg: "gray.50",
+              boxShadow: "inset 0 0 0 1px var(--chakra-colors-gray-100)",
+            },
+            transition: "all 0.15s",
+          })}
+        />
       </Flex>
     </Sidebar>
   );
