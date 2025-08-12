@@ -1,358 +1,624 @@
-import { AddIcon, CloseIcon, EditIcon, SearchIcon } from "@chakra-ui/icons"
-import DrawerComponent from "../../components/Drawer"
-import Sidebar from "../../components/Sidebar"
-import { Flex, Text, Grid, FormControl, FormLabel, Input, Table, Thead, Tbody, Tr, Th, Td, TableContainer, InputGroup, InputLeftElement, Checkbox, Avatar, IconButton, Badge, useToast, InputRightElement, Progress } from "@chakra-ui/react"
-import { useEffect, useState } from "react"
-import { IUser, schema } from "../../stores/usuarios/interface"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { getAll, createUser, updateUser, removeUser } from "../../stores/usuarios/service"
-import moment from "moment"
-import PhoneInput from "../../components/PhoneInput"
-import ModalDelete from "../../components/ModalDelete"
+import {
+  Box,
+  Flex,
+  FormControl,
+  FormLabel,
+  Grid,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  useToast,
+  Card,
+  CardBody,
+  CardHeader,
+  HStack,
+  VStack,
+  Badge,
+  Skeleton,
+  Icon,
+  Checkbox,
+  Avatar,
+} from "@chakra-ui/react";
+import Sidebar from "../../components/Sidebar";
+import DrawerComponent from "../../components/Drawer";
+import { useEffect, useState } from "react";
+import { AddIcon, SearchIcon, EditIcon, DeleteIcon } from "@chakra-ui/icons";
+import { IUser, schema } from "../../stores/usuarios/interface";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import PhoneInput from "../../components/PhoneInput";
+import {
+  createUser,
+  getAll,
+  updateUser,
+  removeUser,
+} from "../../stores/usuarios/service";
+import ModalDelete from "../../components/ModalDelete";
+import { CheckCircleIcon, WarningIcon } from "@chakra-ui/icons";
+import moment from "moment";
 
 const Usuarios = () => {
+  const toast = useToast();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [user, setUser] = useState<IUser>({} as IUser);
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting },
-        setValue,
-        reset,
-        watch,
-        control
-    } = useForm<IUser>({
-        resolver: zodResolver(schema)
-    })
-    const [users, setUsers] = useState<IUser[]>([])
-    const [filteredUsers, setFilteredUsers] = useState<IUser[]>([])
-    const [user, setUser] = useState<IUser>({} as IUser)
-    const [filter, setFilter] = useState<string>('')
-    const [loading, setLoading] = useState<boolean>(false)
-    const [refresh, setRefresh] = useState<boolean>(false)
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+    reset,
+    control,
+    watch,
+  } = useForm<IUser>({
+    resolver: zodResolver(schema),
+    shouldFocusError: false,
+  });
 
-    const toast = useToast()
-
-    const handleCreateUser = async (data: IUser) => {
-        setLoading(true)
-        try {
-            const response = await createUser(data)
-            setUsers([...users, response])
-            setFilteredUsers([...users, response])
-            toast({
-                title: 'Usuário criado com sucesso',
-                description: 'O usuário foi criado com sucesso',
-                status: 'success',
-                duration: 5000,
-                isClosable: true,
-                position: 'top-right'
-            })
-            setUser({} as IUser)
-
-        } catch (error: any) {
-            toast({
-                title: error?.response?.data?.message || 'Erro ao criar usuário',
-                status: 'error',
-                duration: 5000,
-                isClosable: true,
-                position: 'top-right'
-            })
-        } finally {
-            setLoading(false)
-            reset()
-        }
+  const handleCreateUser = async (data: IUser) => {
+    try {
+      const response = await createUser(data);
+      setUsers([...users, response]);
+      reset();
+      toast({
+        title: "Usuário criado com sucesso!",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error: any) {
+      toast({
+        title: error?.response?.data?.message || "Erro ao criar usuário!",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
+  };
 
-    const handleEditUser = async (data: IUser) => {
-        try {
-            if(data.changePassword) {
-                data.password = data.changePassword
-            }
-            await updateUser(data)
-            toast({
-                title: 'Usuário editado com sucesso',
-                description: 'O usuário foi editado com sucesso',
-                status: 'success',
-                duration: 5000,
-                isClosable: true,
-                position: 'top-right'
-            })
-            const users = await getAll()
-            setUsers(users)
-            setFilteredUsers(users)
-        } catch (error: any) {
-            toast({
-                title: error?.response?.data?.message || 'Erro ao editar usuário',
-                status: 'error',
-                duration: 5000,
-                isClosable: true,
-                position: 'top-right'
-            })
-        }
+  const handleEditUser = async (data: IUser) => {
+    try {
+      if (data.changePassword) {
+        data.password = data.changePassword;
+      }
+      await updateUser(data);
+      const newUsers = await getAll();
+      setUsers(newUsers);
+      toast({
+        title: "Usuário editado com sucesso!",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error: any) {
+      toast({
+        title: error?.response?.data?.message || "Erro ao editar usuário!",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
+  };
 
-    useEffect(() => {
-        if (filter) {
-            const filtered = users.filter(user => user.name.toLowerCase().includes(filter.toLowerCase()))
-            setFilteredUsers(filtered)
-        } else {
-            setFilteredUsers(users)
-        }
-    }, [filter])
+  useEffect(() => {
+    const fetch = async () => {
+      setLoading(true);
+      const response = await getAll();
+      setUsers(response);
+      setLoading(false);
+    };
+    fetch();
+  }, []);
 
-    useEffect(() => {
-        const fetch = async () => {
-            setLoading(true)
-            try {
-                const response = await getAll()
-                setUsers(response)
-                setFilteredUsers(response)
-            } catch (error) {
-                toast({
-                    title: 'Erro ao buscar usuários',
-                    description: 'Ocorreu um erro ao buscar os usuários, tente novamente mais tarde',
-                    status: 'error',
-                    duration: 5000,
-                    isClosable: true,
-                    position: 'top-right'
-                })
-            } finally {
-                setLoading(false)
-            }
-        }
-        fetch()
-    }, [refresh])
+  useEffect(() => {
+    setValue("name", user.name);
+    setValue("email", user.email);
+    setValue("phoneNumber", user.phoneNumber);
+    setValue(
+      "birthDate",
+      user.birthDate ? moment(user.birthDate).format("YYYY-MM-DD") : ""
+    );
+    setValue(
+      "admissionDate",
+      user.admissionDate ? moment(user.admissionDate).format("YYYY-MM-DD") : ""
+    );
+    setValue("hoursToWork", user.hoursToWork);
+    setValue("roles", user.roles);
+    setValue("password", user.password);
+    setValue("confirmPassword", user.confirmPassword);
+    setValue("_id", user._id);
+  }, [setValue, user]);
 
-    useEffect(() => {
-        setValue('name', user.name)
-        setValue('email', user.email)
-        setValue('phoneNumber', user.phoneNumber)
-        setValue('birthDate', user.admissionDate ? moment(user.birthDate).format("YYYY-MM-DD") : '')
-        setValue('admissionDate', user.admissionDate ? moment(user.admissionDate).format("YYYY-MM-DD") : '')
-        setValue('hoursToWork', user.hoursToWork)
-        setValue('roles', user.roles)
-        setValue('password', user.password)
-        setValue('confirmPassword', user.confirmPassword)
-        setValue('_id', user._id)
-    }, [user, setValue])
+  const phoneValue = watch("phoneNumber");
 
-    const phoneValue = watch('phoneNumber')
+  const getUserStatus = (user: IUser) => {
+    const hasAllData =
+      user.name && user.email && user.phoneNumber && user.admissionDate;
+    return hasAllData ? "Completo" : "Incompleto";
+  };
 
-    return (
-        <Sidebar>
-            <Flex w="100%" h="100%" p={10} direction="column" fontFamily="Poppins-Regular">
-                <Flex direction="row" mb="15px" justifyContent="space-between" >
-                    <Text fontSize="4xl">
-                        Usuários
-                    </Text>
-                    <DrawerComponent
-                        buttonIcon={<AddIcon />}
-                        buttonText="Adicionar"
-                        headerText="Adicionar Usuario"
-                        buttonColorScheme="green"
-                        size="md"
-                        isButton
-                        onAction={() => {
-                            handleSubmit(handleCreateUser)()
-                            reset()
-                        }}
-                        onOpenHook={() => setUser({} as IUser)}
-                        isLoading={isSubmitting}
+  const getUserStatusColor = (user: IUser) => {
+    const status = getUserStatus(user);
+    return status === "Completo" ? "green" : "orange";
+  };
 
-                    >
-                        <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
-                            <FormControl gridColumn="span 2">
-                                <FormLabel>Nome completo</FormLabel>
-                                <Input placeholder="Nome" {...register("name")} />
-                                {errors.name && <Text color="red.500" fontSize="sm">{errors.name.message}</Text>}
-                            </FormControl>
-                            <FormControl gridColumn={'span 2'}>
-                                <FormLabel>Email</FormLabel>
-                                <Input {...register("email")} placeholder="exemplo@mail.com.br" type="email" />
-                                {errors.email && <Text color="red.500" fontSize="sm">{errors.email.message}</Text>}
-                            </FormControl>
-                            <FormControl gridColumn={"span 2"} >
-                                <FormLabel>Senha</FormLabel>
-                                <Input {...register("password")} type="password" />
-                                {errors.password && <Text color="red.500" fontSize="sm">{errors.password.message}</Text>}
-                            </FormControl>
-                            <FormControl gridColumn={"span 2"} >
-                                <FormLabel>Confirmar Senha</FormLabel>
-                                <Input {...register("confirmPassword")} type="password" />
-                                {errors.confirmPassword && <Text color="red.500" fontSize="sm">{errors.confirmPassword.message}</Text>}
-                            </FormControl>
-                            <FormControl>
-                                <FormLabel>Telefone</FormLabel>
-                                <PhoneInput
-                                    control={control}
-                                    defaultValue={phoneValue}
-                                />
-                                {errors.phoneNumber && <Text color="red.500" fontSize="sm">{errors.phoneNumber.message}</Text>}
-                            </FormControl>
-                            <FormControl>
-                                <FormLabel>Data Nascimento</FormLabel>
-                                <Input type="date" {...register("birthDate")} />
-                                {errors.birthDate && <Text color="red.500" fontSize="sm">{errors.birthDate.message}</Text>}
-                            </FormControl>
-                            <FormControl>
-                                <FormLabel>Data Admissão</FormLabel>
-                                <Input type="date" {...register("admissionDate")} />
-                                {errors.admissionDate && <Text color="red.500" fontSize="sm">{errors.admissionDate.message}</Text>}
-                            </FormControl>
-                            <FormControl>
-                                <FormLabel>Horas para trabalhar</FormLabel>
-                                <Input type="number" {...register("hoursToWork")} />
-                                {errors.hoursToWork && <Text color="red.500" fontSize="sm">{errors.hoursToWork.message}</Text>}
-                            </FormControl>
-                            <FormControl>
-                                <FormLabel>Permissões</FormLabel>
-                                <Checkbox
-                                    {...register("roles.admin")}
-                                >
-                                    Administrador
-                                </Checkbox>
-                            </FormControl>
-                        </Grid>
-                    </DrawerComponent>
-                </Flex>
-                <Flex
-                    w="100%"
-                    h="50px"
-                    borderRadius="md"
-                    bg="white"
-                    alignItems="center"
-                    px={4}
-                    mb={4}
-                >
-                    <InputGroup>
-                        <InputLeftElement
-                            pointerEvents="none"
-                            children={<SearchIcon color="gray.300" />}
-                        />
-                        <Input value={filter} onChange={e => setFilter(e.target.value)} type="text" placeholder="Pesquisar..." />
-                        <InputRightElement
-                            children={filter !== '' && <IconButton aria-label="Pesquisar" onClick={() => setFilter('')} icon={<CloseIcon />} />}
-                        />
-                    </InputGroup>
-                </Flex>
-                <TableContainer>
-                    <Table variant="striped" >
-                        <Thead>
-                            <Tr>
-                                <Th></Th>
-                                <Th>Nome</Th>
-                                <Th>Telefone</Th>
-                                <Th>Data Admissão</Th>
-                                <Th>Data de nascimento</Th>
-                                <Th>{' '}</Th>
-                            </Tr>
-                        </Thead>
-                        <Tbody>
-                            {
-                                loading ? (
-                                    <Progress size="xs" isIndeterminate />
-                                ) : filteredUsers.length === 0 ? (
-                                    <Text p={4} fontSize="18px">
-                                        Nenhum resultado encontrado :(
-                                    </Text>
-                                ) : (
-                                    filteredUsers.map((user, index) => (
-                                        <Tr key={index}>
-                                            <Td>
-                                                <Avatar size="sm" name={user.name} src={user.name} />
-                                            </Td>
-                                            <Td>
-                                                <Text>{user.name}{user?.roles?.admin && <Badge ml={1} mb={1} colorScheme="green">Admin</Badge>}</Text>
-                                                <Text fontSize="sm" color="gray.500">{user.email}</Text>
-                                            </Td>
-                                            <Td>{user.phoneNumber}</Td>
-                                            <Td>{user.admissionDate && moment(user.admissionDate).format('DD/MM/YYYY')}</Td>
-                                            <Td>{user.birthDate && moment(user.birthDate).format('DD/MM/YYYY')}</Td>
-                                            <Td>
-                                                <DrawerComponent
-                                                    buttonIcon={<EditIcon />}
-                                                    buttonText="Editar"
-                                                    headerText="Editar Usuario"
-                                                    buttonColorScheme="blue"
-                                                    size="md"
-                                                    onOpenHook={() => {
-                                                        setUser(user);
-                                                    }}
-                                                    onAction={handleSubmit(handleEditUser)}
-                                                    isLoading={isSubmitting}
-                                                >
-                                                    <Grid templateColumns="repeat(2, 1fr)" gap={6} fontFamily="Poppins-Regular">
-                                                        <FormControl gridColumn="span 2">
-                                                            <FormLabel>Nome completo</FormLabel>
-                                                            <Input placeholder="Nome" {...register("name")} />                                                        {errors.name && <Text color="red.500" fontSize="sm">{errors.name.message}</Text>}
-                                                        </FormControl>
-                                                        <FormControl gridColumn={'span 2'}>
-                                                            <FormLabel>Email</FormLabel>
-                                                            <Input {...register("email")} placeholder="exemplo@gmail.com" type="email" />
-                                                            {errors.email && <Text color="red.500" fontSize="sm">{errors.email.message}</Text>}
-                                                        </FormControl>
-                                                        <FormControl>
-                                                            <FormLabel>Telefone</FormLabel>
-                                                            <PhoneInput
-                                                                control={control}
-                                                                defaultValue={phoneValue}
-                                                            />
-                                                            {errors.phoneNumber && <Text color="red.500" fontSize="sm">{errors.phoneNumber.message}</Text>}
-                                                        </FormControl>
-                                                        <FormControl>
-                                                            <FormLabel>Data Nascimento</FormLabel>
-                                                            <Input type="date" {...register("birthDate")} />
-                                                            {errors.birthDate && <Text color="red.500" fontSize="sm">{errors.birthDate.message}</Text>}
-                                                        </FormControl>
-                                                        <FormControl>
-                                                            <FormLabel>Data Admissão</FormLabel>
-                                                            <Input type="date" {...register("admissionDate")} />
-                                                            {errors.admissionDate && <Text color="red.500" fontSize="sm">{errors.admissionDate.message}</Text>}
-                                                        </FormControl>
-                                                        <FormControl>
-                                                            <FormLabel>Carga horária</FormLabel>
-                                                            <Input type="number" {...register("hoursToWork")} />
-                                                            {errors.hoursToWork && <Text color="red.500" fontSize="sm">{errors.hoursToWork.message}</Text>}
-                                                        </FormControl>
-                                                        <FormControl>
-                                                            <FormLabel>Alterar senha</FormLabel>
-                                                            <Input {...register("changePassword")} />
-                                                            {errors.changePassword && <Text color="red.500" fontSize="sm">{errors.changePassword.message}</Text>}
-                                                        </FormControl>
-                                                        <FormControl>
-                                                            <FormLabel>Permissões</FormLabel>
-                                                            <Checkbox
-                                                                {...register("roles.admin")}
-                                                            >
-                                                                Administrador
-                                                            </Checkbox>
-                                                        </FormControl>
-                                                    </Grid>
-                                                </DrawerComponent>
-                                                <ModalDelete
-                                                    headerText="Remover Usuário"
-                                                    buttonColorScheme="red"
-                                                    buttonIcon={<CloseIcon />}
-                                                    onDelete={async () => {
-                                                        setLoading(true)
-                                                        await removeUser(user._id!);
-                                                        setLoading(false)
-                                                        setRefresh(!refresh)
-                                                    }}
-                                                >
-                                                    Deseja realmente remover o usuário <b>{user.name}</b>?
-                                                </ModalDelete>
-                                            </Td>
-                                        </Tr>
-                                    ))
-                                )
-                            }
-                        </Tbody>
-                    </Table>
-                </TableContainer>
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.phoneNumber?.includes(searchTerm)
+  );
+
+  const renderUserForm = () => (
+    <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+      <FormControl gridColumn="span 2">
+        <FormLabel fontWeight="medium" color="gray.700">
+          Nome Completo
+        </FormLabel>
+        <Input
+          {...register("name")}
+          placeholder="Ex: João da Silva Santos"
+          focusBorderColor="blue.400"
+        />
+        {errors.name && (
+          <Text color="red.500" fontSize="sm">
+            {errors.name.message}
+          </Text>
+        )}
+      </FormControl>
+
+      <FormControl gridColumn="span 2">
+        <FormLabel fontWeight="medium" color="gray.700">
+          Email
+        </FormLabel>
+        <Input
+          {...register("email")}
+          placeholder="joao@exemplo.com"
+          type="email"
+          focusBorderColor="blue.400"
+        />
+        {errors.email && (
+          <Text color="red.500" fontSize="sm">
+            {errors.email.message}
+          </Text>
+        )}
+      </FormControl>
+
+      {!user._id && (
+        <>
+          <FormControl gridColumn="span 2">
+            <FormLabel fontWeight="medium" color="gray.700">
+              Senha
+            </FormLabel>
+            <Input
+              {...register("password")}
+              type="password"
+              focusBorderColor="blue.400"
+            />
+            {errors.password && (
+              <Text color="red.500" fontSize="sm">
+                {errors.password.message}
+              </Text>
+            )}
+          </FormControl>
+
+          <FormControl gridColumn="span 2">
+            <FormLabel fontWeight="medium" color="gray.700">
+              Confirmar Senha
+            </FormLabel>
+            <Input
+              {...register("confirmPassword")}
+              type="password"
+              focusBorderColor="blue.400"
+            />
+            {errors.confirmPassword && (
+              <Text color="red.500" fontSize="sm">
+                {errors.confirmPassword.message}
+              </Text>
+            )}
+          </FormControl>
+        </>
+      )}
+
+      {user._id && (
+        <FormControl gridColumn="span 2">
+          <FormLabel fontWeight="medium" color="gray.700">
+            Alterar Senha
+          </FormLabel>
+          <Input
+            {...register("changePassword")}
+            type="password"
+            placeholder="Deixe em branco para manter a senha atual"
+            focusBorderColor="blue.400"
+          />
+          {errors.changePassword && (
+            <Text color="red.500" fontSize="sm">
+              {errors.changePassword.message}
+            </Text>
+          )}
+        </FormControl>
+      )}
+
+      <FormControl>
+        <FormLabel fontWeight="medium" color="gray.700">
+          Telefone
+        </FormLabel>
+        <PhoneInput control={control} defaultValue={phoneValue} />
+        {errors.phoneNumber && (
+          <Text color="red.500" fontSize="sm">
+            {errors.phoneNumber.message}
+          </Text>
+        )}
+      </FormControl>
+
+      <FormControl>
+        <FormLabel fontWeight="medium" color="gray.700">
+          Data de Nascimento
+        </FormLabel>
+        <Input
+          {...register("birthDate")}
+          type="date"
+          focusBorderColor="blue.400"
+        />
+        {errors.birthDate && (
+          <Text color="red.500" fontSize="sm">
+            {errors.birthDate.message}
+          </Text>
+        )}
+      </FormControl>
+
+      <FormControl>
+        <FormLabel fontWeight="medium" color="gray.700">
+          Data de Admissão
+        </FormLabel>
+        <Input
+          {...register("admissionDate")}
+          type="date"
+          focusBorderColor="blue.400"
+        />
+        {errors.admissionDate && (
+          <Text color="red.500" fontSize="sm">
+            {errors.admissionDate.message}
+          </Text>
+        )}
+      </FormControl>
+
+      <FormControl>
+        <FormLabel fontWeight="medium" color="gray.700">
+          Carga Horária (horas)
+        </FormLabel>
+        <Input
+          {...register("hoursToWork")}
+          type="number"
+          placeholder="40"
+          focusBorderColor="blue.400"
+        />
+        {errors.hoursToWork && (
+          <Text color="red.500" fontSize="sm">
+            {errors.hoursToWork.message}
+          </Text>
+        )}
+      </FormControl>
+
+      <FormControl gridColumn="span 2">
+        <FormLabel fontWeight="medium" color="gray.700">
+          Permissões
+        </FormLabel>
+        <Checkbox {...register("roles.admin")} colorScheme="blue">
+          Administrador
+        </Checkbox>
+      </FormControl>
+    </Grid>
+  );
+
+  return (
+    <Sidebar>
+      {/* Loading State */}
+      {loading ? (
+        <Flex direction="column" gap={6} p={8} w="100%">
+          <HStack>
+            <Skeleton height="32px" width="260px" />
+          </HStack>
+          <Card>
+            <CardBody>
+              <HStack spacing={4}>
+                <Skeleton height="40px" flex={1} />
+                <Skeleton height="40px" width="160px" />
+              </HStack>
+            </CardBody>
+          </Card>
+          <Card>
+            <CardHeader>
+              <Skeleton height="20px" width="180px" />
+            </CardHeader>
+            <CardBody>
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} height="44px" mb={2} />
+              ))}
+            </CardBody>
+          </Card>
+        </Flex>
+      ) : (
+        <Box w="100%" h="100%" p={6} fontFamily="Poppins-Regular">
+          <VStack spacing={6} align="stretch">
+            {/* Header */}
+            <Flex justify="space-between" align="center">
+              <VStack align="start" spacing={1}>
+                <Text fontSize="3xl" fontWeight="bold" color="gray.800">
+                  Gestão de Usuários
+                </Text>
+                <Text color="gray.600" fontSize="md">
+                  Gerencie informações dos usuários do sistema
+                </Text>
+              </VStack>
             </Flex>
-        </Sidebar >
-    )
-}
 
-export default Usuarios
+            {/* Actions Bar */}
+            <Card shadow="sm" border="1px" borderColor="gray.100">
+              <CardBody>
+                <Flex
+                  justify="space-between"
+                  align="center"
+                  wrap="wrap"
+                  gap={4}
+                >
+                  <HStack spacing={4} flex="1">
+                    <InputGroup maxW="420px">
+                      <InputLeftElement pointerEvents="none">
+                        <SearchIcon color="gray.400" />
+                      </InputLeftElement>
+                      <Input
+                        placeholder="Buscar usuários..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        bg="white"
+                        border="1px"
+                        borderColor="gray.200"
+                        _hover={{ borderColor: "gray.300" }}
+                        _focus={{
+                          borderColor: "blue.400",
+                          boxShadow: "0 0 0 1px var(--chakra-colors-blue-400)",
+                        }}
+                      />
+                    </InputGroup>
+                    <Badge
+                      colorScheme="blue"
+                      variant="solid"
+                      px={3}
+                      py={1}
+                      borderRadius="full"
+                    >
+                      {filteredUsers.length} usuário
+                      {filteredUsers.length !== 1 ? "s" : ""}
+                    </Badge>
+                  </HStack>
+
+                  <DrawerComponent
+                    buttonIcon={<AddIcon />}
+                    buttonText="Novo Usuário"
+                    headerText="Cadastrar Novo Usuário"
+                    buttonColorScheme="green"
+                    size="lg"
+                    isButton
+                    onOpenHook={() => {
+                      setUser({} as IUser);
+                      reset();
+                    }}
+                    onAction={() => handleSubmit(handleCreateUser)()}
+                    isLoading={isSubmitting}
+                  >
+                    <VStack spacing={4} align="stretch">
+                      {renderUserForm()}
+                    </VStack>
+                  </DrawerComponent>
+                </Flex>
+              </CardBody>
+            </Card>
+
+            {/* Tabela de Usuários */}
+
+            <TableContainer>
+              <Table
+                variant="simple"
+                size="md"
+                sx={{
+                  th: { bg: "gray.50", fontSize: "sm", py: 3 },
+                  td: { py: 3, fontSize: "sm" },
+                }}
+              >
+                <Thead>
+                  <Tr>
+                    <Th>Usuário</Th>
+                    <Th>Telefone</Th>
+                    <Th>Data de Admissão</Th>
+                    <Th>Data de Nascimento</Th>
+                    <Th>Carga Horária</Th>
+                    <Th>Status</Th>
+                    <Th width="140px">Ações</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {filteredUsers.map((user) => (
+                    <Tr
+                      key={user._id}
+                      _hover={{
+                        bg: "gray.50",
+                        boxShadow:
+                          "inset 0 0 0 1px var(--chakra-colors-gray-100)",
+                      }}
+                      transition="all 0.15s"
+                    >
+                      <Td>
+                        <HStack align="center" spacing={4}>
+                          <Avatar
+                            size="sm"
+                            name={user.name}
+                            bg="blue.500"
+                            color="white"
+                            fontSize="sm"
+                            fontWeight="bold"
+                          />
+                          <VStack align="start" spacing={0} maxW="260px">
+                            <HStack spacing={2}>
+                              <Text
+                                fontWeight="semibold"
+                                color="gray.800"
+                                noOfLines={1}
+                              >
+                                {user.name}
+                              </Text>
+                              {user?.roles?.admin && (
+                                <Badge
+                                  colorScheme="green"
+                                  variant="solid"
+                                  fontSize="0.6rem"
+                                  px={2}
+                                  py={0.5}
+                                  borderRadius="full"
+                                >
+                                  Admin
+                                </Badge>
+                              )}
+                            </HStack>
+                            <Text fontSize="xs" color="gray.600" noOfLines={1}>
+                              {user.email}
+                            </Text>
+                          </VStack>
+                        </HStack>
+                      </Td>
+                      <Td>
+                        <Text fontSize="sm">{user.phoneNumber || "-"}</Text>
+                      </Td>
+                      <Td>
+                        <Text fontSize="sm">
+                          {user.admissionDate
+                            ? moment(user.admissionDate).format("DD/MM/YYYY")
+                            : "-"}
+                        </Text>
+                      </Td>
+                      <Td>
+                        <Text fontSize="sm">
+                          {user.birthDate
+                            ? moment(user.birthDate).format("DD/MM/YYYY")
+                            : "-"}
+                        </Text>
+                      </Td>
+                      <Td>
+                        <Text fontSize="sm">
+                          {user.hoursToWork ? `${user.hoursToWork}h` : "-"}
+                        </Text>
+                      </Td>
+                      <Td>
+                        <Badge
+                          colorScheme={getUserStatusColor(user)}
+                          variant="subtle"
+                          fontSize="0.7rem"
+                          px={3}
+                          py={1}
+                          display="inline-flex"
+                          alignItems="center"
+                          gap={1}
+                          borderRadius="full"
+                        >
+                          <Icon
+                            as={
+                              getUserStatus(user) === "Completo"
+                                ? CheckCircleIcon
+                                : WarningIcon
+                            }
+                          />
+                          {getUserStatus(user)}
+                        </Badge>
+                      </Td>
+                      <Td>
+                        <HStack spacing={2}>
+                          <DrawerComponent
+                            buttonIcon={<EditIcon />}
+                            buttonText=""
+                            headerText="Editar Usuário"
+                            buttonColorScheme="blue"
+                            size="lg"
+                            onOpenHook={() => {
+                              setUser(user);
+                              reset();
+                            }}
+                            onAction={() => handleSubmit(handleEditUser)()}
+                            isLoading={isSubmitting}
+                          >
+                            <VStack spacing={4} align="stretch">
+                              {renderUserForm()}
+                            </VStack>
+                          </DrawerComponent>
+                          <ModalDelete
+                            headerText="Excluir Usuário"
+                            buttonIcon={<DeleteIcon />}
+                            buttonColorScheme="red"
+                            onDelete={async () => {
+                              try {
+                                await removeUser(user._id || "");
+                                const newUsers = await getAll();
+                                setUsers(newUsers);
+                                toast({
+                                  title: "Usuário excluído com sucesso!",
+                                  status: "success",
+                                  duration: 3000,
+                                  isClosable: true,
+                                });
+                              } catch (error: any) {
+                                toast({
+                                  title:
+                                    error?.response?.data?.message ||
+                                    "Erro ao excluir usuário",
+                                  status: "error",
+                                  duration: 3000,
+                                  isClosable: true,
+                                });
+                              }
+                            }}
+                          >
+                            <Text>
+                              Tem certeza que deseja excluir o usuário{" "}
+                              <strong>{user.name}</strong>?
+                            </Text>
+                            <Text fontSize="sm" color="gray.600" mt={2}>
+                              Esta ação não pode ser desfeita.
+                            </Text>
+                          </ModalDelete>
+                        </HStack>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+
+            {filteredUsers.length === 0 && !loading && (
+              <Box textAlign="center" py={16}>
+                <Text fontSize="lg" color="gray.500" mb={2}>
+                  {searchTerm
+                    ? "Nenhum usuário encontrado com esse termo."
+                    : "Nenhum usuário cadastrado ainda."}
+                </Text>
+                <Text fontSize="sm" color="gray.400">
+                  Utilize o botão "Novo Usuário" para adicionar o primeiro.
+                </Text>
+              </Box>
+            )}
+          </VStack>
+        </Box>
+      )}
+    </Sidebar>
+  );
+};
+
+export default Usuarios;
