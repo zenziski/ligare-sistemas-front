@@ -1,11 +1,11 @@
-import { 
-  HamburgerIcon, 
-  CloseIcon, 
+import {
+  HamburgerIcon,
+  CloseIcon,
   TimeIcon,
   CalendarIcon,
   StarIcon,
   SettingsIcon,
- } from "@chakra-ui/icons";
+} from "@chakra-ui/icons";
 import {
   Box,
   Flex,
@@ -20,7 +20,7 @@ import {
   DrawerCloseButton,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import UserContext from "../contexts/UserContext";
 
@@ -88,7 +88,13 @@ const Item = ({ label, icon, to, onClick, isCollapsed = false }: ItemProps) => {
   );
 };
 
-const SidebarContent = ({ onToggle, isCollapsed = false }: { onToggle?: () => void; isCollapsed?: boolean }) => {
+const SidebarContent = ({
+  onToggle,
+  isCollapsed = false,
+}: {
+  onToggle?: () => void;
+  isCollapsed?: boolean;
+}) => {
   const { user } = useContext(UserContext);
 
   const handleLogout = () => {
@@ -186,35 +192,50 @@ const SidebarContent = ({ onToggle, isCollapsed = false }: { onToggle?: () => vo
               isCollapsed={isCollapsed}
             />
           )}
-          <Item 
-            to="obras" 
-            label="Obras" 
+          <Item
+            to="obras"
+            label="Obras"
             icon={
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L2 7V10C2 16 6 20.5 12 22C18 20.5 22 16 22 10V7L12 2Z"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M12 2L2 7V10C2 16 6 20.5 12 22C18 20.5 22 16 22 10V7L12 2Z" />
               </svg>
-            } 
-            isCollapsed={isCollapsed} 
+            }
+            isCollapsed={isCollapsed}
           />
-          <Item 
-            to="clientes" 
-            label="Clientes" 
+          <Item
+            to="clientes"
+            label="Clientes"
             icon={
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M12 12C14.21 12 16 10.21 16 8C16 5.79 14.21 4 12 4C9.79 4 8 5.79 8 8C8 10.21 9.79 12 12 12ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14Z" />
               </svg>
-            } 
-            isCollapsed={isCollapsed} 
+            }
+            isCollapsed={isCollapsed}
           />
-          <Item 
-            to="fornecedores" 
-            label="Fornecedores" 
+          <Item
+            to="fornecedores"
+            label="Fornecedores"
             icon={
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.5 4L19.66 8H21V10H19L18.5 12H6.5L6 10H4V8H5.34L6.5 4H18.5ZM7.33 6L6.83 8H17.17L16.67 6H7.33ZM5 14H19V16H5V14ZM5 18H19V20H5V18Z"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M18.5 4L19.66 8H21V10H19L18.5 12H6.5L6 10H4V8H5.34L6.5 4H18.5ZM7.33 6L6.83 8H17.17L16.67 6H7.33ZM5 14H19V16H5V14ZM5 18H19V20H5V18Z" />
               </svg>
-            } 
-            isCollapsed={isCollapsed} 
+            }
+            isCollapsed={isCollapsed}
           />
         </Flex>
       </Box>
@@ -257,16 +278,16 @@ const SidebarContent = ({ onToggle, isCollapsed = false }: { onToggle?: () => vo
             <path
               d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
               stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <polyline
               points="16,17 21,12 16,7"
               stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
             <line
               x1="21"
@@ -274,9 +295,9 @@ const SidebarContent = ({ onToggle, isCollapsed = false }: { onToggle?: () => vo
               x2="9"
               y2="12"
               stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </Flex>
@@ -295,10 +316,35 @@ const SidebarContent = ({ onToggle, isCollapsed = false }: { onToggle?: () => vo
   );
 };
 
+// Função para gerenciar o estado persistente do sidebar
+const getSidebarCollapsedState = (): boolean => {
+  if (typeof window !== "undefined") {
+    const saved = sessionStorage.getItem("sidebarCollapsed");
+    return saved === "true";
+  }
+  return false;
+};
+
+const setSidebarCollapsedState = (collapsed: boolean): void => {
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem("sidebarCollapsed", collapsed.toString());
+  }
+};
+
 const Sidebar = ({ children }: SidebarProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
+
+  // Estado inicializado com valor persistente
+  const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(
+    () => getSidebarCollapsedState()
+  );
+
   const isMobile = useBreakpointValue({ base: true, lg: false });
+
+  // Sincroniza mudanças de estado com sessionStorage
+  useEffect(() => {
+    setSidebarCollapsedState(isDesktopSidebarCollapsed);
+  }, [isDesktopSidebarCollapsed]);
 
   const toggleDesktopSidebar = () => {
     setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed);
@@ -370,14 +416,17 @@ const Sidebar = ({ children }: SidebarProps) => {
         zIndex="sticky"
         transition="all 0.3s ease-in-out"
       >
-        <SidebarContent onToggle={toggleDesktopSidebar} isCollapsed={isDesktopSidebarCollapsed} />
+        <SidebarContent
+          onToggle={toggleDesktopSidebar}
+          isCollapsed={isDesktopSidebarCollapsed}
+        />
       </Box>
 
       {/* Main Content */}
-      <Box 
-        pl={isDesktopSidebarCollapsed ? "16" : "64"} 
-        w="100%" 
-        overflowY="auto" 
+      <Box
+        pl={isDesktopSidebarCollapsed ? "16" : "64"}
+        w="100%"
+        overflowY="auto"
         minH="100vh"
         transition="all 0.3s ease-in-out"
       >
