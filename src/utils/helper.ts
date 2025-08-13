@@ -308,23 +308,6 @@ export default class Helpers {
       // Add logo if available
       if (logoData) {
         try {
-          // Calculate proper dimensions maintaining aspect ratio
-          const maxWidth = 60; // Maximum width for logo
-          const maxHeight = 15; // Maximum height for logo
-          const aspectRatio = logoData.width / logoData.height;
-          
-          let logoWidth = maxWidth;
-          let logoHeight = maxWidth / aspectRatio;
-          
-          // If height exceeds max, scale down based on height
-          if (logoHeight > maxHeight) {
-            logoHeight = maxHeight;
-            logoWidth = maxHeight * aspectRatio;
-          }
-          
-          // Center vertically in header
-          const yPos = ( 100 - logoHeight) / 2;
-          
           // Add logo on the left side of the header
           doc.addImage(logoData.base64, 'PNG', 10, -1, 30, 30);
         } catch (error) {
