@@ -23,7 +23,6 @@ import {
   VStack,
   Badge,
   Skeleton,
-  Icon,
   Checkbox,
   Avatar,
 } from "@chakra-ui/react";
@@ -42,7 +41,6 @@ import {
   removeUser,
 } from "../../stores/usuarios/service";
 import ModalDelete from "../../components/ModalDelete";
-import { CheckCircleIcon, WarningIcon } from "@chakra-ui/icons";
 import moment from "moment";
 
 const Usuarios = () => {
@@ -140,17 +138,6 @@ const Usuarios = () => {
   }, [setValue, user]);
 
   const phoneValue = watch("phoneNumber");
-
-  const getUserStatus = (user: IUser) => {
-    const hasAllData =
-      user.name && user.email && user.phoneNumber && user.admissionDate;
-    return hasAllData ? "Completo" : "Incompleto";
-  };
-
-  const getUserStatusColor = (user: IUser) => {
-    const status = getUserStatus(user);
-    return status === "Completo" ? "green" : "orange";
-  };
 
   const filteredUsers = users.filter(
     (user) =>

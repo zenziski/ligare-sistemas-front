@@ -16,7 +16,6 @@ import {
   VStack,
   Badge,
   Skeleton,
-  Icon,
 } from "@chakra-ui/react";
 import Sidebar from "../../components/Sidebar";
 import DrawerComponent from "../../components/Drawer";
@@ -34,7 +33,6 @@ import {
   deleteCustomer,
 } from "../../stores/clientes/service";
 import ModalDelete from "../../components/ModalDelete";
-import { CheckCircleIcon, WarningIcon } from "@chakra-ui/icons";
 import StyledTable from "../../components/StyledTable";
 
 const Clientes = () => {
@@ -120,17 +118,6 @@ const Clientes = () => {
   }, [setValue, cliente]);
 
   const cpfValue = watch("cpf");
-
-  const getClienteStatus = (cliente: IUserTable) => {
-    const hasAllData =
-      cliente.name && cliente.cpf && cliente.email && cliente.birthDate;
-    return hasAllData ? "Completo" : "Incompleto";
-  };
-
-  const getClienteStatusColor = (cliente: IUserTable) => {
-    const status = getClienteStatus(cliente);
-    return status === "Completo" ? "green" : "orange";
-  };
 
   const getInitials = (name?: string) => {
     if (!name) return "?";

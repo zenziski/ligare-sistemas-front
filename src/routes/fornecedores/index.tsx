@@ -15,8 +15,7 @@ import {
   HStack,
   VStack,
   Badge,
-  Skeleton,
-  Icon,
+  Skeleton
 } from "@chakra-ui/react";
 import Sidebar from "../../components/Sidebar";
 import DrawerComponent from "../../components/Drawer";
@@ -30,7 +29,6 @@ import {
   getAll,
   updateSupplier,
 } from "../../stores/fornecedores/service";
-import { CheckCircleIcon, WarningIcon } from "@chakra-ui/icons";
 import StyledTable from "../../components/StyledTable";
 
 const Fornecedores = () => {
@@ -112,20 +110,6 @@ const Fornecedores = () => {
     setValue("phone", fornecedor.phone);
     setValue("_id", fornecedor._id);
   }, [setValue, fornecedor]);
-
-  const getFornecedorStatus = (fornecedor: IFornecedorTable) => {
-    const hasAllData =
-      fornecedor.name &&
-      fornecedor.cpfCnpj &&
-      fornecedor.email &&
-      fornecedor.phone;
-    return hasAllData ? "Completo" : "Incompleto";
-  };
-
-  const getFornecedorStatusColor = (fornecedor: IFornecedorTable) => {
-    const status = getFornecedorStatus(fornecedor);
-    return status === "Completo" ? "green" : "orange";
-  };
 
   const getInitials = (name?: string) => {
     if (!name) return "?";

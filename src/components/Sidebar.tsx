@@ -5,11 +5,7 @@ import {
   CalendarIcon,
   StarIcon,
   SettingsIcon,
-  InfoIcon,
-  AtSignIcon,
-  PhoneIcon,
-  ViewIcon
-} from "@chakra-ui/icons";
+ } from "@chakra-ui/icons";
 import {
   Box,
   Flex,
