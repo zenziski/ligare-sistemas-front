@@ -16,7 +16,12 @@ export const updateUser = async (data: IUser) => {
     return response.data;
 }
 
+// export const inactiveUser = async (id: string) => {
+//     const response = await Api.patch<IUser>(`/users/${id}/inactive`);
+//     return response.data;
+// }
+
 export const removeUser = async (id: string) => {
-    const response = await Api.delete<IUser>(`/users/${id}`);
+    const response = await Api.patch<IUser>(`/users/${id}/inactive`);
     return response.data;
 }
