@@ -1,22 +1,37 @@
 import { Api } from "../../utils/api";
-import { IAccountPlan } from "./financeiro.interface";
+import {
+  IAccountPlan,
+  IGetAccountPlanService,
+  ICreateAccountPlanService,
+  IUpdateAccountPlanService,
+  IRemoveAccountPlanService,
+} from "./financeiro.interface";
 
-export const getAccountPlanService = async () => {
-    const response = await Api.get('/account-plan');
+export const getAccountPlanService: () => Promise<IGetAccountPlanService> =
+  async () => {
+    const response = await Api.get("/account-plan");
     return response.data;
-}
+  };
 
-export const createAccountPlanService = async (data: any) => {
-    const response = await Api.post<IAccountPlan>('/account-plan', data);
-    return response.data;
+
+export const createAccountPlanService = async (data: ICreateAccountPlanService) => {
+  const response = await Api.post<IAccountPlan>("/account-plan", data);
+  return response.data;
 };
 
-export const updateGroup = async (data: any) => {
-    const response = await Api.patch<IAccountPlan>(`/account-plan/${data._id}`, data);
-    return response.data;
-}
 
-export const removeGroup = async (id: string, type: string) => {
-    const response = await Api.delete<IAccountPlan>(`/account-plan/${id}/${type}`);
-    return response.data;
-}
+export const updateAccountPlanService = async (data: IUpdateAccountPlanService) => {
+  const response = await Api.put<IAccountPlan>(
+    `/account-plan/${data.id}`,
+    data
+  );
+  return response.data;
+};
+
+
+export const removeAccountPlanService = async (data: IRemoveAccountPlanService) => {
+  const response = await Api.delete<IAccountPlan>(
+    `/account-plan/${data.id}/${data.type}`
+  );
+  return response.data;
+};
