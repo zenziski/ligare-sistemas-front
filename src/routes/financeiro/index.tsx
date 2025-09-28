@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Sidebar from "../../components/Sidebar";
 import {
   Text,
@@ -30,20 +30,7 @@ import { IGetAccountPlanService } from "../../stores/financeiro/financeiro.inter
 
 export type TabType = "receita" | "despesa" | "custo" | "investimento";
 
-/**
- * Componente Financeiro completamente refatorado
- *
- * Melhorias implementadas:
- * - Design moderno com animações em cascata
- * - Responsividade aprimorada para todos os dispositivos
- * - Acessibilidade completa com ARIA labels e roles
- * - Estados de loading otimizados
- * - Feedback visual aprimorado
- * - Componentização limpa e reutilizável
- * - Performance otimizada com memoização
- */
 const Financeiro = () => {
-  // Estados principais
   const [currentTab, setCurrentTab] = useState(0);
   const [data, setData] = useState<IGetAccountPlanService>({
     groups: [],
@@ -53,7 +40,6 @@ const Financeiro = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Configuração das tabs com design moderno
   const tabs: TabType[] = ["receita", "despesa", "custo", "investimento"];
 
   const tabConfig = [
@@ -100,23 +86,7 @@ const Financeiro = () => {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
-
-  // Filtro de dados baseado na tab atual
-  const filteredData = useMemo(() => {
-    if (!data.groups.length) return data;
-
-    const currentTabType = tabs[currentTab].toUpperCase();
-    const filteredGroups = data.groups.filter(
-      (item: any) => item.type === currentTabType
-    );
-
-    return {
-      groups: filteredGroups,
-      subgroups: data.subgroups,
-      categories: data.categories,
-    };
-  }, [currentTab, data, tabs]);
+  }, []);
 
   // Loading state
   if (isLoading) {
@@ -230,7 +200,7 @@ const Financeiro = () => {
                   {tabs.map((tab) => (
                     <TabPanel key={tab} px={0}>
                       <HierarchicalTable
-                        data={filteredData}
+                        data={data}
                         tab={tab}
                         onDataChange={fetchData}
                         isLoading={isLoading}

@@ -237,6 +237,21 @@ const SidebarContent = ({
             }
             isCollapsed={isCollapsed}
           />
+          <Item
+            to="financeiro"
+            label="Plano de Contas"
+            icon={
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M18.5 4L19.66 8H21V10H19L18.5 12H6.5L6 10H4V8H5.34L6.5 4H18.5ZM7.33 6L6.83 8H17.17L16.67 6H7.33ZM5 14H19V16H5V14ZM5 18H19V20H5V18Z" />
+              </svg>
+            }
+            isCollapsed={isCollapsed}
+          />
         </Flex>
       </Box>
       <Divider my={4} />

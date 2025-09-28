@@ -230,9 +230,7 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
       ) {
         payload.parent = formData.contextSubgroupId;
       }
-
-      console.log("Payload de criação:", payload);
-
+      
       await createAccountPlanService(payload);
 
       toast({
@@ -489,12 +487,7 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        // bg={cardBg}
-        // borderWidth={1}
-        // borderColor={borderColor}
-        // borderRadius="xl"
         overflow="hidden"
-        // shadow="lg"
       >
         {/* Header */}
         <HStack
