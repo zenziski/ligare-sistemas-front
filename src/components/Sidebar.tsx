@@ -238,7 +238,7 @@ const SidebarContent = ({
             isCollapsed={isCollapsed}
           />
           <Item
-            to="financeiro"
+            to="plano-contas"
             label="Plano de Contas"
             icon={
               <svg
@@ -247,7 +247,23 @@ const SidebarContent = ({
                 viewBox="0 0 24 24"
                 fill="currentColor"
               >
-                <path d="M18.5 4L19.66 8H21V10H19L18.5 12H6.5L6 10H4V8H5.34L6.5 4H18.5ZM7.33 6L6.83 8H17.17L16.67 6H7.33ZM5 14H19V16H5V14ZM5 18H19V20H5V18Z" />
+                <path d="M3 3H21V21H3V3ZM9 9V5H5V9H9ZM9 13V11H5V13H9ZM9 19V15H5V19H9ZM19 9V5H11V9H19ZM19 13V11H11V13H19ZM19 19V15H11V19H19Z" />
+              </svg>
+            }
+            isCollapsed={isCollapsed}
+          />
+          <Item
+            to="livro"
+            label="Livro Diário"
+            icon={
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M18 2H9C7.9 2 7 2.9 7 4V20C7 21.1 7.9 22 9 22H18C19.1 22 20 21.1 20 20V4C20 2.9 19.1 2 18 2ZM9 20V4H18V20H9Z" />
+                <path d="M6 4H5C3.9 4 3 4.9 3 6V20C3 21.1 3.9 22 5 22H6V4Z" />{" "}
               </svg>
             }
             isCollapsed={isCollapsed}

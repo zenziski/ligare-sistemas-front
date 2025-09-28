@@ -22,6 +22,7 @@ import {
   Spinner,
   useToast,
   Input,
+  Checkbox,
 } from "@chakra-ui/react";
 import {
   EditIcon,
@@ -56,6 +57,8 @@ interface SubgroupItem {
   _id?: string;
   name: string;
   group: string;
+  description?: string;
+  contractor?: boolean;
 }
 
 interface CategoryItem {
@@ -86,11 +89,6 @@ interface ExpandedState {
   };
 }
 
-/**
- * Tabela hierárquica expansível para plano de contas
- * Permite expandir grupos -> subgrupos -> categorias na mesma tabela
- * Inclui criação contextual baseada no nível expandido
- */
 export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
   data,
   tab,
@@ -113,6 +111,8 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
     contextGroupId: "",
     contextSubgroupId: "",
     itemType: "group" as "group" | "subgroup" | "category",
+    description: "",
+    contractor: false,
   });
 
   // Modal controls
@@ -221,16 +221,18 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
         type: formData.itemType,
       };
 
-      // Set parent based on context
+      // Set parent and additional fields based on context
       if (formData.itemType === "subgroup" && formData.contextGroupId) {
         payload.parent = formData.contextGroupId;
+        payload.description = formData.description.trim() || undefined;
+        payload.contractor = formData.contractor;
       } else if (
         formData.itemType === "category" &&
         formData.contextSubgroupId
       ) {
         payload.parent = formData.contextSubgroupId;
       }
-      
+
       await createAccountPlanService(payload);
 
       toast({
@@ -247,6 +249,8 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
         contextGroupId: "",
         contextSubgroupId: "",
         itemType: "group",
+        description: "",
+        contractor: false,
       });
 
       onDataChange();
@@ -272,6 +276,8 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
         contextGroupId: type === "subgroup" ? item.group : "",
         contextSubgroupId: type === "category" ? item.subgroup : "",
         itemType: type,
+        description: type === "subgroup" ? item.description || "" : "",
+        contractor: type === "subgroup" ? item.contractor || false : false,
       });
       onEditOpen();
     },
@@ -302,6 +308,8 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
 
       if (editingItem.type === "subgroup" && formData.contextGroupId) {
         payload.parent = formData.contextGroupId;
+        payload.description = formData.description.trim() || undefined;
+        payload.contractor = formData.contractor;
       } else if (
         editingItem.type === "category" &&
         formData.contextSubgroupId
@@ -326,6 +334,8 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
         contextGroupId: "",
         contextSubgroupId: "",
         itemType: "group",
+        description: "",
+        contractor: false,
       });
       onDataChange();
     } catch (error) {
@@ -387,14 +397,7 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
   // Loading state
   if (isLoading) {
     return (
-      <Box
-        // bg={cardBg}
-        // borderWidth={1}
-        // borderColor={borderColor}
-        borderRadius="xl"
-        p={8}
-        textAlign="center"
-      >
+      <Box borderRadius="xl" p={8} textAlign="center">
         <VStack spacing={4}>
           <Spinner size="lg" color="blue.500" />
           <Text color="gray.600">Carregando plano de contas...</Text>
@@ -406,13 +409,7 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
   // Empty state
   if (!filteredData.groups.length) {
     return (
-      <Box
-        // bg={cardBg}
-        // borderWidth={1}
-        // borderColor={borderColor}
-        borderRadius="xl"
-        overflow="hidden"
-      >
+      <Box borderRadius="xl" overflow="hidden">
         {/* Header with Add Group Button */}
         <HStack
           justify="space-between"
@@ -457,7 +454,14 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
                     }))
                   }
                   placeholder="Ex: Receitas Operacionais"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  size="lg"
+                  borderColor="gray.300"
+                  borderRadius="lg"
+                  focusBorderColor="blue.400"
+                  _focus={{
+                    borderColor: "blue.400",
+                    boxShadow: "0 0 0 1px var(--chakra-colors-blue-400)",
+                  }}
                 />
               </Box>
             </VStack>
@@ -537,7 +541,14 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
                     }))
                   }
                   placeholder="Ex: Receitas Operacionais"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  size="lg"
+                  borderColor="gray.300"
+                  borderRadius="lg"
+                  focusBorderColor="blue.400"
+                  _focus={{
+                    borderColor: "blue.400",
+                    boxShadow: "0 0 0 1px var(--chakra-colors-blue-400)",
+                  }}
                 />
               </Box>
             </VStack>
@@ -705,8 +716,71 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
                                       }))
                                     }
                                     placeholder="Ex: Vendas de Produtos"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    size="lg"
+                                    borderColor="gray.300"
+                                    borderRadius="lg"
+                                    focusBorderColor="purple.400"
+                                    _focus={{
+                                      borderColor: "purple.400",
+                                      boxShadow:
+                                        "0 0 0 1px var(--chakra-colors-purple-400)",
+                                    }}
                                   />
+                                </Box>
+                                <Box>
+                                  <Text
+                                    fontSize="sm"
+                                    fontWeight="medium"
+                                    mb={2}
+                                  >
+                                    Descrição
+                                  </Text>
+                                  <Input
+                                    type="text"
+                                    value={formData.description}
+                                    onChange={(e) =>
+                                      setFormData((prev) => ({
+                                        ...prev,
+                                        description: e.target.value,
+                                      }))
+                                    }
+                                    placeholder="Descrição opcional do subgrupo"
+                                    size="lg"
+                                    borderColor="gray.300"
+                                    borderRadius="lg"
+                                    focusBorderColor="purple.400"
+                                    _focus={{
+                                      borderColor: "purple.400",
+                                      boxShadow:
+                                        "0 0 0 1px var(--chakra-colors-purple-400)",
+                                    }}
+                                  />
+                                </Box>
+                                <Box>
+                                  <Text
+                                    fontSize="sm"
+                                    fontWeight="medium"
+                                    mb={2}
+                                  >
+                                    Empreiteiro
+                                  </Text>
+                                  <HStack spacing={3}>
+                                    <Checkbox
+                                      isChecked={formData.contractor}
+                                      onChange={(e) =>
+                                        setFormData((prev) => ({
+                                          ...prev,
+                                          contractor: e.target.checked,
+                                        }))
+                                      }
+                                      colorScheme="purple"
+                                      size="md"
+                                    />
+                                    <Text fontSize="sm" color="gray.600">
+                                      Marque se este subgrupo refere-se ao
+                                      empreiteiro
+                                    </Text>
+                                  </HStack>
                                 </Box>
                               </VStack>
                             </EnhancedDrawer>
@@ -812,29 +886,45 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
                                   </Td>
 
                                   <Td>
-                                    <HStack spacing={3} pl={8}>
-                                      <Badge
-                                        colorScheme="purple"
-                                        variant="subtle"
-                                        px={2}
-                                        py={1}
-                                        borderRadius="md"
-                                      >
-                                        Subgrupo
-                                      </Badge>
-                                      <Text fontWeight="medium" fontSize="sm">
-                                        {subgroup.name}
-                                      </Text>
-                                      {categories.length > 0 && (
+                                    <VStack align="start" spacing={1} pl={8}>
+                                      <HStack spacing={3}>
                                         <Badge
-                                          size="sm"
-                                          colorScheme="gray"
-                                          variant="outline"
+                                          colorScheme="purple"
+                                          variant="subtle"
+                                          px={2}
+                                          py={1}
+                                          borderRadius="md"
                                         >
-                                          {categories.length} categorias
+                                          Subgrupo
                                         </Badge>
+                                        <Text fontWeight="medium" fontSize="sm">
+                                          {subgroup.name}
+                                        </Text>
+                                        {subgroup.contractor && (
+                                          <Badge
+                                            colorScheme="orange"
+                                            variant="outline"
+                                            size="sm"
+                                          >
+                                            Empreiteiro
+                                          </Badge>
+                                        )}
+                                        {categories.length > 0 && (
+                                          <Badge
+                                            size="sm"
+                                            colorScheme="gray"
+                                            variant="outline"
+                                          >
+                                            {categories.length} categorias
+                                          </Badge>
+                                        )}
+                                      </HStack>
+                                      {subgroup.description && (
+                                        <Text fontSize="xs" color="gray.600">
+                                          {subgroup.description}
+                                        </Text>
                                       )}
-                                    </HStack>
+                                    </VStack>
                                   </Td>
 
                                   <Td textAlign="center">
@@ -921,7 +1011,15 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
                                                 }))
                                               }
                                               placeholder="Ex: Venda de Software"
-                                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                                              size="lg"
+                                              borderColor="gray.300"
+                                              borderRadius="lg"
+                                              focusBorderColor="teal.400"
+                                              _focus={{
+                                                borderColor: "teal.400",
+                                                boxShadow:
+                                                  "0 0 0 1px var(--chakra-colors-teal-400)",
+                                              }}
                                             />
                                           </Box>
                                         </VStack>
@@ -1104,6 +1202,8 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
             contextGroupId: "",
             contextSubgroupId: "",
             itemType: "group",
+            description: "",
+            contractor: false,
           });
         }}
         title={`Editar ${editingItem?.type || "Item"}`}
@@ -1127,9 +1227,66 @@ export const HierarchicalTable: React.FC<HierarchicalTableProps> = ({
                 setFormData((prev) => ({ ...prev, name: e.target.value }))
               }
               placeholder={`Nome do ${editingItem?.type}`}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              size="lg"
+              borderColor="gray.300"
+              borderRadius="lg"
+              focusBorderColor="blue.400"
+              _focus={{
+                borderColor: "blue.400",
+                boxShadow: "0 0 0 1px var(--chakra-colors-blue-400)",
+              }}
             />
           </Box>
+
+          {editingItem?.type === "subgroup" && (
+            <>
+              <Box>
+                <Text fontSize="sm" fontWeight="medium" mb={2}>
+                  Descrição
+                </Text>
+                <Input
+                  type="text"
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
+                  placeholder="Descrição opcional do subgrupo"
+                  size="lg"
+                  borderColor="gray.300"
+                  borderRadius="lg"
+                  focusBorderColor="purple.400"
+                  _focus={{
+                    borderColor: "purple.400",
+                    boxShadow: "0 0 0 1px var(--chakra-colors-purple-400)",
+                  }}
+                />
+              </Box>
+              <Box>
+                <Text fontSize="sm" fontWeight="medium" mb={2}>
+                  Empreiteiro
+                </Text>
+                <HStack spacing={3}>
+                  <Checkbox
+                    isChecked={formData.contractor}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        contractor: e.target.checked,
+                      }))
+                    }
+                    colorScheme="purple"
+                    size="md"
+                  />
+                  <Text fontSize="sm" color="gray.600">
+                    Marque se este subgrupo refere-se ao empreiteiro
+                  </Text>
+                </HStack>
+              </Box>
+            </>
+          )}
         </VStack>
       </EditModal>
 
